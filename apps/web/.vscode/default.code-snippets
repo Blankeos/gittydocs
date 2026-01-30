@@ -1,0 +1,95 @@
+{
+  "New SolidJS Page": {
+    "prefix": "newsolidpage",
+    "scope": "javascriptreact,typescriptreact",
+    "body": ["export default function ${1:MyAwesome}Page() {", "  return <></>;", "}"],
+    "description": "Creates a new page in SolidJS."
+  },
+
+  "New SolidJS Component": {
+    "prefix": "newsolidcomponent",
+    "scope": "javascriptreact,typescriptreact",
+    "body": [
+      "import { mergeProps, ${2|VoidProps,FlowProps|} } from 'solid-js';",
+      "",
+      "type ${1:MyComponent}Props = {};",
+      "",
+      "export default function ${1:MyComponent}(props: ${2|VoidProps,FlowProps|}<${1:MyComponent}Props>) {",
+      "  const defaultProps = mergeProps({}, props);",
+      "",
+      "  return <></>;",
+      "}",
+      ""
+    ],
+    "description": "Creates a new SolidJS Component"
+  },
+
+  "New SolidJS Context File": {
+    "prefix": "newsolidcontext",
+    "scope": "javascriptreact,typescriptreact",
+    "body": [
+      "import { createSignal, FlowComponent, type Accessor, type Setter } from 'solid-js';",
+      "import { createStrictContext } from '@/utils/create-strict-context';",
+      "",
+      "// ===========================================================================",
+      "// Context & Hook",
+      "// ===========================================================================",
+      "",
+      "export type ${1:CounterContext}Value = {",
+      "  count: Accessor<number>",
+      "  setCount: Setter<number>",
+      "}",
+      "",
+      "const [use${1:CounterContext}, ${1:CounterContext}Provider] = createStrictContext<${1:CounterContext}Value>('${1:CounterContext}');",
+      "",
+      "export { use${1:CounterContext} };",
+      "",
+      "// ===========================================================================",
+      "// Provider",
+      "// ===========================================================================",
+      "export const ${1:CounterContext}Provider: FlowComponent = (props) => {",
+      "  const [count, setCount] = createSignal(0);",
+      "",
+      "  return (",
+      "    <${1:CounterContext}Provider value={{ count, setCount }}>",
+      "      {props.children}",
+      "    </${1:CounterContext}Provider>",
+      "  );",
+      "};",
+      ""
+    ],
+    "description": "New SolidJS Context File"
+  },
+
+  "Comment Headers (TS)": {
+    "prefix": "commentheaders",
+    "scope": "typescript,javascript,javascriptreact,typescriptreact",
+    "body": [
+      "// ===========================================================================",
+      "// ${1:Comment Headers}",
+      "// ==========================================================================="
+    ],
+    "description": "Makes a comment header to subsection the content in your files."
+  },
+
+  // Vike
+  "Vike +data.ts": {
+    "prefix": "newvikedata",
+    "scope": "typescript,javascript",
+    "body": [
+      "import { PageContext } from 'vike/types';",
+      "",
+      "export type Data = ReturnType<Awaited<typeof data>>;",
+      "",
+      "export async function data(pageContext: PageContext) {",
+      "  const result = await fetch('https://jsonplaceholder.typicode.com/todos/1');",
+      "  const data = await result.json();",
+      "",
+      "  return {",
+      "    todo: data as { userId: number; id: number; title: string; completed: boolean },",
+      "  };",
+      "}"
+    ],
+    "description": "Vike +data.ts"
+  }
+}
