@@ -1,0 +1,120 @@
+# gittydocs
+
+Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site with almost no setup.
+
+## Quick Start
+
+### Viewer Mode (No Setup)
+
+Simply navigate to:
+
+```
+https://gittydocs.dev/gh/{owner}/{repo}/{ref}/{docs-path}
+```
+
+For example:
+- `https://gittydocs.dev/gh/solidjs/solid/main/docs`
+- `https://gittydocs.dev/gh/vercel/next.js/main/docs`
+
+### Self-Hosted Mode
+
+1. Fork this repository
+2. Set environment variables:
+   - `GITHUB_OWNER` - Repository owner
+   - `GITHUB_REPO` - Repository name  
+   - `GITHUB_REF` - Branch or tag (default: `main`)
+   - `DOCS_PATH` - Path to docs folder (default: root)
+   - `GITHUB_TOKEN` - Optional GitHub token for private repos
+3. Deploy to your favorite platform (Vercel, Cloudflare Pages, etc.)
+
+## Features
+
+- **Instant Search** - Fast full-text search with `Ctrl+K`
+- **Auto Navigation** - Automatically generates sidebar from your docs structure
+- **Table of Contents** - Auto-generated "On this page" with scroll spy
+- **GitHub Integration** - "Edit this page" and "Open an issue" links
+- **Dark Mode** - Built-in dark mode support
+- **Mobile Responsive** - Works great on all devices
+
+## Configuration
+
+Create a `gittydocs.jsonc` file in your docs folder:
+
+```jsonc
+{
+  "site": {
+    "name": "My Project Docs",
+    "repo": {
+      "owner": "myorg",
+      "name": "myrepo",
+      "ref": "main",
+      "docsPath": "docs"
+    }
+  },
+  "nav": [
+    {
+      "label": "Getting Started",
+      "items": [
+        { "label": "Introduction", "path": "/" },
+        { "label": "Installation", "path": "/installation" }
+      ]
+    }
+  ],
+  "links": {
+    "issues": "https://github.com/myorg/myrepo/issues"
+  }
+}
+```
+
+## Documentation Structure
+
+Your docs folder can contain:
+
+- `index.mdx` or `README.mdx` - Landing page
+- `.md` and `.mdx` files - Documentation pages
+- Subfolders - Organized sections
+
+Files are sorted by:
+1. `index.*` files first
+2. Numeric prefixes (`01-introduction.md`)
+3. Alphabetical order
+
+## Frontmatter
+
+Each page can include frontmatter:
+
+```mdx
+---
+title: Getting Started
+description: Learn how to use our library
+date: 2024-01-15
+categories: [tutorial, guide]
+---
+
+# Getting Started
+
+Your content here...
+```
+
+## Deployment
+
+### Vercel
+
+1. Connect your repository
+2. Set environment variables
+3. Deploy
+
+### Cloudflare Pages
+
+1. Connect your repository
+2. Set build command: `bun run build`
+3. Set output directory: `dist/client`
+4. Set environment variables
+
+### GitHub Pages (Coming Soon)
+
+Add a workflow file for static deployment.
+
+## License
+
+MIT

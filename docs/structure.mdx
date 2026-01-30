@@ -1,0 +1,112 @@
+---
+title: Documentation Structure
+description: How to organize your documentation files
+---
+
+# Documentation Structure
+
+gittydocs automatically discovers and organizes your documentation based on your file structure.
+
+## File Organization
+
+Your docs folder can contain:
+
+```
+docs/
+├── index.mdx              # Landing page
+├── getting-started.mdx    # Regular page
+├── installation.mdx
+├── api/
+│   ├── index.mdx         # Section overview
+│   ├── core.mdx
+│   └── utilities.mdx
+└── guides/
+    ├── index.mdx
+    ├── advanced.mdx
+    └── troubleshooting.mdx
+```
+
+## Supported Formats
+
+- `.md` - Markdown files
+- `.mdx` - MDX files (Markdown with JSX)
+
+## Landing Page
+
+gittydocs looks for a landing page in this order:
+
+1. `index.mdx`
+2. `index.md`
+3. `README.mdx`
+4. `README.md`
+
+The landing page is served at the root path (`/`).
+
+## Auto-Sorting
+
+Files are automatically sorted by:
+
+1. **Index files first** - `index.mdx` appears first in its folder
+2. **Numeric prefixes** - Files like `01-introduction.md` are sorted by number
+3. **Alphabetical** - Everything else is sorted A-Z
+
+Example:
+
+```
+docs/
+├── 01-introduction.mdx    # Appears first
+├── 02-installation.mdx    # Appears second
+├── advanced.mdx           # Appears third
+└── index.mdx              # Section overview
+```
+
+## Route Generation
+
+Routes are generated from file paths:
+
+| File | Route |
+|------|-------|
+| `index.mdx` | `/` |
+| `getting-started.mdx` | `/getting-started` |
+| `api/core.mdx` | `/api/core` |
+| `guides/advanced.mdx` | `/guides/advanced` |
+
+## Frontmatter
+
+Add metadata to your pages with frontmatter:
+
+```mdx
+---
+title: Getting Started
+description: Learn the basics
+date: 2024-01-15
+categories: [tutorial, guide]
+---
+
+# Getting Started
+
+Your content here...
+```
+
+### Available Fields
+
+- `title` - Page title (overrides H1)
+- `description` - Page description
+- `date` - Publication date
+- `categories` - Categories or tags
+
+### Title Resolution
+
+Page titles are resolved in this order:
+
+1. `title` in frontmatter
+2. First H1 heading in content
+3. Filename (formatted)
+
+## Best Practices
+
+1. **Use index files** for section overviews
+2. **Use descriptive filenames** that match the content
+3. **Add frontmatter** for better SEO and organization
+4. **Group related content** in folders
+5. **Use numeric prefixes** for explicit ordering

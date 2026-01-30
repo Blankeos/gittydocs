@@ -1,0 +1,143 @@
+---
+title: Configuration
+description: Customize gittydocs with gittydocs.jsonc
+---
+
+# Configuration
+
+gittydocs works without any configuration, but you can customize it with a `gittydocs.jsonc` file.
+
+## Configuration File
+
+Create a `gittydocs.jsonc` file in your docs folder:
+
+```jsonc
+{
+  "site": {
+    "name": "My Project",
+    "logo": "Optional logo URL or text",
+    "repo": {
+      "owner": "myorg",
+      "name": "myrepo",
+      "ref": "main",
+      "docsPath": "docs"
+    }
+  },
+  "nav": [
+    // Navigation items...
+  ],
+  "links": {
+    "issues": "https://github.com/myorg/myrepo/issues"
+  }
+}
+```
+
+## Site Configuration
+
+### name
+
+The name of your documentation site. Displayed in the header.
+
+```jsonc
+{
+  "site": {
+    "name": "My Awesome Project"
+  }
+}
+```
+
+### logo
+
+Optional logo. Can be a URL to an image or text.
+
+```jsonc
+{
+  "site": {
+    "logo": "https://example.com/logo.png"
+    // or
+    "logo": "📚"
+  }
+}
+```
+
+### repo
+
+Repository information for GitHub integration.
+
+```jsonc
+{
+  "site": {
+    "repo": {
+      "owner": "myorg",      // Repository owner
+      "name": "myrepo",      // Repository name
+      "ref": "main",         // Branch or tag
+      "docsPath": "docs"     // Path to docs folder
+    }
+  }
+}
+```
+
+## Navigation
+
+Define custom navigation with the `nav` property:
+
+```jsonc
+{
+  "nav": [
+    {
+      "label": "Getting Started",
+      "items": [
+        { "label": "Introduction", "path": "/" },
+        { "label": "Installation", "path": "/installation" },
+        { "label": "Quick Start", "path": "/quick-start" }
+      ]
+    },
+    {
+      "label": "API Reference",
+      "items": [
+        { "label": "Core", "path": "/api/core" },
+        { "label": "Utilities", "path": "/api/utilities" }
+      ]
+    }
+  ]
+}
+```
+
+### Navigation Items
+
+Each item can have:
+
+- `label` - Display text (required)
+- `path` - URL path (for links)
+- `items` - Nested items (for groups)
+
+## Links
+
+Configure footer links:
+
+```jsonc
+{
+  "links": {
+    "issues": "https://github.com/myorg/myrepo/issues"
+  }
+}
+```
+
+## JSONC Format
+
+The configuration file uses JSONC (JSON with Comments):
+
+- Supports comments (`//` and `/* */`)
+- Supports trailing commas
+- Standard JSON is also accepted
+
+Example:
+
+```jsonc
+{
+  // This is a comment
+  "site": {
+    "name": "My Docs", // Inline comment
+  }, // Trailing comma is OK
+}
+```
