@@ -62,7 +62,8 @@ export function SearchDialog(props: SearchDialogProps) {
               {docsResults().map((doc) => (
                 <CommandItem
                   onSelect={() => {
-                    navigate(`/${doc.slug}`)
+                    const path = doc.slugAsParams === "" ? "/" : `/${doc.slugAsParams}`
+                    navigate(path)
                     props.onOpenChange(false)
                     clearResults()
                   }}
