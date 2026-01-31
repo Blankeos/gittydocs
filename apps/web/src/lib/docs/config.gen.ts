@@ -11,6 +11,7 @@ export interface NavItem {
   label: string
   path?: string
   items?: NavItem[]
+  accordion?: boolean
 }
 
 export interface DocsConfig {

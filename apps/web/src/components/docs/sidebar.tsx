@@ -14,7 +14,7 @@ export function Sidebar(props: SidebarProps) {
         props.class
       )}
     >
-      <div class="py-6 pr-4 pl-4 lg:pl-6">{props.children}</div>
+      <div class="py-4">{props.children}</div>
     </aside>
   )
 }

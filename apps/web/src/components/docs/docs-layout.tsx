@@ -123,7 +123,7 @@ export function DocsLayout(_props: DocsLayoutProps) {
             </div>
 
             <Show when={hasHeadings()}>
-              <div class="hidden text-sm xl:block xl:pl-8 2xl:pl-16">
+              <div class="hidden text-sm xl:block">
                 <div class="sticky top-16 -mt-10 h-[calc(100vh-3.5rem)] overflow-y-auto pt-10">
                   <TableOfContents headings={headings()} />
                 </div>

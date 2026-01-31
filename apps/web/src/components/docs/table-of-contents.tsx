@@ -63,13 +63,13 @@ export function TableOfContents(props: TableOfContentsProps) {
   }
 
   return (
-    <div class={cn("space-y-2", props.class)}>
-      <p class="font-medium text-sm">On this page</p>
+    <div class={cn("space-y-1", props.class)}>
+      <p class="px-3 font-medium text-sm">On this page</p>
       <Show
         when={props.headings.length > 0}
-        fallback={<p class="text-muted-foreground text-sm">No headings found</p>}
+        fallback={<p class="px-3 text-muted-foreground text-sm">No headings found</p>}
       >
-        <ul class="space-y-2.5 text-sm">
+        <ul class="text-sm">
           <For each={props.headings}>
             {(heading) => (
               <li
@@ -83,9 +83,9 @@ export function TableOfContents(props: TableOfContentsProps) {
                   href={`#${heading.slug}`}
                   onClick={(e) => handleClick(e, heading.slug)}
                   class={cn(
-                    "block py-0.5 transition-colors hover:text-foreground",
+                    "flex w-full items-center border-l-2 border-transparent px-3 py-1 transition-colors hover:text-foreground hover:bg-accent",
                     activeSlug() === heading.slug
-                      ? "font-medium text-foreground"
+                      ? "border-l-primary bg-accent font-medium text-foreground"
                       : "text-muted-foreground"
                   )}
                 >
