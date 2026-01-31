@@ -1,8 +1,8 @@
 export const sourcePathByRoute: Record<string, string> = {
   "/configuration": "configuration.mdx",
-  "/": "index.mdx",
-  "/README": "README.md",
-  "/getting-started": "getting-started.mdx",
-  "/guides/quickstart": "guides/quickstart.mdx",
-  "/structure": "structure.mdx"
+  "/deploy/cloudflare": "deploy/cloudflare.mdx",
+  "/deploy/github-pages": "deploy/github-pages.mdx",
+  "/deploy/netlify": "deploy/netlify.mdx",
+  "/deploy/vercel": "deploy/vercel.mdx",
+  "/": "index.mdx"
 }

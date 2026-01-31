@@ -1,123 +1,62 @@
 ---
-title: 📝 gittydocs
-description: Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site with almost no setup.
+title: Introduction
+description: Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site.
 ---
+
+# gittydocs
+
+Write docs in Markdown. Push to GitHub. Get a beautiful docs site.
 
 ## Quick Start
 
-### Viewer Mode (No Setup)
+Create a `docs` folder in your repo:
 
-Simply navigate to:
-
-```
-https://gittydocs.dev/gh/{owner}/{repo}/{ref}/{docs-path}
+```bash
+mkdir -p docs/guides
 ```
 
-For example:
-
-- `https://gittydocs.dev/gh/solidjs/solid/main/docs`
-- `https://gittydocs.dev/gh/vercel/next.js/main/docs`
-
-### Self-Hosted Mode
-
-1. Fork this repository
-2. Set environment variables:
-   - `GITHUB_OWNER` - Repository owner
-   - `GITHUB_REPO` - Repository name
-   - `GITHUB_REF` - Branch or tag (default: `main`)
-   - `DOCS_PATH` - Path to docs folder (default: root)
-   - `GITHUB_TOKEN` - Optional GitHub token for private repos
-3. Deploy to your favorite platform (Vercel, Cloudflare Pages, etc.)
-
-## Features
-
-- **Instant Search** - Fast full-text search with `Ctrl+K`
-- **Auto Navigation** - Automatically generates sidebar from your docs structure
-- **Table of Contents** - Auto-generated "On this page" with scroll spy
-- **GitHub Integration** - "Edit this page" and "Open an issue" links
-- **Dark Mode** - Built-in dark mode support
-- **Mobile Responsive** - Works great on all devices
-
-## Configuration
-
-Create a `gittydocs.jsonc` file in your docs folder:
+Add `gittydocs.jsonc`:
 
 ```jsonc
+// docs/gittydocs.jsonc
 {
   "site": {
-    "name": "My Project Docs",
+    "name": "My Project",
     "repo": {
-      "owner": "myorg",
-      "name": "myrepo",
+      "owner": "yourusername",
+      "name": "yourrepo",
       "ref": "main",
       "docsPath": "docs",
     },
   },
-  "nav": [
-    {
-      "label": "Getting Started",
-      "items": [
-        { "label": "Introduction", "path": "/" },
-        { "label": "Installation", "path": "/installation" },
-      ],
-    },
-  ],
-  "links": {
-    "issues": "https://github.com/myorg/myrepo/issues",
-  },
 }
 ```
 
-## Documentation Structure
-
-Your docs folder can contain:
-
-- `index.mdx` or `README.mdx` - Landing page
-- `.md` and `.mdx` files - Documentation pages
-- Subfolders - Organized sections
-
-Files are sorted by:
-
-1. `index.*` files first
-2. Numeric prefixes (`01-introduction.md`)
-3. Alphabetical order
-
-## Frontmatter
-
-Each page can include frontmatter:
+Add a page (i.e. `docs/index.mdx`):
 
 ```mdx
 ---
-title: Getting Started
-description: Learn how to use our library
-date: 2024-01-15
-categories: [tutorial, guide]
+title: Welcome
 ---
 
-# Getting Started
+# Welcome
 
-Your content here...
+Your content here.
 ```
 
-## Deployment
+Push to GitHub. Pick a deployment option:
 
-### Vercel
+- [GitHub Pages](/deploy/github-pages)
+- [Vercel](/deploy/vercel)
+- [Cloudflare Pages](/deploy/cloudflare)
+- [Netlify](/deploy/netlify)
 
-1. Connect your repository
-2. Set environment variables
-3. Deploy
+## Features
 
-### Cloudflare Pages
-
-1. Connect your repository
-2. Set build command: `bun run build`
-3. Set output directory: `dist/client`
-4. Set environment variables
-
-### GitHub Pages (Coming Soon)
-
-Add a workflow file for static deployment.
-
-## License
-
-MIT
+- **Quick & Easy** — One config file, push to GitHub, deploy anywhere
+- **Full-Text Search** — `Ctrl+K` for instant search across all docs
+- **Table of Contents** — Auto-generated with scroll spy showing current section
+- **Dark Mode** — Built-in toggle
+- **GitHub Integration** — "Edit this page" links
+- **Fully Customizable** — Built on Velite + Vike + Solid. Eject anytime and own your stack
+- **Static Export** — Deploy to any host

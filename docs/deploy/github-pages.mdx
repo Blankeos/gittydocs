@@ -1,0 +1,33 @@
+---
+title: GitHub Pages
+description: Deploy your docs to GitHub Pages.
+---
+
+Create `.github/workflows/deploy.yml`:
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bunx degit blankeos/gittydocs/template ./temp && mv ./temp/* . && rm -rf ./temp
+      - run: bun install
+      - run: GITTYDOCS_SOURCE="https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}/docs" bun run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist/client
+      - uses: actions/deploy-pages@v4
+```
+
+Enable GitHub Pages in repo settings → Pages → Source: GitHub Actions.

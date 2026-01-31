@@ -30,7 +30,7 @@ export const gittydocsConfig: DocsConfig | null = {
   "site": {
     "name": "gittydocs",
     "repo": {
-      "owner": "anomalyco",
+      "owner": "blankeos",
       "name": "gittydocs",
       "ref": "main",
       "docsPath": "docs"
@@ -38,37 +38,42 @@ export const gittydocsConfig: DocsConfig | null = {
   },
   "nav": [
     {
-      "label": "Getting Started",
+      "label": "Docs",
       "items": [
         {
           "label": "Introduction",
           "path": "/"
         },
         {
-          "label": "Getting Started",
-          "path": "/getting-started"
-        },
-        {
           "label": "Configuration",
           "path": "/configuration"
-        },
-        {
-          "label": "Documentation Structure",
-          "path": "/structure"
         }
       ]
     },
     {
-      "label": "Guides",
+      "label": "Deploy",
+      "accordion": true,
       "items": [
         {
-          "label": "Quick Start",
-          "path": "/guides/quickstart"
+          "label": "GitHub Pages",
+          "path": "/deploy/github-pages"
+        },
+        {
+          "label": "Vercel",
+          "path": "/deploy/vercel"
+        },
+        {
+          "label": "Cloudflare Pages",
+          "path": "/deploy/cloudflare"
+        },
+        {
+          "label": "Netlify",
+          "path": "/deploy/netlify"
         }
       ]
     }
   ],
   "links": {
-    "issues": "https://github.com/anomalyco/gittydocs/issues"
+    "issues": "https://github.com/blankeos/gittydocs/issues"
   }
 }
