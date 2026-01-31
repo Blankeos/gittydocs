@@ -6,29 +6,24 @@ Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site with almo
 
 gittydocs should feel like:
 
-- Viewer-first: a docs *reader* that mirrors a repo's content cleanly.
-- Minimal/low-maintenance: no heavy authoring framework; no bespoke build pipeline required.
+- Build-time first: a static docs site generated at build time, not a public viewer.
+- Minimal/low-maintenance: no heavy authoring framework; keep setup close to zero.
 - Fast by default: instant navigation + instant search on typical docs sizes.
+- Frontend polish: use the layout and MDX rendering approach from `/Users/carlo/Desktop/Projects/email-thing/apps/landing` as the baseline for the docs UI.
 
-Long-term, gittydocs should support a near-zero-config GitHub Pages deployment path via a single workflow file.
+gittydocs should support a near-zero-config GitHub Pages deployment path via a single workflow file.
 
 ## Modes
 
-### 1) Public Viewer (no auth)
+### 1) Build-Time Static (primary)
 
-- Input: a public GitHub repo/folder URL.
-- Output: a shareable permalink URL that renders that docs tree.
+- Input: a single env var that points to either a public GitHub URL or a local path.
+- Output: a static docs site pinned to that source.
 
-### 2) Self-Hosted (env-config)
+### 2) Local Scaffold (secondary)
 
-- Input: env vars for `owner/repo/ref/docsPath`.
-- Output: a docs site pinned to that source.
-
-### 3) GitHub Pages (future: near-zero config deploy)
-
-- Add a single workflow file to deploy to GitHub Pages.
-- gittydocs builds a static docs site from the repo contents (no runtime GitHub fetching).
-- Optional: add a config file later for explicit nav/branding.
+- Input: `bunx degit` a template folder and keep the same docs structure.
+- Output: a local docs site you can customize freely.
 
 ## Goals
 
@@ -48,9 +43,9 @@ Long-term, gittydocs should support a near-zero-config GitHub Pages deployment p
 
 ## Primary Users
 
-### Docs reader (public)
+### Docs reader (static site)
 
-- Wants to view docs from a repo without cloning/building.
+- Wants to view docs without cloning/building.
 
 ### Repo owner/maintainer
 
@@ -80,11 +75,11 @@ Title resolution order: `frontmatter.title` -> first H1 -> filename.
 
 ## Configuration Philosophy
 
-Configuration should be *optional*.
+Configuration should be *optional* and build-time focused.
 
 Precedence order (highest to lowest):
 
-1. Explicit runtime inputs (env vars for self-host; URL params for viewer).
+1. Single build-time env var `GITTYDOCS_SOURCE` (GitHub URL or local path).
 2. `gittydocs.jsonc` or `gittydocs.json` if present.
 3. Auto-discovery + heuristics (docs root, nav, titles).
 
@@ -103,7 +98,7 @@ File: `gittydocs.jsonc` (preferred) or `gittydocs.json`.
       "owner": "org",
       "name": "repo",
       "ref": "main",
-      "docsPath": "docs" // folder containing gittydocs.jsonc (optional in viewer)
+      "docsPath": "docs" // folder containing gittydocs.jsonc (optional)
     }
   },
   "nav": [
@@ -138,7 +133,7 @@ Try in order:
 2. Conventional folders containing `index.*` or `README.*`: `docs/`, `doc/`, `documentation/`.
 3. Repo root if it contains `index.*` or `README.*`.
 
-If multiple candidates match, pick the shortest path (closest to repo root) and expose a UI affordance to switch roots (viewer mode), but keep the URL permalink stable.
+If multiple candidates match, pick the shortest path (closest to repo root) and allow override via config or `GITTYDOCS_SOURCE`.
 
 ### Nav Generation
 
@@ -195,33 +190,24 @@ When no config is present:
 
 ### Inputs
 
-- Viewer: `owner`, `repo`, `ref`, and `docsPath` inferred from the URL (or discovered).
-- Self-host: `owner`, `repo`, `ref`, `docsPath` via env.
+- `GITTYDOCS_SOURCE` env var:
+  - Public GitHub URL pointing to a repo or folder, e.g. `https://github.com/org/repo/tree/main/docs`.
+  - Local path, e.g. `./docs` or `/absolute/path/to/docs`.
+
+`docs` is the default folder name, but the env var can point to any path.
 
 ### Fetch Strategy (MVP)
 
-- Fetch config if present.
-- Fetch MD/MDX files on demand per route.
-- Cache:
-  - honor ETag/Last-Modified
-  - use edge/browser caching where possible
+- Build-time only.
+- If `GITTYDOCS_SOURCE` is GitHub URL:
+  - parse URL and use the `api.github.com/repos` endpoint to resolve the tree.
+  - fetch MD/MDX content during the build and emit a static site.
+- If `GITTYDOCS_SOURCE` is a local path:
+  - read from disk during the build.
 
 Search indexing:
 
-- Start simple: index only pages in nav (config nav or auto nav).
-- Optionally prefetch/index in background after first render.
-
-### Permalink Format (Viewer)
-
-Stable URL scheme (draft):
-
-- `/gh/:owner/:repo/:ref/*docsPath` as the docs root
-- routes beneath map to doc routes
-
-Examples:
-
-- `/gh/solidjs/solid/main/docs` -> loads docs root
-- `/gh/solidjs/solid/main/docs/install` -> loads `docs/install.mdx` (or `.md`)
+- Build-time index from the same source and ship a static index artifact.
 
 ## Data Model
 
@@ -251,8 +237,7 @@ Result fields:
 
 Storage:
 
-- in-memory per active docs root
-- optional `indexedDB` cache keyed by `owner/repo/ref/docsPath`
+- in-memory after loading the static index artifact
 
 ## Product Requirements
 
@@ -260,7 +245,7 @@ Storage:
 
 - Search typing stays responsive (target: < 50ms/keystroke on typical docs corpora).
 - Avoid heavy client bundles; split per-page MDX when possible.
-- Avoid repeated GitHub fetches; use caching aggressively.
+- Avoid repeated source reads during the build; use caching aggressively.
 
 ### UX + Aesthetic
 
@@ -276,7 +261,7 @@ Storage:
 - Modal focus management.
 - Proper heading semantics; anchor focus visibility.
 
-## GitHub Pages Mode (Future: Near-Zero Config Deploy)
+## GitHub Pages Mode (Near-Zero Config Deploy)
 
 This mode exists to:
 
@@ -290,30 +275,64 @@ This mode exists to:
 - Default behavior requires no other repo changes.
 - Optional customization:
   - add `gittydocs.jsonc` for explicit nav/branding
-  - set workflow inputs/env for `docsPath` if auto-detection is wrong
+  - set `GITTYDOCS_SOURCE` if auto-detection is wrong or a non-default docs folder is used
 
 ### Build + Deploy Behavior
 
 - On push to default branch:
   - checkout repo
-  - detect docs root (config-first, else heuristics)
+  - resolve docs source (`GITTYDOCS_SOURCE` or auto-discovery)
   - build static HTML for pages
   - build a static search index artifact
   - deploy to GitHub Pages
 
 Target: GitHub project pages (served under `/<repo>/`). The build must support a configurable base path.
 
-Optional (later): PR preview deploys.
+### Workflow Template (Short)
 
-### Security
+```yaml
+name: gittydocs
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bun run build
+        env:
+          GITTYDOCS_SOURCE: ./docs
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+```
 
-- Uses GitHub Actions' built-in token to deploy Pages.
-- No content fetching from GitHub at runtime.
+### Cloudflare Pages (Optional)
+
+- Use the same build command and output `./dist`.
+- Set `GITTYDOCS_SOURCE` in the project environment variables.
 
 ## Tech Stack (Current)
 
 - UI: SolidJS
 - Routing + SSR-ish meta: Vike
+- MDX: Velite (use the implementation pattern from `/Users/carlo/Desktop/Projects/email-thing/apps/landing`)
 - Components: shadcn
 - Hotkey: bagon-hooks
 - Search: flexsearch
@@ -322,24 +341,24 @@ Optional (later): PR preview deploys.
 
 - App shell: header + sidebar + content + ToC + footer
 - Data layer:
-  - source resolver (viewer/env/pages)
-  - GitHub fetch module (raw URLs / API + caching)
+  - source resolver (`GITTYDOCS_SOURCE` -> GitHub URL or local path)
+  - GitHub fetch module (API + raw content during build)
   - config parser (JSONC/JSON)
-  - MDX loader/compiler
-  - search index builder
+  - Velite MDX loader/compiler
+  - search index builder (build-time)
   - scroll spy (IntersectionObserver)
 
 ## Milestones
 
-### MVP (Public Viewer + Self-Hosted)
+### MVP (Build-Time Static)
 
-1. Resolve docs root (env or viewer route) and load config if present.
-2. Render MDX per route with frontmatter + heading anchors.
+1. Resolve docs root from `GITTYDOCS_SOURCE` and load config if present.
+2. Render MDX per route with Velite (frontmatter + heading anchors).
 3. Sidebar (config-driven, with fallback auto-nav if no config).
 4. ToC + scroll spy.
 5. Ctrl/Cmd+K search indexing nav pages.
 6. GitHub footer links.
-7. Document Cloudflare-friendly deploy.
+7. Provide a short GitHub Pages workflow and a Cloudflare Pages deploy note.
 
 ### V1.1 (No-Config Quality)
 
@@ -347,7 +366,7 @@ Optional (later): PR preview deploys.
 - Solid auto-nav ordering rules.
 - `.md` support (if not already done).
 
-### V1.2 (GitHub Pages Workflow)
+### V1.1 (GitHub Pages Workflow)
 
 - Provide an official `.github/workflows/gittydocs.yml`.
 - Static build that works with no config via auto-discovery.
@@ -363,8 +382,9 @@ MVP:
 - `Ctrl/Cmd+K` opens search; results update as user types; enter navigates.
 - "Edit this page" resolves the correct GitHub file at the configured ref.
 - Mobile navigation and search are usable.
+- No public viewer UI; site is preconfigured at build time.
 
-GitHub Pages (when implemented):
+GitHub Pages:
 
 - Adding the workflow file results in a deployed Pages site that renders docs.
 - Site has working nav, ToC, and search without requiring `gittydocs.jsonc`.
@@ -372,7 +392,7 @@ GitHub Pages (when implemented):
 
 ## Risks / Constraints
 
-- GitHub API/rate limits (viewer mode) and raw content restrictions.
+- GitHub API/rate limits when building from a public GitHub URL.
 - MDX compilation cost (cache aggressively; consider precompilation later).
 - Search indexing size for large docs sets (incremental indexing/limits).
 - JSONC parsing in-browser (keep parser small and safe).
@@ -380,9 +400,7 @@ GitHub Pages (when implemented):
 ## Open Questions
 
 - `.md` support timing (MVP vs V1.1)?
-- How do we expose "switch docs root" in viewer mode without making permalinks confusing?
 - GitHub Enterprise support (custom domains)?
-- Best caching layer for viewer mode (edge caching strategy)?
 - Should we ship one workflow or two (Node vs Bun), and what runtime do we officially support?
 - How do we handle custom base paths cleanly for GitHub Pages (repo pages vs user/org pages)?
 - Do we require pre-rendered routes for Pages, or do we ship a SPA fallback (`404.html`) to support client-side routing?

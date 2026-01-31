@@ -1,0 +1,167 @@
+.prose {
+  color: var(--foreground);
+  line-height: 1.75;
+  max-width: 65ch;
+}
+
+.prose > * + * {
+  margin-top: 1.25em;
+}
+
+.prose p {
+  margin: 0 0 1.25em;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 1.5em 0 0.5em;
+  line-height: 1.25;
+}
+
+.prose h1 {
+  font-size: 2.25em;
+}
+.prose h2 {
+  font-size: 1.875em;
+}
+.prose h3 {
+  font-size: 1.5em;
+}
+.prose h4 {
+  font-size: 1.25em;
+}
+.prose h5 {
+  font-size: 1.125em;
+}
+.prose h6 {
+  font-size: 1em;
+}
+
+.prose a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.prose a:hover {
+  color: var(--primary-foreground);
+}
+
+.prose strong {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose blockquote {
+  margin: 1.5em 0;
+  padding-left: 1em;
+  border-left: 3px solid var(--border);
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+
+.prose ul,
+.prose ol {
+  margin: 1.25em 0;
+  padding-left: 1.75em;
+}
+
+.prose li {
+  margin: 0.5em 0;
+}
+
+/*.prose code {
+  background: var(--secondary);
+  color: var(--destructive);
+  font-size: 0.875em;
+  padding: 0.125em 0.25em;
+  border-radius: 0.25em;
+}*/
+
+/* Code container*/
+.prose pre {
+  background: black;
+  /*color: var(--accent-foreground);*/
+  padding: 1em;
+  margin-bottom: 1.5em;
+  border-radius: 0.5em;
+  overflow-x: auto;
+  font-size: 0.875em;
+  line-height: 1.5;
+}
+
+/*.prose pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}*/
+
+.prose hr {
+  border: none;
+  height: 1px;
+  background: var(--border);
+  margin: 3em 0;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5em;
+}
+
+.prose figure {
+  margin: 2em 0;
+}
+
+.prose figcaption {
+  font-size: 0.875em;
+  color: var(--muted-foreground);
+  text-align: center;
+  margin-top: 0.5em;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+}
+
+.prose th,
+.prose td {
+  padding: 0.75em 1em;
+  border: 1px solid var(--border);
+}
+
+.prose th {
+  background: var(--muted);
+  font-weight: 600;
+  text-align: left;
+}
+
+.prose ul {
+  list-style-type: disc;
+  color: var(--foreground);
+}
+
+.prose ol {
+  list-style-type: decimal;
+  color: var(--foreground);
+}
+
+.prose li {
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+.prose li::marker {
+  color: var(--foreground);
+}

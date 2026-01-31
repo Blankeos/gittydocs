@@ -1,0 +1,39 @@
+import type { DocsConfig } from "@/lib/gittydocs/types"
+
+export const gittydocsConfig: DocsConfig | null = {
+  "site": {
+    "name": "gittydocs",
+    "repo": {
+      "owner": "anomalyco",
+      "name": "gittydocs",
+      "ref": "main",
+      "docsPath": "docs"
+    }
+  },
+  "nav": [
+    {
+      "label": "Getting Started",
+      "items": [
+        {
+          "label": "Introduction",
+          "path": "/"
+        },
+        {
+          "label": "Getting Started",
+          "path": "/getting-started"
+        },
+        {
+          "label": "Configuration",
+          "path": "/configuration"
+        },
+        {
+          "label": "Documentation Structure",
+          "path": "/structure"
+        }
+      ]
+    }
+  ],
+  "links": {
+    "issues": "https://github.com/anomalyco/gittydocs/issues"
+  }
+}

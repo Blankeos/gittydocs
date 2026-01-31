@@ -17,11 +17,18 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@velite": ["./.velite"]
     },
-    "types": ["@types/bun", "vite-plugin-solid-svg/types-component-solid", "vite/client"]
+    "types": [
+      "@types/bun",
+      "vite-plugin-solid-svg/types-component-solid",
+      "vite/client",
+      "vike-solid/client",
+      ".velite/**/*"
+    ]
   },
-  "include": ["src"],
+  "include": ["src", "scripts"],
   "references": [
     {
       "path": "./tsconfig.node.json"
