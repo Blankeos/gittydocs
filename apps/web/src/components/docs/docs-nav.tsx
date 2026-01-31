@@ -1,4 +1,5 @@
-import { For, Show, createMemo } from "solid-js"
+import { For, Show, createMemo, onMount } from "solid-js"
+import { createStore } from "solid-js/store"
 import { usePageContext } from "vike-solid/usePageContext"
 import { useDocsContext, type NavItem } from "@/contexts/docs.context"
 import { stripBasePath, withBasePath } from "@/utils/base-path"
@@ -10,17 +11,61 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion"
 
+interface AccordionState {
+  openAccordions: Record<string, boolean>
+}
+
 export function DocsNav() {
   const docs = useDocsContext()
+  const pageContext = usePageContext()
+  const pathname = () => stripBasePath(pageContext.urlParsed?.pathname || "/")
+
+  const [accordionState, setAccordionState] = createStore<AccordionState>({
+    openAccordions: {},
+  })
+
+  const toggleAccordion = (label: string) => {
+    setAccordionState("openAccordions", label, (prev) => !prev)
+  }
+
+  onMount(() => {
+    // Initialize accordions that contain the current active link
+    const initialOpen: Record<string, boolean> = {}
+    docs.nav.forEach((item) => {
+      if (item.accordion && item.items) {
+        const hasActiveChild = item.items.some(
+          (child) => child.path && isActive(pathname(), child.path)
+        )
+        if (hasActiveChild) {
+          initialOpen[item.label] = true
+        }
+      }
+    })
+    setAccordionState("openAccordions", initialOpen)
+  })
 
   return (
     <div class="w-full">
-      <For each={docs.nav}>{(item) => <NavSection item={item} />}</For>
+      <For each={docs.nav}>
+        {(item) => (
+          <NavSection
+            item={item}
+            isOpen={accordionState.openAccordions[item.label] || false}
+            onToggle={() => toggleAccordion(item.label)}
+          />
+        )}
+      </For>
     </div>
   )
 }
 
-function NavSection(props: { item: NavItem }) {
+interface NavSectionProps {
+  item: NavItem
+  isOpen: boolean
+  onToggle: () => void
+}
+
+function NavSection(props: NavSectionProps) {
   const pageContext = usePageContext()
   const pathname = () => stripBasePath(pageContext.urlParsed?.pathname || "/")
 
@@ -31,6 +76,10 @@ function NavSection(props: { item: NavItem }) {
     return props.item.items.some(
       (child) => child.path && isActive(pathname(), child.path)
     )
+  })
+
+  const accordionValue = createMemo(() => {
+    return props.isOpen ? [props.item.label] : []
   })
 
   return (
@@ -78,13 +127,20 @@ function NavSection(props: { item: NavItem }) {
                           </a>
                         )}
                       </Show>
-                    )}</For>
+                    )}
+                  </For>
                 </div>
               </div>
             }
           >
             <Accordion
-              defaultValue={isGroupActive() ? [props.item.label] : []}
+              value={accordionValue()}
+              onChange={(value) => {
+                const isExpanded = value.includes(props.item.label)
+                if (isExpanded !== props.isOpen) {
+                  props.onToggle()
+                }
+              }}
               multiple
               class="border-0"
             >
