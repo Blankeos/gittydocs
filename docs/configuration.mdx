@@ -44,6 +44,20 @@ Create `gittydocs.jsonc` in your docs folder:
 | `nav` | array | Custom navigation sections |
 | `links.issues` | string | URL to issues page |
 
+## Source
+
+Set `GITTYDOCS_SOURCE` environment variable to point to your docs:
+
+**GitHub URL** (auto-parsed):
+```bash
+GITTYDOCS_SOURCE=https://github.com/owner/repo/tree/main/docs
+```
+
+**Local path** (absolute):
+```bash
+GITTYDOCS_SOURCE=/absolute/path/to/docs
+```
+
 ## Writing Content
 
 Use `.md` or `.mdx` files. Frontmatter optional:
