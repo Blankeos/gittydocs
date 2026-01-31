@@ -84,32 +84,6 @@ export function DocsHeader() {
           </div>
 
           <div class="flex flex-1 items-center justify-end gap-4">
-            <div class="w-full max-w-md flex-1 md:w-auto md:flex-none">
-              <Button
-                variant="outline"
-                class="relative flex h-8 w-full items-center justify-start rounded-[0.5rem] bg-background font-normal text-muted-foreground text-sm shadow-none hover:bg-accent hover:text-accent-foreground lg:w-64"
-                onClick={() => setSearchOpen(true)}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="mr-2 h-4 w-4"
-                >
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.3-4.3" />
-                </svg>
-                Search...
-                <kbd class="pointer-events-none ml-auto h-5 select-none items-center justify-center gap-1 rounded border bg-muted px-1.5 font-medium font-mono text-[10px] opacity-100 md:flex">
-                  <span class="text-xs">⌘</span>K
-                </kbd>
-              </Button>
-            </div>
-
             <nav class="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -141,6 +115,32 @@ export function DocsHeader() {
                 </a>
               </Show>
             </nav>
+
+            <div class="w-full max-w-md flex-1 md:w-auto md:flex-none">
+              <Button
+                variant="outline"
+                class="relative flex h-8 items-center justify-start rounded-[0.5rem] bg-background font-normal text-muted-foreground text-sm shadow-none hover:bg-accent hover:text-accent-foreground w-full"
+                onClick={() => setSearchOpen(true)}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="mr-2 h-4 w-4"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                Search...
+                <kbd class="pointer-events-none ml-auto h-5 select-none items-center justify-center gap-1 rounded border bg-muted px-1.5 font-medium font-mono text-[10px] opacity-100 flex">
+                  <span class="text-xs">⌘</span><span>K</span>
+                </kbd>
+              </Button>
+            </div>
           </div>
         </div>
       </header>

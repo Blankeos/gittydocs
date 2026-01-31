@@ -1,5 +1,8 @@
 export const sourcePathByRoute: Record<string, string> = {
+  "/configuration": "configuration.mdx",
   "/": "index.mdx",
-  "/api-reference": "api-reference.mdx",
-  "/test-page": "test-page.mdx"
+  "/README": "README.md",
+  "/getting-started": "getting-started.mdx",
+  "/guides/quickstart": "guides/quickstart.mdx",
+  "/structure": "structure.mdx"
 }

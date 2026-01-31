@@ -27,29 +27,42 @@ export interface DocsConfig {
 
 export const gittydocsConfig: DocsConfig | null = {
   "site": {
-    "name": "Coffee Brewing Guide",
+    "name": "gittydocs",
     "repo": {
       "owner": "anomalyco",
       "name": "gittydocs",
       "ref": "main",
-      "docsPath": "docs2"
+      "docsPath": "docs"
     }
   },
   "nav": [
     {
-      "label": "Coffee Guide",
+      "label": "Getting Started",
       "items": [
         {
           "label": "Introduction",
           "path": "/"
         },
         {
-          "label": "Roasting",
-          "path": "/test-page"
+          "label": "Getting Started",
+          "path": "/getting-started"
         },
         {
-          "label": "Equipment",
-          "path": "/api-reference"
+          "label": "Configuration",
+          "path": "/configuration"
+        },
+        {
+          "label": "Documentation Structure",
+          "path": "/structure"
+        }
+      ]
+    },
+    {
+      "label": "Guides",
+      "items": [
+        {
+          "label": "Quick Start",
+          "path": "/guides/quickstart"
         }
       ]
     }

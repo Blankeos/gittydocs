@@ -17,7 +17,7 @@ function HeadingLink(props: HeadingProps) {
     <Tag
       {...props}
       onClick={handleClick}
-      class={`${props.class ?? ""} cursor-pointer hover:underline`}
+      class={`${props.class ?? ""} cursor-pointer hover:opacity-80`}
       style={{ "scroll-margin-top": "4rem" }}
     >
       {props.children}

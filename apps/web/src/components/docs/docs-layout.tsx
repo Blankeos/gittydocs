@@ -99,13 +99,13 @@ export function DocsLayout(_props: DocsLayoutProps) {
                   <article class="prose prose-slate dark:prose-invert max-w-none">
                     <Show when={d().title}>
                       <div class="mb-5 flex items-center justify-between">
-                        <h1 class="scroll-m-20 font-bold text-4xl tracking-tight">{d().title}</h1>
+                        <h1 class="scroll-m-20 font-bold text-3xl tracking-tight">{d().title}</h1>
                         <CopyPageButton markdown={d().rawMarkdown ?? ""} />
                       </div>
                     </Show>
 
                     <Show when={d().description}>
-                      <p class="text-muted-foreground text-xl">{d().description}</p>
+                      <p class="text-muted-foreground text-lg">{d().description}</p>
                     </Show>
 
                     <div class="mt-8">
@@ -123,7 +123,7 @@ export function DocsLayout(_props: DocsLayoutProps) {
             </div>
 
             <Show when={hasHeadings()}>
-              <div class="hidden text-sm xl:block">
+              <div class="hidden text-sm xl:block xl:pl-8 2xl:pl-16">
                 <div class="sticky top-16 -mt-10 h-[calc(100vh-3.5rem)] overflow-y-auto pt-10">
                   <TableOfContents headings={headings()} />
                 </div>
