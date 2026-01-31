@@ -14,8 +14,10 @@ import { useDocsContext } from "@/contexts/docs.context"
 import { withBasePath } from "@/utils/base-path"
 import { DocsNav } from "./docs-nav"
 import { SearchDialog } from "./search-dialog"
+import { useSearchContext } from "@/contexts/search.context"
 
 export function DocsHeader() {
+  const {} = useSearchContext()
   const docs = useDocsContext()
   const { inferredTheme, toggleTheme } = useThemeContext()
   const [searchOpen, setSearchOpen] = createSignal(false)

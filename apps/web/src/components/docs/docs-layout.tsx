@@ -11,13 +11,15 @@ import { MdxContext } from "@/lib/velite/mdx-context"
 import { stripBasePath } from "@/utils/base-path"
 import { useParams } from "@/route-tree.gen"
 import { docs } from "@velite"
-import { useDocsContext } from "@/contexts/docs.context"
+import { useMetadata } from "vike-metadata-solid"
 
 interface DocsLayoutProps {
   children?: never
 }
 
 export function DocsLayout(_props: DocsLayoutProps) {
+  useMetadata({})
+
   const params = useParams({ from: "/@" })
   const slug = createMemo(() => params()["_@"] ?? "/")
 
@@ -98,14 +100,14 @@ export function DocsLayout(_props: DocsLayoutProps) {
                 {(d) => (
                   <article class="prose prose-slate dark:prose-invert max-w-none">
                     <Show when={d().title}>
-                      <div class="mb-5 flex items-center justify-between">
+                      <div class="mb-0 flex items-center justify-between">
                         <h1 class="scroll-m-20 font-bold text-3xl tracking-tight">{d().title}</h1>
                         <CopyPageButton markdown={d().rawMarkdown ?? ""} />
                       </div>
                     </Show>
 
                     <Show when={d().description}>
-                      <p class="text-muted-foreground text-lg">{d().description}</p>
+                      <p class="text-muted-foreground text-sm">{d().description}</p>
                     </Show>
 
                     <div class="mt-8">

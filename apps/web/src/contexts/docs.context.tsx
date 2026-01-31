@@ -3,7 +3,7 @@ import { createMemo, type FlowComponent } from "solid-js"
 import { createStrictContext } from "@/utils/create-strict-context"
 import type { DocsConfig, NavItem } from "@/lib/docs/config.gen"
 import { gittydocsConfig } from "@/lib/docs/config.gen"
-import FlexSearch from "flexsearch"
+import { Index } from "flexsearch"
 
 // ===========================================================================
 // Types
@@ -53,11 +53,11 @@ export { useDocsContext }
 // ===========================================================================
 
 class SearchIndex {
-  private index: FlexSearch.Index
+  private index: Index
   private pages: Map<string, DocsPage>
 
   constructor() {
-    this.index = new FlexSearch.Index({
+    this.index = new Index({
       tokenize: "forward",
       cache: true,
     })

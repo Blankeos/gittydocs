@@ -43,7 +43,14 @@ const staticExtensions = new Set([
 ])
 const configFiles = ["gittydocs.jsonc", "gittydocs.json"]
 
-await prepareDocs()
+try {
+  await prepareDocs()
+  console.log("✓ prepare:docs completed successfully")
+  process.exit(0)
+} catch (error) {
+  console.error("✗ prepare:docs failed:", error)
+  process.exit(1)
+}
 
 async function prepareDocs() {
   await fs.rm(docsRoot, { recursive: true, force: true })
