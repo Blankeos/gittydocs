@@ -19,17 +19,36 @@ export function TableOfContents(props: TableOfContentsProps) {
     const headings = props.headings
     if (headings.length === 0) return
 
+    let lastActiveSlug: string | null = null
+    const visibleHeadings = new Set<string>()
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setActiveSlug(entry.target.id)
+            visibleHeadings.add(entry.target.id)
+          } else {
+            visibleHeadings.delete(entry.target.id)
           }
         })
+
+        // If we have visible headings, use the first one
+        // Otherwise, keep the last active heading
+        if (visibleHeadings.size > 0) {
+          // Find the first visible heading in document order
+          const firstVisible = headings.find((h) => visibleHeadings.has(h.slug))
+          if (firstVisible) {
+            lastActiveSlug = firstVisible.slug
+            setActiveSlug(firstVisible.slug)
+          }
+        } else if (lastActiveSlug) {
+          // Keep the last active heading when scrolling past all headings
+          setActiveSlug(lastActiveSlug)
+        }
       },
       {
-        rootMargin: "-100px 0px -66%",
-        threshold: 0,
+        rootMargin: "-80px 0px -40%",
+        threshold: [0, 0.25, 0.5, 0.75, 1],
       }
     )
 
