@@ -17,6 +17,12 @@
         { "label": "Configuration", "path": "/configuration" },
         { "label": "Documentation Structure", "path": "/structure" }
       ]
+    },
+    {
+      "label": "Guides",
+      "items": [
+        { "label": "Quick Start", "path": "/guides/quickstart" }
+      ]
     }
   ],
   "links": {

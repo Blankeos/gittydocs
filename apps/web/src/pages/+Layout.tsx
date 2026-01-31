@@ -20,7 +20,9 @@ useMetadata.setGlobalDefaults({
 export default function RootLayout(props: FlowProps) {
   return (
     <ThemeContextProvider>
-      <DocsProvider>{props.children}</DocsProvider>
+      <DocsProvider>
+        {props.children}
+      </DocsProvider>
     </ThemeContextProvider>
   )
 }

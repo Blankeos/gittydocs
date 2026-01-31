@@ -1,12 +1,11 @@
 import { For, Show } from "solid-js"
 import { usePageContext } from "vike-solid/usePageContext"
-import type { NavItem } from "@/lib/gittydocs"
-import { useDocs } from "@/lib/gittydocs"
+import { useDocsContext, type NavItem } from "@/contexts/docs.context"
 import { stripBasePath, withBasePath } from "@/utils/base-path"
 import { cn } from "@/utils/cn"
 
 export function DocsNav() {
-  const docs = useDocs()
+  const docs = useDocsContext()
 
   return (
     <div class="w-full">

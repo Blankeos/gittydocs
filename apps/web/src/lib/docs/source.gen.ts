@@ -1,6 +1,6 @@
 export const gittydocsSource = {
   "type": "local",
-  "source": "../../docs"
+  "source": "../../docs2"
 } as const
 
 export type GittydocsSource = typeof gittydocsSource

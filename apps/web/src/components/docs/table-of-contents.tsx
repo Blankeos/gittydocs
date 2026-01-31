@@ -1,6 +1,11 @@
 import { createEffect, createSignal, For, onCleanup, Show } from "solid-js"
-import type { Heading } from "@/lib/gittydocs"
 import { cn } from "@/utils/cn"
+
+export interface Heading {
+  level: number
+  text: string
+  slug: string
+}
 
 interface TableOfContentsProps {
   headings: Heading[]

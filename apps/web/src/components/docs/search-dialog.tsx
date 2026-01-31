@@ -1,9 +1,15 @@
-import { createEffect, createSignal, For, Show } from "solid-js"
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog"
-import type { SearchResult } from "@/lib/gittydocs"
-import { useDocs } from "@/lib/gittydocs"
-import { withBasePath } from "@/utils/base-path"
-import { cn } from "@/utils/cn"
+import { useSearchContext } from "@/contexts/search.context"
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import { createMemo, createSignal, Show } from "solid-js"
+import { navigate } from "vike/client/router"
 
 interface SearchDialogProps {
   open: boolean
@@ -11,136 +17,70 @@ interface SearchDialogProps {
 }
 
 export function SearchDialog(props: SearchDialogProps) {
-  const docs = useDocs()
   const [query, setQuery] = createSignal("")
-  const [results, setResults] = createSignal<SearchResult[]>([])
-  const [selectedIndex, setSelectedIndex] = createSignal(0)
+  const [docsResults, setDocsResults] = createSignal<ReturnType<typeof searchDocs>>([])
+  const { searchDocs } = useSearchContext()
 
-  createEffect(() => {
-    const q = query()
-    if (q.length >= 2) {
-      const searchResults = docs.searchIndex.search(q)
-      setResults(searchResults)
-      setSelectedIndex(0)
-    } else {
-      setResults([])
-    }
+  const noResults = createMemo(() => {
+    return docsResults().length === 0
   })
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "ArrowDown") {
-      e.preventDefault()
-      setSelectedIndex((prev) => (prev < results().length - 1 ? prev + 1 : prev))
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault()
-      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : 0))
-    } else if (e.key === "Enter") {
-      e.preventDefault()
-      const result = results()[selectedIndex()]
-      if (result) {
-        // Navigate using window.location for simplicity
-        window.location.href = withBasePath(result.routePath)
-        props.onOpenChange(false)
-        setQuery("")
-      }
-    } else if (e.key === "Escape") {
-      props.onOpenChange(false)
+  function handleCommandInput(value: string) {
+    setQuery(value)
+
+    if (!value) {
+      clearResults()
+    } else {
+      const _docsResults = searchDocs(value)
+      setDocsResults(_docsResults)
     }
   }
 
-  const handleSelect = (result: SearchResult) => {
-    window.location.href = withBasePath(result.routePath)
-    props.onOpenChange(false)
+  function clearResults() {
     setQuery("")
+    setDocsResults([])
   }
 
   return (
-    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent class="gap-0 overflow-hidden p-0 sm:max-w-[550px]">
-        <DialogHeader class="border-b px-4 py-3 pr-12">
-          <div class="flex items-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="h-4 w-4 text-muted-foreground"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search documentation..."
-              class="flex-1 bg-transparent outline-none placeholder:text-muted-foreground"
-              value={query()}
-              onInput={(e) => setQuery(e.currentTarget.value)}
-              onKeyDown={handleKeyDown}
-              autofocus
-            />
-            <kbd class="hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-medium font-mono text-[10px] text-muted-foreground sm:inline-flex">
-              <span>ESC</span>
-            </kbd>
-          </div>
-        </DialogHeader>
-
-        <div class="max-h-[300px] overflow-y-auto py-2">
-          <Show
-            when={query().length >= 2}
-            fallback={
-              <div class="px-4 py-8 text-center text-muted-foreground text-sm">
-                Type to search documentation...
-              </div>
-            }
-          >
-            <Show
-              when={results().length > 0}
-              fallback={
-                <div class="px-4 py-8 text-center text-muted-foreground text-sm">
-                  No results found for "{query()}"
-                </div>
-              }
-            >
-              <For each={results()}>
-                {(result, index) => (
-                  <button
-                    type="button"
-                    onClick={() => handleSelect(result)}
-                    class={cn(
-                      "w-full px-4 py-2 text-left transition-colors hover:bg-accent",
-                      selectedIndex() === index() && "bg-accent"
-                    )}
-                    onMouseEnter={() => setSelectedIndex(index())}
-                  >
-                    <div class="font-medium text-sm">{result.title}</div>
-                    <div class="line-clamp-1 text-muted-foreground text-xs">{result.snippet}</div>
-                  </button>
-                )}
-              </For>
-            </Show>
+    <CommandDialog open={props.open} onOpenChange={props.onOpenChange}>
+      <Command shouldFilter={false}>
+        <CommandInput 
+          placeholder="Search documentation..." 
+          onValueChange={handleCommandInput} 
+        />
+        <CommandList>
+          <Show when={noResults() && query().length > 0}>
+            <CommandEmpty>No results found.</CommandEmpty>
           </Show>
-        </div>
 
-        <Show when={results().length > 0}>
-          <div class="flex items-center justify-between border-t px-4 py-2 text-muted-foreground text-xs">
-            <div class="flex items-center gap-2">
-              <span>Use </span>
-              <kbd class="inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-medium font-mono text-[10px]">
-                ↑↓
-              </kbd>
-              <span>to navigate</span>
-              <kbd class="inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-medium font-mono text-[10px]">
-                ↵
-              </kbd>
-              <span>to select</span>
-            </div>
-            <div>{results().length} results</div>
-          </div>
-        </Show>
-      </DialogContent>
-    </Dialog>
+          <Show when={query().length === 0}>
+            <CommandEmpty>Type to search documentation...</CommandEmpty>
+          </Show>
+
+          <Show when={docsResults().length > 0}>
+            <CommandGroup heading="Documentation">
+              {docsResults().map((doc) => (
+                <CommandItem
+                  onSelect={() => {
+                    navigate(`/${doc.slug}`)
+                    props.onOpenChange(false)
+                    clearResults()
+                  }}
+                  class="flex flex-col items-start justify-start text-start"
+                >
+                  <span class="text-start">{doc.title}</span>
+                  <Show when={doc.highlights && doc.highlights.length > 0}>
+                    <div
+                      class="line-clamp-2 text-muted-foreground text-xs"
+                      innerHTML={`...${doc.highlights?.join("...")}...`}
+                    />
+                  </Show>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </Show>
+        </CommandList>
+      </Command>
+    </CommandDialog>
   )
 }

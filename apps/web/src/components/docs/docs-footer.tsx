@@ -1,17 +1,30 @@
 import { Show } from "solid-js"
-import { getEditUrl, getIssuesUrl } from "@/lib/docs/source"
-import { useDocs } from "@/lib/gittydocs"
+import { useDocsContext } from "@/contexts/docs.context"
 
-export function DocsFooter() {
-  const docs = useDocs()
-  const currentPage = () => docs.currentPage
+interface DocsFooterProps {
+  sourcePath?: string
+}
+
+export function DocsFooter(props: DocsFooterProps) {
+  const docs = useDocsContext()
 
   const editUrl = () => {
-    if (!currentPage()) return null
-    return getEditUrl(currentPage()!.sourcePath)
+    if (!props.sourcePath) return null
+    const repo = docs.config?.site?.repo
+    if (!repo) return null
+    const { owner, repo: repoName, ref } = repo
+    const docsPath = repo.docsPath || "docs"
+    return `https://github.com/${owner}/${repoName}/edit/${ref}/${docsPath}/${props.sourcePath}`
   }
 
-  const issuesUrl = () => getIssuesUrl(docs.config)
+  const issuesUrl = () => {
+    if (docs.config?.links?.issues) return docs.config.links.issues
+    const repo = docs.config?.site?.repo
+    if (repo) {
+      return `https://github.com/${repo.owner}/${repo.repo}/issues`
+    }
+    return null
+  }
 
   return (
     <footer class="border-t py-6">
@@ -53,19 +66,19 @@ export function DocsFooter() {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="h-4 w-4"
-            >
-              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-              <path d="M3 3v5h5" />
-              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-              <path d="M16 21h5v-5" />
-            </svg>
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="h-4 w-4"
+                >
+                  <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                  <path d="M3 3v5h5" />
+                  <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                  <path d="M16 21h5v-5" />
+                </svg>
                 Open an issue
               </a>
             )}

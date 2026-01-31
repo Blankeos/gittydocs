@@ -449,3 +449,8 @@ input::-ms-clear {
   border-radius: 0.75rem;
   overflow-x: auto;
 }
+
+mark {
+  background: var(--color-primary);
+  color: var(--primary-foreground)
+}

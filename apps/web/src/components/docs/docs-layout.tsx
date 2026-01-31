@@ -1,4 +1,4 @@
-import { createEffect, createMemo, Show } from "solid-js"
+import { createMemo, Show } from "solid-js"
 import { usePageContext } from "vike-solid/usePageContext"
 import { CopyPageButton } from "@/components/docs/copy-page-button"
 import { DocsFooter } from "@/components/docs/docs-footer"
@@ -6,35 +6,69 @@ import { DocsHeader } from "@/components/docs/docs-header"
 import { DocsNav } from "@/components/docs/docs-nav"
 import { Sidebar } from "@/components/docs/sidebar"
 import { TableOfContents } from "@/components/docs/table-of-contents"
-import { loadPage, useDocs } from "@/lib/gittydocs"
 import { MdxContentStatic } from "@/lib/velite/mdx-content"
 import { MdxContext } from "@/lib/velite/mdx-context"
 import { stripBasePath } from "@/utils/base-path"
+import { useParams } from "@/route-tree.gen"
+import { docs } from "@velite"
+import { useDocsContext } from "@/contexts/docs.context"
 
 interface DocsLayoutProps {
   children?: never
 }
 
 export function DocsLayout(_props: DocsLayoutProps) {
-  const docs = useDocs()
-  const pageContext = usePageContext()
+  const params = useParams({ from: "/@" })
+  const slug = createMemo(() => params()["_@"] ?? "/")
 
-  // Get current route path from URL and convert to docs page path
+  // Use velite's docs directly with slugAsParams
+  // Handle root path (slugAsParams is "" for index.mdx)
+  const doc = createMemo(() =>
+    docs.find((d) => {
+      const docSlug = d.slugAsParams === "" ? "/" : `/${d.slugAsParams}`
+      return docSlug === slug()
+    })
+  )
+
+
+
+  const pageContext = usePageContext()
   const routePath = createMemo(() => {
     const url = pageContext.urlParsed
     const pathname = url.pathname || "/"
     return stripBasePath(pathname)
   })
 
-  createEffect(() => {
-    loadPage(docs, routePath())
+  const hasHeadings = createMemo(() => {
+    const d = doc()
+    // Extract headings from raw markdown
+    if (!d?.rawMarkdown) return false
+    return d.rawMarkdown.match(/^#{1,6}\s+/m) !== null
   })
 
-  const page = createMemo(() => docs.currentPage)
+  // Extract headings for TOC
+  const headings = createMemo(() => {
+    const d = doc()
+    if (!d?.rawMarkdown) return []
 
-  const hasHeadings = createMemo(() => {
-    const p = page()
-    return p && p.headings.length > 0
+    const headingsList: Array<{ level: number; text: string; slug: string }> = []
+    const lines = d.rawMarkdown.split("\n")
+
+    for (const line of lines) {
+      const match = line.match(/^(#{1,6})\s+(.+)$/)
+      if (!match) continue
+      const level = match[1].length
+      const text = match[2].trim()
+      const slug = text
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .trim()
+      headingsList.push({ level, text, slug })
+    }
+
+    return headingsList
   })
 
   return (
@@ -50,61 +84,48 @@ export function DocsLayout(_props: DocsLayoutProps) {
           <main class="relative px-4 py-6 md:px-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_220px] xl:px-8">
             <div class="mx-auto w-full min-w-0 max-w-3xl">
               <Show
-                when={!docs.isLoading}
+                when={doc()}
                 fallback={
-                  <div class="flex items-center justify-center py-12">
-                    <div class="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                  <div class="py-12 text-center">
+                    <h1 class="font-bold text-2xl">Page not found</h1>
+                    <p class="mt-2 text-muted-foreground">
+                      The page you're looking for doesn't exist.
+                    </p>
+                    <p class="mt-1 text-muted-foreground text-sm">Path: {routePath()}</p>
                   </div>
                 }
               >
-                <Show when={docs.error}>
-                  <div class="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-destructive">
-                    <h3 class="font-semibold">Error loading documentation</h3>
-                    <p class="text-sm">{docs.error}</p>
-                  </div>
-                </Show>
-                <Show
-                  when={page()}
-                  fallback={
-                    <div class="py-12 text-center">
-                      <h1 class="font-bold text-2xl">Page not found</h1>
-                      <p class="mt-2 text-muted-foreground">
-                        The page you're looking for doesn't exist.
-                      </p>
-                      <p class="mt-1 text-muted-foreground text-sm">Path: {routePath()}</p>
-                    </div>
-                  }
-                >
-                  {(p) => (
-                    <article class="prose prose-slate dark:prose-invert max-w-none">
-                      <Show when={p().title}>
-                        <div class="mb-5 flex items-center justify-between">
-                          <h1 class="scroll-m-20 font-bold text-4xl tracking-tight">{p().title}</h1>
-                          <CopyPageButton markdown={p().rawContent} />
-                        </div>
-                      </Show>
-
-                      <Show when={p().description}>
-                        <p class="text-muted-foreground text-xl">{p().description}</p>
-                      </Show>
-
-                      <div class="mt-8">
-                        <MdxContext>
-                          <MdxContentStatic code={p().content} />
-                        </MdxContext>
+                {(d) => (
+                  <article class="prose prose-slate dark:prose-invert max-w-none">
+                    <Show when={d().title}>
+                      <div class="mb-5 flex items-center justify-between">
+                        <h1 class="scroll-m-20 font-bold text-4xl tracking-tight">{d().title}</h1>
+                        <CopyPageButton markdown={d().rawMarkdown ?? ""} />
                       </div>
+                    </Show>
 
-                      <DocsFooter />
-                    </article>
-                  )}
-                </Show>
+                    <Show when={d().description}>
+                      <p class="text-muted-foreground text-xl">{d().description}</p>
+                    </Show>
+
+                    <div class="mt-8">
+                      <Show when={d().slug} keyed>
+                        <MdxContext>
+                          <MdxContentStatic code={d().content} />
+                        </MdxContext>
+                      </Show>
+                    </div>
+
+                    <DocsFooter sourcePath={d().slugAsParams} />
+                  </article>
+                )}
               </Show>
             </div>
 
             <Show when={hasHeadings()}>
               <div class="hidden text-sm xl:block">
                 <div class="sticky top-16 -mt-10 h-[calc(100vh-3.5rem)] overflow-y-auto pt-10">
-                  <TableOfContents headings={page()!.headings} />
+                  <TableOfContents headings={headings()} />
                 </div>
               </div>
             </Show>

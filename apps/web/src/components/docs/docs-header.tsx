@@ -10,14 +10,13 @@ import {
 } from "@/components/ui/drawer"
 import { IconMoonDuo, IconSunDuo } from "@/assets/icons"
 import { useThemeContext } from "@/contexts/theme.context"
-import { getRepoUrl, getSiteName } from "@/lib/docs/source"
-import { useDocs } from "@/lib/gittydocs"
+import { useDocsContext } from "@/contexts/docs.context"
 import { withBasePath } from "@/utils/base-path"
 import { DocsNav } from "./docs-nav"
 import { SearchDialog } from "./search-dialog"
 
 export function DocsHeader() {
-  const docs = useDocs()
+  const docs = useDocsContext()
   const { inferredTheme, toggleTheme } = useThemeContext()
   const [searchOpen, setSearchOpen] = createSignal(false)
   const [mobileMenuOpen, setMobileMenuOpen] = createSignal(false)
@@ -36,8 +35,14 @@ export function DocsHeader() {
     onCleanup(() => window.removeEventListener("keydown", handleKeyDown))
   })
 
-  const siteName = () => getSiteName(docs.config)
-  const repoUrl = () => getRepoUrl(docs.config)
+  const siteName = () => docs.config?.site?.name ?? "gittydocs"
+  const repoUrl = () => {
+    const repo = docs.config?.site?.repo
+    if (repo) {
+      return `https://github.com/${repo.owner}/${repo.repo}`
+    }
+    return null
+  }
 
   return (
     <>
