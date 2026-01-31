@@ -1,0 +1,10 @@
+- [ ] clear distinct approaches:
+  - [ ] out-of-the-box setup
+  - [ ] ejectable setup
+- [ ] AI-friendliness:
+  - [ ] A clear llms.txt endpoint + an llms.txt, add it as a new feature called automatic llms.txt.
+  - [ ] A 1-shot prompt.
+- [ ] Hot reload during development.
+- [ ] Theming
+- [ ] Possibly a CLI for this at this point?
+- [ ] An AI skill / just reusing llms.txt

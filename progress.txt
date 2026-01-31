@@ -1,0 +1,17 @@
+Progress (current state)
+- SolidJS/Vike docs shell is in place with header, sidebar, ToC, footer, and mobile layout.
+- GitHub runtime fetching works: config load, file tree listing, raw file fetch, edit/issues links.
+- Auto-nav generation and title/heading parsing are implemented.
+- Search is wired with FlexSearch and a modal UI.
+- Viewer route and landing page exist for pasting GitHub URLs.
+
+Needs more work (relative to updated PRD)
+- Replace runtime GitHub fetching with build-time source resolution and static output.
+- Switch to Velite-based MDX rendering using the pattern in `/Users/carlo/Desktop/Projects/email-thing/apps/landing`.
+- Remove the public viewer UI and /gh route; no runtime URL input.
+- Consolidate env to a single `GITTYDOCS_SOURCE` that accepts GitHub URL or local path.
+- Build-time auto-discovery of docs root, config parsing, and static search index generation.
+- Add base-path handling for GitHub Pages and a short workflow template.
+- Document Cloudflare Pages deploy and the degit template flow.
+
+THIS IS ALSO OUTDATED

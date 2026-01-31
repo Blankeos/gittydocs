@@ -1,3 +1,5 @@
+THIS PRD IS VERY OUTDATED
+
 # PRD: gittydocs
 
 Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site with almost no setup.
@@ -75,7 +77,7 @@ Title resolution order: `frontmatter.title` -> first H1 -> filename.
 
 ## Configuration Philosophy
 
-Configuration should be *optional* and build-time focused.
+Configuration should be _optional_ and build-time focused.
 
 Precedence order (highest to lowest):
 
@@ -98,21 +100,21 @@ File: `gittydocs.jsonc` (preferred) or `gittydocs.json`.
       "owner": "org",
       "name": "repo",
       "ref": "main",
-      "docsPath": "docs" // folder containing gittydocs.jsonc (optional)
-    }
+      "docsPath": "docs", // folder containing gittydocs.jsonc (optional)
+    },
   },
   "nav": [
     {
       "label": "Getting Started",
       "items": [
         { "label": "Introduction", "path": "/" },
-        { "label": "Install", "path": "/install" }
-      ]
-    }
+        { "label": "Install", "path": "/install" },
+      ],
+    },
   ],
   "links": {
-    "issues": "https://github.com/org/repo/issues"
-  }
+    "issues": "https://github.com/org/repo/issues",
+  },
 }
 ```
 
@@ -141,9 +143,9 @@ When no config is present:
 
 - Use a tree listing to find pages under docs root.
 - Sort by:
-  1) `index.*` first within a folder,
-  2) numeric prefixes (`01-foo.mdx`),
-  3) alphabetical.
+  1. `index.*` first within a folder,
+  2. numeric prefixes (`01-foo.mdx`),
+  3. alphabetical.
 - Generate routes from relative paths.
 - Labels from title resolution (frontmatter/H1/filename).
 

@@ -45,6 +45,10 @@ export const gittydocsConfig: DocsConfig | null = {
           "path": "/"
         },
         {
+          "label": "Motivation",
+          "path": "/motivation"
+        },
+        {
           "label": "Configuration",
           "path": "/configuration"
         }
