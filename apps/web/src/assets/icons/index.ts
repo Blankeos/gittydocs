@@ -31,3 +31,7 @@ export { default as IconSettings } from "./solar:settings-broken.svg"
 export { default as IconSunDuo } from "./solar:sun-2-bold-duotone.svg"
 export { default as IconSolid } from "./solid.svg"
 export { default as IconAlertFilled } from "./tabler:alert-triangle-filled.svg"
+export { default as IconOpenAI } from './openai'
+export { default as IconAnthropic } from './anthropic'
+export { default as IconCopy } from './copy'
+export { default as IconMarkdownLine } from './markdown-line'

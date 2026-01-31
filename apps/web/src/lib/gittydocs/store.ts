@@ -1,6 +1,6 @@
 import { createContext, useContext } from "solid-js"
 import { createStore, type SetStoreFunction } from "solid-js/store"
-import { docsPages, docsConfig } from "@/lib/docs/docs-data"
+import { docsConfig, docsPages } from "@/lib/docs/docs-data"
 import { gittydocsSource } from "@/lib/docs/source.gen"
 import { resolveNavItems } from "@/lib/gittydocs/config"
 import { buildNavFromPaths } from "@/lib/gittydocs/nav"
@@ -81,12 +81,19 @@ export async function loadPage(
   routePath: string
 ): Promise<DocsPage | null> {
   const normalizedPath = normalizeRoutePath(routePath)
+  console.log("[DEBUG] loadPage:", {
+    routePath,
+    normalizedPath,
+    availableRoutes: Array.from(store.pages.keys()),
+  })
   const existing = store.pages.get(normalizedPath)
   if (existing) {
+    console.log("[DEBUG] Found page:", existing.title)
     store.setCurrentPage("currentPage", existing)
     return existing
   }
 
+  console.log("[DEBUG] Page not found, setting to null")
   store.setCurrentPage("currentPage", null)
   return null
 }

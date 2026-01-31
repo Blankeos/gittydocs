@@ -8,6 +8,8 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
+import { IconMoonDuo, IconSunDuo } from "@/assets/icons"
+import { useThemeContext } from "@/contexts/theme.context"
 import { getRepoUrl, getSiteName } from "@/lib/docs/source"
 import { useDocs } from "@/lib/gittydocs"
 import { withBasePath } from "@/utils/base-path"
@@ -16,6 +18,7 @@ import { SearchDialog } from "./search-dialog"
 
 export function DocsHeader() {
   const docs = useDocs()
+  const { inferredTheme, toggleTheme } = useThemeContext()
   const [searchOpen, setSearchOpen] = createSignal(false)
   const [mobileMenuOpen, setMobileMenuOpen] = createSignal(false)
 
@@ -103,6 +106,17 @@ export function DocsHeader() {
             </div>
 
             <nav class="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleTheme}
+                class="h-9 w-9"
+              >
+                <Show when={inferredTheme() === "dark"} fallback={<IconSunDuo class="h-5 w-5" />}>
+                  <IconMoonDuo class="h-5 w-5" />
+                </Show>
+                <span class="sr-only">Toggle theme</span>
+              </Button>
               <Show when={repoUrl()}>
                 <a
                   href={repoUrl()!}

@@ -5,6 +5,11 @@ import type { DocsConfig, DocsPage, Heading } from "@/lib/gittydocs/types"
 
 export const docsConfig: DocsConfig | null = gittydocsConfig
 
+console.log(
+  "[DEBUG] docs from velite:",
+  docs.map((d) => ({ slug: d.slug, slugAsParams: d.slugAsParams, title: d.title }))
+)
+
 export const docsPages = docs.map((doc) => {
   const routePath = toRoutePath(doc.slugAsParams)
   const sourcePath = sourcePathByRoute[routePath] || `${doc.slugAsParams}.mdx`

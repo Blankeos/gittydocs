@@ -2,6 +2,7 @@ import type { FlowProps } from "solid-js"
 
 import "@/styles/app.css"
 import "@/styles/bprogress.css"
+import "@/styles/prose.css"
 
 import { useMetadata } from "vike-metadata-solid"
 import { DocsProvider } from "@/components/docs/docs-provider"

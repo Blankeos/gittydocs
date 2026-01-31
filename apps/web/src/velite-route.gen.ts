@@ -1,6 +1,7 @@
 export const veliteRoutes = [
   "/",
   "/configuration",
+  "/getting-started",
   "/structure"
 ] as const
 

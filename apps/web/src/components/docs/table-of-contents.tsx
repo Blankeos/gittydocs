@@ -45,7 +45,14 @@ export function TableOfContents(props: TableOfContentsProps) {
     e.preventDefault()
     const element = document.getElementById(slug)
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" })
+      const headerOffset = 80 // Account for sticky header height + some padding
+      const elementPosition = element.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.scrollY - headerOffset
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      })
       window.history.pushState(null, "", `#${slug}`)
     }
   }

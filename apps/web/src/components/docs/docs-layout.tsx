@@ -1,5 +1,6 @@
 import { createEffect, createMemo, Show } from "solid-js"
 import { usePageContext } from "vike-solid/usePageContext"
+import { CopyPageButton } from "@/components/docs/copy-page-button"
 import { DocsFooter } from "@/components/docs/docs-footer"
 import { DocsHeader } from "@/components/docs/docs-header"
 import { DocsNav } from "@/components/docs/docs-nav"
@@ -77,7 +78,10 @@ export function DocsLayout(_props: DocsLayoutProps) {
                   {(p) => (
                     <article class="prose prose-slate dark:prose-invert max-w-none">
                       <Show when={p().title}>
-                        <h1 class="scroll-m-20 font-bold text-4xl tracking-tight">{p().title}</h1>
+                        <div class="mb-5 flex items-center justify-between">
+                          <h1 class="scroll-m-20 font-bold text-4xl tracking-tight">{p().title}</h1>
+                          <CopyPageButton markdown={p().rawContent} />
+                        </div>
                       </Show>
 
                       <Show when={p().description}>

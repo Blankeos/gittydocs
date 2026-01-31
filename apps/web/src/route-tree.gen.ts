@@ -13,17 +13,7 @@ export type { PageRoute, UseParamsResult };
 
 const pageRoutes = [
   "/",
-  "/_components",
-  "/about",
-  "/accept-invitation/@invitationId",
-  "/dashboard",
-  "/dashboard/settings",
-  "/forgot-password",
-  "/forgot-password/verify",
-  "/payment/completed",
-  "/pricing",
-  "/sign-in",
-  "/sign-up"
+  "/@"
 ] as const;
 
 type PageRoute = typeof pageRoutes[number];

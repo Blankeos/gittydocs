@@ -13,6 +13,7 @@ https://gittydocs.dev/gh/{owner}/{repo}/{ref}/{docs-path}
 ```
 
 For example:
+
 - `https://gittydocs.dev/gh/solidjs/solid/main/docs`
 - `https://gittydocs.dev/gh/vercel/next.js/main/docs`
 
@@ -21,7 +22,7 @@ For example:
 1. Fork this repository
 2. Set environment variables:
    - `GITHUB_OWNER` - Repository owner
-   - `GITHUB_REPO` - Repository name  
+   - `GITHUB_REPO` - Repository name
    - `GITHUB_REF` - Branch or tag (default: `main`)
    - `DOCS_PATH` - Path to docs folder (default: root)
    - `GITHUB_TOKEN` - Optional GitHub token for private repos
@@ -48,21 +49,21 @@ Create a `gittydocs.jsonc` file in your docs folder:
       "owner": "myorg",
       "name": "myrepo",
       "ref": "main",
-      "docsPath": "docs"
-    }
+      "docsPath": "docs",
+    },
   },
   "nav": [
     {
       "label": "Getting Started",
       "items": [
         { "label": "Introduction", "path": "/" },
-        { "label": "Installation", "path": "/installation" }
-      ]
-    }
+        { "label": "Installation", "path": "/installation" },
+      ],
+    },
   ],
   "links": {
-    "issues": "https://github.com/myorg/myrepo/issues"
-  }
+    "issues": "https://github.com/myorg/myrepo/issues",
+  },
 }
 ```
 
@@ -75,6 +76,7 @@ Your docs folder can contain:
 - Subfolders - Organized sections
 
 Files are sorted by:
+
 1. `index.*` files first
 2. Numeric prefixes (`01-introduction.md`)
 3. Alphabetical order
