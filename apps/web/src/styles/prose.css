@@ -167,3 +167,98 @@
 .prose li::marker {
   color: var(--foreground);
 }
+
+/* GitHub-style markdown callouts */
+.markdown-alert {
+  margin: 1.5em 0;
+  padding: 1em;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  background-color: var(--muted);
+}
+
+.markdown-alert > *:first-child {
+  margin-top: 0;
+}
+
+.markdown-alert > *:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-alert p {
+  margin: 0.5em 0;
+}
+
+.markdown-alert p:first-child {
+  margin-top: 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+/* Remove left padding from plugin-generated title */
+.markdown-alert-title {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Style SVG icons in callouts */
+.markdown-alert-title svg {
+  fill: currentColor;
+}
+
+/* Note callout */
+.markdown-alert-note {
+  border-color: var(--info);
+  background-color: color-mix(in oklch, var(--info) 10%, transparent);
+  color: var(--info);
+}
+
+.markdown-alert-note p:first-child {
+  color: var(--info);
+}
+
+/* Tip callout */
+.markdown-alert-tip {
+  border-color: var(--success);
+  background-color: color-mix(in oklch, var(--success) 10%, transparent);
+  color: var(--success);
+}
+
+.markdown-alert-tip p:first-child {
+  color: var(--success);
+}
+
+/* Important callout */
+.markdown-alert-important {
+  border-color: var(--primary);
+  background-color: color-mix(in oklch, var(--primary) 10%, transparent);
+  color: var(--primary);
+}
+
+.markdown-alert-important p:first-child {
+  color: var(--primary);
+}
+
+/* Warning callout */
+.markdown-alert-warning {
+  border-color: var(--warning);
+  background-color: color-mix(in oklch, var(--warning) 20%, transparent);
+  color: var(--warning-foreground);
+}
+
+.markdown-alert-warning p:first-child {
+  color: var(--warning-foreground);
+}
+
+/* Caution callout */
+.markdown-alert-caution {
+  border-color: var(--error);
+  background-color: color-mix(in oklch, var(--error) 10%, transparent);
+  color: var(--error);
+}
+
+.markdown-alert-caution p:first-child {
+  color: var(--error);
+}

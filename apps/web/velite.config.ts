@@ -3,6 +3,7 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings"
 import rehypeKatex from "rehype-katex"
 import rehypeSlug from "rehype-slug"
 import remarkGfm from "remark-gfm"
+import remarkGithubBlockquoteAlert from "remark-github-blockquote-alert"
 import remarkMath from "remark-math"
 import { defineConfig, s } from "velite"
 
@@ -43,7 +44,7 @@ export default defineConfig({
     },
   },
   mdx: {
-    remarkPlugins: [remarkGfm, remarkMath],
+    remarkPlugins: [remarkGfm, remarkMath, remarkGithubBlockquoteAlert],
     rehypePlugins: [
       [rehypeShiki, { theme: "one-dark-pro" }],
       rehypeKatex,

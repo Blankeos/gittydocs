@@ -1,10 +1,11 @@
 export const veliteRoutes = [
   "/",
-  "/README",
   "/configuration",
-  "/getting-started",
-  "/guides/quickstart",
-  "/structure"
+  "/deploy/cloudflare",
+  "/deploy/github-pages",
+  "/deploy/netlify",
+  "/deploy/vercel",
+  "/motivation"
 ] as const
 
 export type VeliteRoute = typeof veliteRoutes[number]
