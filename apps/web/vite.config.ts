@@ -5,10 +5,7 @@ import { defineConfig } from "vite"
 import solidSvg from "vite-plugin-solid-svg"
 import tsConfigPaths from "vite-tsconfig-paths"
 
-const basePath = process.env.PUBLIC_BASE_PATH || "/"
-
 export default defineConfig({
-  base: basePath,
   plugins: [
     tsConfigPaths(),
     vike({

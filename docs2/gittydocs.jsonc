@@ -1,0 +1,24 @@
+{
+  "site": {
+    "name": "Coffee Brewing Guide",
+    "repo": {
+      "owner": "anomalyco",
+      "name": "gittydocs",
+      "ref": "main",
+      "docsPath": "docs2"
+    }
+  },
+  "nav": [
+    {
+      "label": "Coffee Guide",
+      "items": [
+        { "label": "Introduction", "path": "/" },
+        { "label": "Roasting", "path": "/test-page" },
+        { "label": "Equipment", "path": "/api-reference" }
+      ]
+    }
+  ],
+  "links": {
+    "issues": "https://github.com/anomalyco/gittydocs/issues"
+  }
+}
