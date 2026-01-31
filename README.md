@@ -1,4 +1,6 @@
-# gittydocs
+# gittydocs ✨
+
+Simple, but ejectable modern docs for simple devs.
 
 Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site.
 
