@@ -1,11 +1,12 @@
 import { useClipboard } from "bagon-hooks"
 import {
+  IconAnthropic,
   IconCheck,
   IconChevronDown,
   IconCopy,
+  IconGemini,
   IconMarkdownLine,
   IconOpenAI,
-  IconAnthropic,
 } from "@/assets/icons"
 import { Button } from "../ui/button"
 import { DropdownMenuComp } from "../ui/dropdown-menu"
@@ -29,7 +30,7 @@ export function CopyPageButton(props: { markdown: string }) {
             type: "item",
             itemDisplay: (
               <span class="flex items-center gap-1">
-                <IconMarkdownLine class="shrink-0 size-5 w-6" /> Copy page as Markdown for LLMs
+                <IconMarkdownLine class="size-5 w-6 shrink-0" /> Copy page as Markdown for LLMs
               </span>
             ),
             // itemTip: <IconFileTextSpark />,
@@ -67,9 +68,30 @@ export function CopyPageButton(props: { markdown: string }) {
               )
             },
           },
+          // This isn't possible unfortunately
+          // {
+          //   type: "item",
+          //   itemDisplay: (
+          //     <span class="flex items-center gap-1">
+          //       <IconGemini class="shrink-0" /> Open in Gemini
+          //     </span>
+          //   ),
+          //   // itemTip: <IconArrowUpRight />,
+          //   itemOnSelect: () => {
+          //     const prompt = `Read from ${window.location.href} so I can ask questions about it.`;
+          //       window.open(
+          //         `https://www.google.com/search?q=${encodeURIComponent(prompt)}`,
+          //         "_blank"
+          //       );            },
+          // },
         ]}
       >
-        <Button as="div" size="icon" variant="secondary" class="size-[28px] shrink-0 rounded-l-none">
+        <Button
+          as="div"
+          size="icon"
+          variant="secondary"
+          class="size-[28px] shrink-0 rounded-l-none"
+        >
           <IconChevronDown class="size-4 shrink-0" />
         </Button>
       </DropdownMenuComp>

@@ -5,8 +5,11 @@
 // - Get your icons from https://icones.js.org/
 // =========================================================================';
 
+export { default as IconAnthropic } from "./anthropic"
+export { default as IconCopy } from "./copy"
 export { default as IconGitHub } from "./devicon:github.svg"
 export { default as IconGoogle } from "./devicon:google.svg"
+export { default as IconGemini } from "./gemini"
 export { default as IconLoading } from "./line-md:loading-twotone-loop.svg"
 export { default as IconArrowDown } from "./lucide:arrow-down.svg"
 export { default as IconArrowUp } from "./lucide:arrow-up.svg"
@@ -17,8 +20,10 @@ export { default as IconEye } from "./lucide:eye.svg"
 export { default as IconEyeOff } from "./lucide:eye-off.svg"
 export { default as IconPlus } from "./lucide:plus.svg"
 export { default as IconUpload } from "./lucide:upload.svg"
+export { default as IconMarkdownLine } from "./markdown-line"
 export { default as IconX } from "./material-symbols:close-small-rounded.svg"
 export { default as IconMenu } from "./mdi:menu"
+export { default as IconOpenAI } from "./openai"
 export { default as IconCirclePlus } from "./solar:add-circle-broken.svg"
 export { default as IconChevronDown } from "./solar:alt-arrow-down-broken.svg"
 export { default as IconChevronLeft } from "./solar:alt-arrow-left-broken.svg"
@@ -31,7 +36,3 @@ export { default as IconSettings } from "./solar:settings-broken.svg"
 export { default as IconSunDuo } from "./solar:sun-2-bold-duotone.svg"
 export { default as IconSolid } from "./solid.svg"
 export { default as IconAlertFilled } from "./tabler:alert-triangle-filled.svg"
-export { default as IconOpenAI } from './openai'
-export { default as IconAnthropic } from './anthropic'
-export { default as IconCopy } from './copy'
-export { default as IconMarkdownLine } from './markdown-line'
