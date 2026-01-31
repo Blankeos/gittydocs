@@ -6,7 +6,7 @@ import "@/styles/prose.css"
 
 import { useMetadata } from "vike-metadata-solid"
 import { DocsProvider } from "@/components/docs/docs-provider"
-import { ThemeContextProvider } from "@/contexts/theme.context"
+import { ThemeContextProvider, themeInitScript } from "@/contexts/theme.context"
 
 useMetadata.setGlobalDefaults({
   title: "gittydocs",
@@ -15,6 +15,11 @@ useMetadata.setGlobalDefaults({
     width: "device-width",
     initialScale: 1,
   },
+  otherJSX: () => (
+    <>
+      <script innerHTML={themeInitScript} />
+    </>
+  )
 })
 
 export default function RootLayout(props: FlowProps) {
