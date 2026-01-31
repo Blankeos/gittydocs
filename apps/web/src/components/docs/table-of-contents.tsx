@@ -102,9 +102,9 @@ export function TableOfContents(props: TableOfContentsProps) {
                   href={`#${heading.slug}`}
                   onClick={(e) => handleClick(e, heading.slug)}
                   class={cn(
-                    "flex w-full items-center border-l-2 border-transparent px-3 py-1 transition-colors hover:text-foreground hover:bg-accent",
+                    "flex w-full items-center border-l-2 border-transparent px-3 py-1 transition-colors hover:text-accent-foreground hover:bg-accent",
                     activeSlug() === heading.slug
-                      ? "border-l-primary bg-accent font-medium text-foreground"
+                      ? "border-l-primary bg-accent font-medium text-accent-foreground"
                       : "text-muted-foreground"
                   )}
                 >
