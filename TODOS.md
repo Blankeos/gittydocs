@@ -1,10 +1,16 @@
 - [ ] clear distinct approaches:
   - [ ] out-of-the-box setup
+    - [ ] Better packaging (i.e. binarify the web project, only add the .env and the config, we're good)
+    - [ ] Possibly a CLI for this at this point?
   - [ ] ejectable setup
 - [ ] AI-friendliness:
   - [ ] A clear llms.txt endpoint + an llms.txt, add it as a new feature called automatic llms.txt.
   - [ ] A 1-shot prompt.
 - [ ] Hot reload during development.
 - [ ] Theming
-- [ ] Possibly a CLI for this at this point?
 - [ ] An AI skill / just reusing llms.txt
+- [ ] Customize:
+  - [ ] The logo
+  - [ ] The github url
+- [ ] Refactor:
+  - [ ] Collocate all gittydocs files into a folder so when ejecting, it's very easy to see where gittydocs is.

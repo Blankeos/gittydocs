@@ -24,7 +24,7 @@ mkdir docs && cat > docs/gittydocs.jsonc << 'EOF'
 EOF
 ```
 
-Push to GitHub. Deploy with one command.
+Push to GitHub. Deploy with an action.
 
 See [gittydocs.carlo.tl](https://gittydocs.carlo.tl) for full setup and deployment guides.
 
@@ -42,3 +42,5 @@ See [gittydocs.carlo.tl](https://gittydocs.carlo.tl) for full setup and deployme
 ## License
 
 MIT
+
+Built w/ 🩷 using Vike + Solid
