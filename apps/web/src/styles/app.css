@@ -429,8 +429,18 @@ input::-ms-clear {
   }
 }
 
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  position: relative;
+}
+
 .prose .subheading-anchor {
-  margin-left: 0.35rem;
+  position: absolute;
+  left: -1.25rem;
   opacity: 0;
   text-decoration: none;
   transition: opacity 150ms ease;
