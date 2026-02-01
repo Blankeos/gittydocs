@@ -340,6 +340,7 @@ export interface DocsConfig {
   }
   nav?: NavItem[]
   links?: {
+    github?: string
     issues?: string
   }
 }

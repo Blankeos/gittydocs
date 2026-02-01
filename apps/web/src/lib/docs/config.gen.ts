@@ -22,6 +22,7 @@ export interface DocsConfig {
   }
   nav?: NavItem[]
   links?: {
+    github?: string
     issues?: string
   }
 }
@@ -29,6 +30,7 @@ export interface DocsConfig {
 export const gittydocsConfig: DocsConfig | null = {
   "site": {
     "name": "gittydocs",
+    "logo": "/icon-logo.svg",
     "repo": {
       "owner": "blankeos",
       "name": "gittydocs",
@@ -78,6 +80,7 @@ export const gittydocsConfig: DocsConfig | null = {
     }
   ],
   "links": {
+    "github": "https://github.com/blankeos/gittydocs",
     "issues": "https://github.com/blankeos/gittydocs/issues"
   }
 }

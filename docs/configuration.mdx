@@ -10,6 +10,7 @@ Create `gittydocs.jsonc` in your docs folder:
 {
   "site": {
     "name": "Site Name",
+    "logo": "/logo.svg",
     "repo": {
       "owner": "username",
       "name": "repo",
@@ -27,6 +28,7 @@ Create `gittydocs.jsonc` in your docs folder:
     }
   ],
   "links": {
+    "github": "https://github.com/user/repo",
     "issues": "https://github.com/user/repo/issues"
   }
 }
@@ -37,12 +39,16 @@ Create `gittydocs.jsonc` in your docs folder:
 | Field | Type | Description |
 |-------|------|-------------|
 | `site.name` | string | Site title |
+| `site.logo` | string | Logo image URL or public path |
 | `site.repo.owner` | string | GitHub username or org |
 | `site.repo.name` | string | Repository name |
 | `site.repo.ref` | string | Branch or tag (default: `main`) |
 | `site.repo.docsPath` | string | Path to docs folder |
 | `nav` | array | Custom navigation sections |
+| `links.github` | string | URL to repository or org |
 | `links.issues` | string | URL to issues page |
+
+`site.logo` can be a full URL or a path to a file in `public/`. Relative paths are resolved with the base URL.
 
 ## Source
 

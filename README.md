@@ -13,12 +13,17 @@ mkdir docs && cat > docs/gittydocs.jsonc << 'EOF'
 {
   "site": {
     "name": "My Project",
+    "logo": "/logo.svg",
     "repo": {
       "owner": "yourusername",
       "name": "yourrepo",
       "ref": "main",
       "docsPath": "docs"
     }
+  },
+  "links": {
+    "github": "https://github.com/yourusername/yourrepo",
+    "issues": "https://github.com/yourusername/yourrepo/issues"
   }
 }
 EOF

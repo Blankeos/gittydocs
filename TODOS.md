@@ -1,16 +1,27 @@
+- [x] Customize:
+  - [x] The logo
+    - [x] Parts to update: site header/logo asset, README
+  - [x] The github url
+    - [x] Parts to update: README, site footer/header links
+- [ ] Theming
+  - [ ] Parts to update: global styles, theme tokens
+- [ ] Hot reload during development.
+  - [ ] Parts to update: dev server config, docs
+- [ ] AI-friendliness:
+  - [ ] A clear llms.txt endpoint + an llms.txt, add it as a new feature called automatic llms.txt.
+    - [ ] Parts to update: server routes, docs
+  - [ ] A 1-shot prompt.
+    - [ ] Parts to update: docs templates
+  - [ ] An AI skill / just reusing llms.txt
+    - [ ] Parts to update: docs, llms.txt generation
+- [ ] Refactor:
+  - [ ] Collocate all gittydocs files into a folder so when ejecting, it's very easy to see where gittydocs is.
+    - [ ] Parts to update: project structure, eject docs
 - [ ] clear distinct approaches:
   - [ ] out-of-the-box setup
     - [ ] Better packaging (i.e. binarify the web project, only add the .env and the config, we're good)
+      - [ ] Parts to update: build pipeline, packaging docs
     - [ ] Possibly a CLI for this at this point?
+      - [ ] Parts to update: CLI entrypoint, docs
   - [ ] ejectable setup
-- [ ] AI-friendliness:
-  - [ ] A clear llms.txt endpoint + an llms.txt, add it as a new feature called automatic llms.txt.
-  - [ ] A 1-shot prompt.
-- [ ] Hot reload during development.
-- [ ] Theming
-- [ ] An AI skill / just reusing llms.txt
-- [ ] Customize:
-  - [ ] The logo
-  - [ ] The github url
-- [ ] Refactor:
-  - [ ] Collocate all gittydocs files into a folder so when ejecting, it's very easy to see where gittydocs is.
+    - [ ] Parts to update: scaffolding, docs

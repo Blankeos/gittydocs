@@ -1,6 +1,7 @@
 {
   "site": {
     "name": "gittydocs",
+    "logo": "/icon-logo.svg",
     "repo": {
       "owner": "blankeos",
       "name": "gittydocs",
@@ -29,6 +30,7 @@
     },
   ],
   "links": {
+    "github": "https://github.com/blankeos/gittydocs",
     "issues": "https://github.com/blankeos/gittydocs/issues",
   },
 }

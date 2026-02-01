@@ -17,7 +17,6 @@ import { SearchDialog } from "./search-dialog"
 import { useSearchContext } from "@/contexts/search.context"
 
 export function DocsHeader() {
-  const {} = useSearchContext()
   const docs = useDocsContext()
   const { inferredTheme, toggleTheme } = useThemeContext()
   const [searchOpen, setSearchOpen] = createSignal(false)
@@ -38,6 +37,12 @@ export function DocsHeader() {
   })
 
   const siteName = () => docs.config?.site?.name ?? "gittydocs"
+  const logoUrl = () => {
+    const logo = docs.config?.site?.logo
+    if (!logo) return null
+    if (/^(https?:)?\/\//i.test(logo) || logo.startsWith("data:")) return logo
+    return withBasePath(logo)
+  }
   const repoUrl = () => {
     const repo = docs.config?.site?.repo
     if (repo) {
@@ -45,6 +50,7 @@ export function DocsHeader() {
     }
     return null
   }
+  const githubUrl = () => docs.config?.links?.github ?? repoUrl()
 
   return (
     <>
@@ -80,7 +86,12 @@ export function DocsHeader() {
               </DrawerContent>
             </Drawer>
 
-            <a href={withBasePath("/")} class="mr-6 flex items-center space-x-2">
+            <a href={withBasePath("/")} class="mr-6 flex items-center gap-2">
+              <Show when={logoUrl()}>
+                {(src) => (
+                  <img src={src()} alt={siteName()} class="h-6 w-6 object-contain" />
+                )}
+              </Show>
               <span class="font-bold">{siteName()}</span>
             </a>
           </div>
@@ -98,9 +109,9 @@ export function DocsHeader() {
                 </Show>
                 <span class="sr-only">Toggle theme</span>
               </Button>
-              <Show when={repoUrl()}>
+              <Show when={githubUrl()}>
                 <a
-                  href={repoUrl()!}
+                  href={githubUrl()!}
                   target="_blank"
                   rel="noopener noreferrer"
                   class="inline-flex h-9 w-9 items-center justify-center rounded-md font-medium text-sm transition-colors hover:bg-accent hover:text-accent-foreground"
