@@ -66,7 +66,7 @@ export function DocContent() {
 
   return (
     <>
-      <div class="mx-auto w-full min-w-0 max-w-3xl">
+      <div class="mx-auto flex min-h-full w-full min-w-0 max-w-3xl flex-col">
         <Show
           when={doc()}
           fallback={
@@ -80,24 +80,26 @@ export function DocContent() {
           }
         >
           {(d) => (
-            <article class="prose prose-slate dark:prose-invert max-w-none">
-              <Show when={d().title}>
-                <div class="mb-0 flex items-center justify-between">
-                  <h1 class="scroll-m-20 font-bold text-3xl tracking-tight">{d().title}</h1>
-                  <CopyPageButton markdown={d().rawMarkdown ?? ""} />
-                </div>
-              </Show>
-
-              <Show when={d().description}>
-                <p class="text-muted-foreground text-sm">{d().description}</p>
-              </Show>
-
-              <div class="mt-8">
-                <Show when={d().slug} keyed>
-                  <MdxContext>
-                    <MdxContentStatic code={d().content} />
-                  </MdxContext>
+            <article class="prose prose-slate dark:prose-invert flex min-h-full max-w-none flex-col">
+              <div class="flex-1">
+                <Show when={d().title}>
+                  <div class="mb-0 flex items-center justify-between">
+                    <h1 class="scroll-m-20 font-bold text-3xl tracking-tight">{d().title}</h1>
+                    <CopyPageButton markdown={d().rawMarkdown ?? ""} />
+                  </div>
                 </Show>
+
+                <Show when={d().description}>
+                  <p class="text-muted-foreground text-sm">{d().description}</p>
+                </Show>
+
+                <div class="mt-8">
+                  <Show when={d().slug} keyed>
+                    <MdxContext>
+                      <MdxContentStatic code={d().content} />
+                    </MdxContext>
+                  </Show>
+                </div>
               </div>
 
               <DocsFooter sourcePath={d().slugAsParams} />

@@ -8,13 +8,13 @@ export function DocsLayout(props: FlowProps) {
     <div class="relative flex min-h-screen flex-col">
       <DocsHeader />
 
-      <div class="container flex-1">
-        <div class="flex-1 items-start md:grid md:grid-cols-[240px_minmax(0,1fr)] lg:grid-cols-[288px_minmax(0,1fr)]">
+      <div class="container flex flex-1 flex-col">
+        <div class="flex-1 min-h-0 items-start md:grid md:grid-cols-[240px_minmax(0,1fr)] lg:grid-cols-[288px_minmax(0,1fr)]">
           <Sidebar>
             <DocsNav />
           </Sidebar>
 
-          <main class="relative px-4 py-6 md:px-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_220px] xl:px-8">
+          <main class="relative flex min-h-[calc(100vh-3.5rem)] flex-col px-4 py-6 md:px-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_220px] xl:px-8">
             {props.children}
           </main>
         </div>
