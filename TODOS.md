@@ -3,8 +3,8 @@
     - [x] Parts to update: site header/logo asset, README
   - [x] The github url
     - [x] Parts to update: README, site footer/header links
-- [ ] Theming
-  - [ ] Parts to update: global styles, theme tokens
+- [x] Theming
+  - [x] Parts to update: global styles, theme tokens
 - [ ] Hot reload during development.
   - [ ] Parts to update: dev server config, docs
 - [ ] AI-friendliness:
