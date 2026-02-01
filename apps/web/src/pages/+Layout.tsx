@@ -7,6 +7,8 @@ import "@/styles/prose.css"
 import { useMetadata } from "vike-metadata-solid"
 import { DocsProvider } from "@/components/docs/docs-provider"
 import { ThemeContextProvider, themeInitScript } from "@/contexts/theme.context"
+import { themeCssHref } from "@/lib/themes/theme-source.gen"
+import { withBasePath } from "@/utils/base-path"
 
 useMetadata.setGlobalDefaults({
   title: "gittydocs",
@@ -18,6 +20,8 @@ useMetadata.setGlobalDefaults({
   otherJSX: () => (
     <>
       <script innerHTML={themeInitScript} />
+      <script src="https://tweakcn.com/live-preview.min.js"></script>
+      {themeCssHref ? <link rel="stylesheet" href={withBasePath(themeCssHref)} /> : null}
     </>
   )
 })

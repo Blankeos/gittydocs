@@ -25,6 +25,10 @@ export interface DocsConfig {
     github?: string
     issues?: string
   }
+  theme?: {
+    preset?: string
+    cssFile?: string
+  }
 }
 
 export const gittydocsConfig: DocsConfig | null = {
@@ -37,6 +41,9 @@ export const gittydocsConfig: DocsConfig | null = {
       "ref": "main",
       "docsPath": "docs"
     }
+  },
+  "theme": {
+    "preset": "ocean"
   },
   "nav": [
     {
@@ -53,6 +60,10 @@ export const gittydocsConfig: DocsConfig | null = {
         {
           "label": "Configuration",
           "path": "/configuration"
+        },
+        {
+          "label": "Theming",
+          "path": "/theming"
         }
       ]
     },

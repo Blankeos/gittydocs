@@ -7,6 +7,7 @@ import {
   type Setter,
 } from "solid-js"
 import { createStrictContext } from "@/utils/create-strict-context"
+import { gittydocsConfig } from "@/lib/docs/config.gen"
 
 /**
  * Blocking Theme Script (for `<head>`)
@@ -16,6 +17,12 @@ import { createStrictContext } from "@/utils/create-strict-context"
  */
 export const themeInitScript = `
 (function() {
+  const presetTheme = ${JSON.stringify(gittydocsConfig?.theme?.preset ?? null)}
+  if (presetTheme && presetTheme !== "default") {
+    document.documentElement.setAttribute("data-theme", presetTheme)
+  } else {
+    document.documentElement.removeAttribute("data-theme")
+  }
   const themes = ["light", "dark"]
   const themeKey = "app-theme"
   let savedTheme = null

@@ -5,5 +5,6 @@ export const sourcePathByRoute: Record<string, string> = {
   "/deploy/github-pages": "deploy/github-pages.mdx",
   "/deploy/netlify": "deploy/netlify.mdx",
   "/deploy/vercel": "deploy/vercel.mdx",
-  "/": "index.mdx"
+  "/": "index.mdx",
+  "/theming": "theming.mdx"
 }

@@ -1,10 +1,15 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
 
 @import "tailwindcss";
+@import "./themes/slate.css";
+@import "./themes/sage.css";
+@import "./themes/ember.css";
+@import "./themes/ocean.css";
+@import "./themes/sand.css";
 
 /* HTML Defaults */
 body {
-  font-family: Manrope, Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
   background-color: var(--background);
   color: var(--foreground);
 }
@@ -37,18 +42,6 @@ input::-ms-clear {
 *::-webkit-scrollbar-track {
   background-color: transparent;
 }
-&::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-  background-color: transparent;
-}
-&::-webkit-scrollbar-thumb {
-  background-color: var(--color-border);
-  border-radius: 9999px;
-}
-&::-webkit-scrollbar-track {
-  background-color: transparent;
-}
 
 /* -- Tailwind Defaults (Removed in V4, so manually set) -- */
 
@@ -72,6 +65,9 @@ input::-ms-clear {
 /** Theming */
 @layer base {
   :root {
+    --font-sans: "Geist", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-serif: "Geist", "Times New Roman", serif;
+    --font-mono: "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
     --background: oklch(1 0 0);
     --foreground: oklch(0.27 0 0);
     --card: oklch(1 0 0);
@@ -105,8 +101,6 @@ input::-ms-clear {
     --shadow-lg: 0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 4px 6px -2px hsl(0 0% 0% / 0.1);
     --shadow-xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.1), 0px 8px 10px -2px hsl(0 0% 0% / 0.1);
     --shadow-2xl: 0px 4px 8px -1px hsl(0 0% 0% / 0.25);
-
-    /* The foregrounds suck for me. */
     --success: oklch(65% 0.15 160);
     --success-foreground: oklch(0.2 0.05 160);
     --warning: oklch(85% 0.15 85);
@@ -153,9 +147,6 @@ input::-ms-clear {
     --chart-4: oklch(0.56 0.15 49);
     --chart-5: oklch(0.47 0.12 46.2);
 
-    --font-sans: Inter, sans-serif;
-    --font-serif: Source Serif 4, serif;
-    --font-mono: JetBrains Mono, monospace;
     --radius: 0.625rem;
     --shadow-2xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0px 4px 8px -1px hsl(0 0% 0% / 0.05);
@@ -179,7 +170,7 @@ input::-ms-clear {
 }
 
 @theme {
-  --font-manrope: "Manrope", "sans-serif";
+  --font-geist: "Geist", "sans-serif";
   --default-border-width: 0.5px;
   /* --font-sans: Inter, sans-serif; */
   /* --font-serif: Source Serif 4, serif; */
@@ -462,5 +453,5 @@ input::-ms-clear {
 
 mark {
   background: var(--color-primary);
-  color: var(--primary-foreground)
+  color: var(--primary-foreground);
 }

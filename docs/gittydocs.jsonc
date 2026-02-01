@@ -9,6 +9,9 @@
       "docsPath": "docs",
     },
   },
+  "theme": {
+    "preset": "ocean",
+  },
   "nav": [
     {
       "label": "Docs",
@@ -16,6 +19,7 @@
         { "label": "Introduction", "path": "/" },
         { "label": "Motivation", "path": "/motivation" },
         { "label": "Configuration", "path": "/configuration" },
+        { "label": "Theming", "path": "/theming" },
       ],
     },
     {
