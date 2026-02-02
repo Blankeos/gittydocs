@@ -13,8 +13,7 @@ export type { PageRoute, UseParamsResult };
 
 const pageRoutes = [
   "/",
-  "/@",
-  "/hatdog"
+  "/@"
 ] as const;
 
 type PageRoute = typeof pageRoutes[number];

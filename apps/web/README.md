@@ -3,12 +3,19 @@
 This is built on top of the Solid Launch template:
 https://github.com/blankeos/solid-launch
 
-gittydocs keeps Vike routing intact in `src/pages/` (including the `(docs)` routes) and collocates gittydocs-specific modules under `src/gittydocs/`.
+Gittydocs is essentially a repackaged docs template. So you could use it without the template. If you're reading this, you're using the ejected version for more granular customizations.
 
-Structure (high level)
+### Structure (high level)
 
+**Gittydocs stuff**
+
+- `docs/` – your content (follows https://gittydocs.carlo.tl) linked via env `GITTYDOCS_SOURCE`
 - `src/gittydocs/` – gittydocs code (components, contexts, hooks, lib, styles)
-- `docs/` – your content (follows https://gittydocs.carlo.tl)
+- `src/pages/(docs)/` – Vike routes for documentation pages at `/*`
+- `scripts/gen-velite-routes.ts` and `scripts/prepare-docs.ts` - Scripts that are used to build your docs
+
+**Regular vike stuff**
+
 - `src/pages/` – Vike pages
 - Shared code from the template stays put
 
