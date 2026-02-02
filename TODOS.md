@@ -14,9 +14,9 @@
     - [x] Parts to update: docs templates
   - [x] ~An AI skill / just reusing llms.txt ? (Just maybe but very deprioritized)~
     - [x] Parts to update: docs, llms.txt generation
-- [ ] Refactor:
-  - [ ] Collocate all gittydocs files into a folder so when ejecting, it's very easy to see where gittydocs is.
-    - [ ] Parts to update: project structure, eject docs
+- [x] Refactor:
+  - [x] Collocate all gittydocs files into a folder so when ejecting, it's very easy to see where gittydocs is.
+    - [x] Parts to update: project structure, eject docs
 - [x] clear distinct approaches:
   - [x] out-of-the-box setup
     - [x] Better packaging (i.e. binarify the web project, only add the .env and the config, we're good)
