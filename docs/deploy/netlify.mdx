@@ -3,15 +3,40 @@ title: Netlify 🌐
 description: Deploy your docs to Netlify.
 ---
 
-Connect your repository with these settings:
+Generate a workflow:
 
-**Build configuration:**
-- **Build command:** `bun run build`
-- **Publish directory:** `dist/client`
-
-**Environment variables:**
-```
-GITTYDOCS_SOURCE=https://github.com/yourusername/yourrepo/tree/main/docs
+```bash
+npx gittydocs@latest deploy --netlify
 ```
 
-Deploy.
+If your docs folder isn't `docs/`, update the build path in the workflow.
+
+This writes `.github/workflows/deploy-gittydocs.yml`.
+
+Required GitHub Actions secrets:
+
+- `NETLIFY_AUTH_TOKEN`
+- `NETLIFY_SITE_ID`
+
+Generated workflow:
+
+```yaml
+name: Deploy Gittydocs (Netlify)
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: oven-sh/setup-bun@v2
+      - run: npx gittydocs@latest build "./docs"
+      - run: npx netlify-cli@latest deploy --dir="./dist/client" --prod
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+```

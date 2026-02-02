@@ -3,11 +3,18 @@ title: GitHub Pages 🚀
 description: Deploy your docs to GitHub Pages.
 ---
 
-Create `.github/workflows/deploy.yml`:
+Generate a workflow:
+
+```bash
+npx gittydocs@latest deploy --ghpages
+```
+
+This writes `.github/workflows/deploy-gittydocs.yml`.
+
+Generated workflow:
 
 ```yaml
-# .github/workflows/deploy.yml
-name: Deploy
+name: Deploy Gittydocs (GitHub Pages)
 on:
   push:
     branches: [main]
@@ -20,14 +27,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - uses: oven-sh/setup-bun@v2
-      - run: bunx degit blankeos/gittydocs/template ./temp && mv ./temp/* . && rm -rf ./temp
-      - run: bun install
-      - run: GITTYDOCS_SOURCE="https://github.com/${{ github.repository }}/tree/${{ github.ref_name }}/docs" bun run build
+      - run: npx gittydocs@latest build "./docs"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist/client
       - uses: actions/deploy-pages@v4
 ```
 
-Enable GitHub Pages in repo settings → Pages → Source: GitHub Actions.
+If your docs folder isn't `docs/`, update the build path in the workflow.
+
+Enable GitHub Pages in repo settings -> Pages -> Source: GitHub Actions.

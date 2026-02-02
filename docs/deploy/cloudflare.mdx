@@ -3,15 +3,44 @@ title: Cloudflare Pages ☁️
 description: Deploy your docs to Cloudflare Pages.
 ---
 
-Connect your repository with these settings:
+Generate a workflow:
 
-**Build configuration:**
-- **Build command:** `bun run build`
-- **Build output:** `dist/client`
-
-**Environment variables:**
-```
-GITTYDOCS_SOURCE=https://github.com/yourusername/yourrepo/tree/main/docs
+```bash
+npx gittydocs@latest deploy --cfpages
 ```
 
-Deploy.
+This writes `.github/workflows/deploy-gittydocs.yml`.
+
+Required GitHub Actions secrets:
+
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
+
+Generated workflow:
+
+```yaml
+name: Deploy Gittydocs (Cloudflare Pages)
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: oven-sh/setup-bun@v2
+      - run: npx gittydocs@latest build "./docs"
+      - uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ${{ github.event.repository.name }}
+          directory: ./dist/client
+```
+
+If your docs folder isn't `docs/`, update the build path in the workflow.
+
+If your Cloudflare Pages project name is not your repo name, edit `projectName`.

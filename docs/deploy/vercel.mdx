@@ -3,19 +3,38 @@ title: Vercel ▲
 description: Deploy your docs to Vercel.
 ---
 
+Generate a workflow:
+
 ```bash
-bunx degit blankeos/gittydocs/template my-docs
-cd my-docs && bun install
+npx gittydocs@latest deploy --vercel
 ```
 
-Set environment variable in Vercel dashboard:
+If your docs folder isn't `docs/`, update the build path in the workflow.
 
+This writes `.github/workflows/deploy-gittydocs.yml`.
+
+Required GitHub Actions secret:
+
+- `VERCEL_TOKEN`
+
+Generated workflow:
+
+```yaml
+name: Deploy Gittydocs (Vercel)
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: oven-sh/setup-bun@v2
+      - run: npx gittydocs@latest build "./docs"
+      - run: npx vercel@latest deploy --prod --yes --token="${VERCEL_TOKEN}" "./dist/client"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 ```
-GITTYDOCS_SOURCE=https://github.com/yourusername/yourrepo/tree/main/docs
-```
-
-Build settings (auto-detected):
-- **Build Command:** `bun run build`
-- **Output Directory:** `dist/client`
-
-Deploy.

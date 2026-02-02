@@ -15,43 +15,43 @@ Create `gittydocs.jsonc` in your docs folder:
       "owner": "username",
       "name": "repo",
       "ref": "main",
-      "docsPath": "docs"
-    }
+      "docsPath": "docs",
+    },
   },
   "nav": [
     {
       "label": "Section",
       "items": [
         { "label": "Page", "path": "/" },
-        { "label": "Subpage", "path": "/subpage" }
-      ]
-    }
+        { "label": "Subpage", "path": "/subpage" },
+      ],
+    },
   ],
   "links": {
     "github": "https://github.com/user/repo",
-    "issues": "https://github.com/user/repo/issues"
-  }
+    "issues": "https://github.com/user/repo/issues",
+  },
 }
 ```
 
 ## Options
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `site.name` | string | Site title |
-| `site.description` | string | Short site description used in `/llms.txt` |
-| `site.logo` | string | Logo image URL or public path |
-| `site.repo.owner` | string | GitHub username or org |
-| `site.repo.name` | string | Repository name |
-| `site.repo.ref` | string | Branch or tag (default: `main`) |
-| `site.repo.docsPath` | string | Path to docs folder |
-| `nav` | array | Custom navigation sections |
-| `links.github` | string | URL to repository or org |
-| `links.issues` | string | URL to issues page |
-| `theme.preset` | string | Preset theme name (see `/theming`) |
-| `theme.cssFile` | string | Path to a CSS file in your docs folder |
-| `llms.enabled` | boolean | Generate `/llms.txt` at build time (default: `true`) |
-| `llms.path` | string | Folder for per-page LLM markdown (default: `llms`) |
+| Field                | Type    | Description                                          |
+| -------------------- | ------- | ---------------------------------------------------- |
+| `site.name`          | string  | Site title                                           |
+| `site.description`   | string  | Short site description used in `/llms.txt`           |
+| `site.logo`          | string  | Logo image URL or public path                        |
+| `site.repo.owner`    | string  | GitHub username or org                               |
+| `site.repo.name`     | string  | Repository name                                      |
+| `site.repo.ref`      | string  | Branch or tag (default: `main`)                      |
+| `site.repo.docsPath` | string  | Path to docs folder                                  |
+| `nav`                | array   | Custom navigation sections                           |
+| `links.github`       | string  | URL to repository or org                             |
+| `links.issues`       | string  | URL to issues page                                   |
+| `theme.preset`       | string  | Preset theme name (see `/theming`)                   |
+| `theme.cssFile`      | string  | Path to a CSS file in your docs folder               |
+| `llms.enabled`       | boolean | Generate `/llms.txt` at build time (default: `true`) |
+| `llms.path`          | string  | Folder for per-page LLM markdown (default: `llms`)   |
 
 `site.logo` can be a full URL or a path to a file in `public/`. Relative paths are resolved with the base URL.
 
@@ -62,11 +62,13 @@ For more theming details and presets, see `/theming`.
 Set `GITTYDOCS_SOURCE` environment variable to point to your docs:
 
 **GitHub URL** (auto-parsed):
+
 ```bash
 GITTYDOCS_SOURCE=https://github.com/owner/repo/tree/main/docs
 ```
 
 **Local path** (absolute):
+
 ```bash
 GITTYDOCS_SOURCE=/absolute/path/to/docs
 ```
@@ -87,6 +89,7 @@ Content here.
 ```
 
 Files sorted by:
+
 1. `index.*` first
 2. Numeric prefix (`01-intro.md`)
 3. Alphabetical
@@ -96,8 +99,9 @@ Files sorted by:
 The template is a thin wrapper around [Velite](https://velite.js.org/). For full control:
 
 ```bash
-bunx degit blankeos/gittydocs/apps/web my-docs
-cd my-docs && bun install
+bunx gittydocs@latest new my-docs --ejected
+cd my-docs
+bun install
 ```
 
 Edit `velite.config.ts`, components, styles. Deploy the same way.

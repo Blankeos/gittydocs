@@ -1,0 +1,29 @@
+{
+  "site": {
+    "name": "My Project",
+    "description": "Documentation for My Project.",
+    "logo": "/static/logo.svg",
+    "repo": {
+      "owner": "yourusername",
+      "name": "yourrepo",
+      "ref": "main",
+      "docsPath": "docs"
+    }
+  },
+  "nav": [
+    {
+      "label": "Docs",
+      "items": [
+        { "label": "Overview", "path": "/" },
+        { "label": "Getting Started", "path": "/getting-started" }
+      ]
+    }
+  ],
+  "links": {
+    "github": "https://github.com/yourusername/yourrepo",
+    "issues": "https://github.com/yourusername/yourrepo/issues"
+  },
+  "theme": {
+    "cssFile": "theme.css"
+  }
+}

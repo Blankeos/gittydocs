@@ -72,6 +72,10 @@ export const gittydocsConfig: DocsConfig | null = {
           "path": "/configuration"
         },
         {
+          "label": "CLI",
+          "path": "/cli"
+        },
+        {
           "label": "Theming",
           "path": "/theming"
         }

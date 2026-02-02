@@ -12,6 +12,7 @@ Per-page markdown lives at /llms/... by default.
 - [Motivation](/llms/motivation.md): Why gittydocs exists.
 - [AI Docs Prompt](/llms/ai-docs-prompt.md): Let an LLM write your docs for you with our llms.txt.
 - [Configuration ⚙️](/llms/configuration.md): Configure your gittydocs site.
+- [CLI](/llms/cli.md): Scaffold, develop, build, and deploy with the gittydocs CLI.
 - [Theming](/llms/theming.md): Customize app.css, choose a preset, and add custom CSS.
 
 ### Deploy

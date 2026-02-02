@@ -1,0 +1,78 @@
+---
+title: CLI
+description: Scaffold, develop, build, and deploy with the gittydocs CLI.
+---
+
+# CLI
+
+The `gittydocs` CLI packages the docs app into a local workflow.
+
+## Install
+
+Use `npx` (no install):
+
+```bash
+npx gittydocs@latest --help
+```
+
+Or install globally:
+
+```bash
+npm i -g gittydocs
+gittydocs --help
+```
+
+## Commands
+
+### `gittydocs new <folder>`
+
+Create a new docs folder scaffold:
+
+```bash
+gittydocs new my-docs
+cd my-docs
+gittydocs dev docs
+```
+
+For the fully customizable app (ejected):
+
+```bash
+gittydocs new my-docs --ejected
+cd my-docs
+bun install
+bun run dev
+```
+
+### `gittydocs dev <GITTYDOCS_SOURCE>`
+
+Run the local dev server:
+
+```bash
+gittydocs dev ./docs
+```
+
+If `./docs/.env` exists, it is loaded automatically (or use `--env`).
+
+### `gittydocs build <GITTYDOCS_SOURCE>`
+
+Build a static site:
+
+```bash
+gittydocs build ./docs
+```
+
+Output defaults to `dist/client` (override with `--out`).
+
+### `gittydocs deploy`
+
+Generate GitHub Actions workflow(s):
+
+```bash
+gittydocs deploy --ghpages
+```
+
+Commit the generated workflow(s) in `.github/workflows/`.
+
+## Requirements
+
+`gittydocs dev` and `gittydocs build` require `bun`.
