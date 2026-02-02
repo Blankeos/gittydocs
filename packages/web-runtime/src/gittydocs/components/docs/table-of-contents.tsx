@@ -112,7 +112,7 @@ export function TableOfContents(props: TableOfContentsProps) {
       <div ref={mobileRef} class={cn("relative", props.class)}>
         <button
           type="button"
-          class="flex w-full items-center justify-between gap-2 rounded-none border-x-0 border-b border-t-0 bg-background/95 px-3 py-2 text-sm shadow-sm backdrop-blur"
+          class="flex w-full items-center justify-between gap-2 rounded-none border-x-0 border-b border-t-0 bg-background/95 px-4 py-3 text-sm backdrop-blur"
           aria-expanded={mobileOpen()}
           aria-controls="mobile-toc-panel"
           onClick={() => setMobileOpen((open) => !open)}
