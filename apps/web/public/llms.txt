@@ -1,0 +1,21 @@
+﻿# gittydocs
+
+> Simple, fast docs from your Markdown.
+
+Paths are site-relative. Use {origin}{path}, not /llms.txt{path}.
+Per-page markdown lives at /llms/... by default.
+
+## Table of Contents
+
+### Docs
+- [Introduction](/llms/index.md): Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site.
+- [Motivation](/llms/motivation.md): Why gittydocs exists.
+- [AI Docs Prompt](/llms/ai-docs-prompt.md): Let an LLM write your docs for you with our llms.txt.
+- [Configuration ⚙️](/llms/configuration.md): Configure your gittydocs site.
+- [Theming](/llms/theming.md): Customize app.css, choose a preset, and add custom CSS.
+
+### Deploy
+- [GitHub Pages 🚀](/llms/deploy/github-pages.md): Deploy your docs to GitHub Pages.
+- [Vercel ▲](/llms/deploy/vercel.md): Deploy your docs to Vercel.
+- [Cloudflare Pages ☁️](/llms/deploy/cloudflare.md): Deploy your docs to Cloudflare Pages.
+- [Netlify 🌐](/llms/deploy/netlify.md): Deploy your docs to Netlify.

@@ -1,7 +1,6 @@
----
-title: Theming
-description: Customize app.css, choose a preset, and add custom CSS.
----
+﻿# Theming
+
+> Customize app.css, choose a preset, and add custom CSS.
 
 gittydocs themes are pure CSS. The default look lives in `app.css`, and themes are just CSS variable overrides. It follows a shadcn-style token setup, so tools like tweakcn work well for live edits and previews. You can pick a preset, add a CSS file, or fully eject for deeper changes.
 

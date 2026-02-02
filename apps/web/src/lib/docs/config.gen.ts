@@ -17,6 +17,7 @@ export interface NavItem {
 export interface DocsConfig {
   site: {
     name: string
+    description?: string
     logo?: string
     repo?: GitHubRepo
   }
@@ -29,11 +30,16 @@ export interface DocsConfig {
     preset?: string
     cssFile?: string
   }
+  llms?: {
+    enabled?: boolean
+    path?: string
+  }
 }
 
 export const gittydocsConfig: DocsConfig | null = {
   "site": {
     "name": "gittydocs",
+    "description": "Simple, fast docs from your Markdown.",
     "logo": "/icon-logo.svg",
     "repo": {
       "owner": "blankeos",
@@ -56,6 +62,10 @@ export const gittydocsConfig: DocsConfig | null = {
         {
           "label": "Motivation",
           "path": "/motivation"
+        },
+        {
+          "label": "AI Docs Prompt",
+          "path": "/ai-docs-prompt"
         },
         {
           "label": "Configuration",

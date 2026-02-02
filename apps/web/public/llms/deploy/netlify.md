@@ -1,0 +1,16 @@
+﻿# Netlify 🌐
+
+> Deploy your docs to Netlify.
+
+Connect your repository with these settings:
+
+**Build configuration:**
+- **Build command:** `bun run build`
+- **Publish directory:** `dist/client`
+
+**Environment variables:**
+```
+GITTYDOCS_SOURCE=https://github.com/yourusername/yourrepo/tree/main/docs
+```
+
+Deploy.

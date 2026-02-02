@@ -19,6 +19,8 @@ export function DocsNav() {
   const docs = useDocsContext()
   const pageContext = usePageContext()
   const pathname = () => stripBasePath(pageContext.urlParsed?.pathname || "/")
+  const navItems = createMemo(() => removeLlmsItems(docs.nav))
+  const llmsEnabled = () => docs.config?.llms?.enabled !== false
 
   const [accordionState, setAccordionState] = createStore<AccordionState>({
     openAccordions: {},
@@ -31,7 +33,7 @@ export function DocsNav() {
   onMount(() => {
     // Initialize accordions that contain the current active link
     const initialOpen: Record<string, boolean> = {}
-    docs.nav.forEach((item) => {
+    navItems().forEach((item) => {
       if (item.accordion && item.items) {
         const hasActiveChild = item.items.some(
           (child) => child.path && isActive(pathname(), child.path)
@@ -46,7 +48,7 @@ export function DocsNav() {
 
   return (
     <div class="w-full">
-      <For each={docs.nav}>
+      <For each={navItems()}>
         {(item) => (
           <NavSection
             item={item}
@@ -55,6 +57,21 @@ export function DocsNav() {
           />
         )}
       </For>
+      <Show when={llmsEnabled()}>
+        <div class="mt-4 border-t pt-3">
+          <a
+            href={withBasePath("/llms.txt")}
+            data-vike="false"
+            class={cn(
+              "flex w-full items-center border-l-2 border-transparent px-3 py-1 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+              isActive(pathname(), "/llms.txt") &&
+                "border-l-primary bg-accent font-medium text-accent-foreground"
+            )}
+          >
+            llms.txt
+          </a>
+        </div>
+      </Show>
     </div>
   )
 }
@@ -184,4 +201,15 @@ function isActive(currentPath: string, navPath: string): boolean {
     return currentPath === "/"
   }
   return currentPath.startsWith(navPath)
+}
+
+function removeLlmsItems(items: NavItem[]): NavItem[] {
+  return items
+    .filter((item) => item.path !== "/llms.txt")
+    .map((item) => {
+      if (!item.items) return item
+      const filteredItems = item.items.filter((child) => child.path !== "/llms.txt")
+      return { ...item, items: filteredItems }
+    })
+    .filter((item) => !item.items || item.items.length > 0)
 }

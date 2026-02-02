@@ -1,7 +1,6 @@
----
-title: Configuration ⚙️
-description: Configure your gittydocs site.
----
+﻿# Configuration ⚙️
+
+> Configure your gittydocs site.
 
 Create `gittydocs.jsonc` in your docs folder:
 

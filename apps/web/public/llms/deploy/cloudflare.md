@@ -1,0 +1,16 @@
+﻿# Cloudflare Pages ☁️
+
+> Deploy your docs to Cloudflare Pages.
+
+Connect your repository with these settings:
+
+**Build configuration:**
+- **Build command:** `bun run build`
+- **Build output:** `dist/client`
+
+**Environment variables:**
+```
+GITTYDOCS_SOURCE=https://github.com/yourusername/yourrepo/tree/main/docs
+```
+
+Deploy.

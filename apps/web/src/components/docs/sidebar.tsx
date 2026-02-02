@@ -14,7 +14,7 @@ export function Sidebar(props: SidebarProps) {
         props.class
       )}
     >
-      <div class="py-4">{props.children}</div>
+      <div class="flex min-h-full flex-col py-4">{props.children}</div>
     </aside>
   )
 }

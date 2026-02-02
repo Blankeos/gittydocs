@@ -18,6 +18,7 @@ interface PreparedSource {
 interface DocsConfig {
   site?: {
     name?: string
+    description?: string
     logo?: string
     repo?: GitHubSource
   }
@@ -30,6 +31,16 @@ interface DocsConfig {
     preset?: string
     cssFile?: string
   }
+  llms?: {
+    enabled?: boolean
+  }
+}
+
+interface NavItem {
+  label: string
+  path?: string
+  items?: NavItem[]
+  accordion?: boolean
 }
 
 const projectRoot = process.cwd()
@@ -59,6 +70,10 @@ const staticExtensions = new Set([
   ".eot",
 ])
 const configFiles = ["gittydocs.jsonc", "gittydocs.json"]
+
+const llmsTitleByRoute = new Map<string, string>()
+const llmsDescriptionByRoute = new Map<string, string>()
+const llmsPathByRoute = new Map<string, string>()
 
 try {
   await prepareDocs()
@@ -93,6 +108,7 @@ async function prepareDocs() {
   }
 
   await writeThemeSource(source, config)
+  await writeLlmsFile(config)
 }
 
 async function clearConfigFiles() {
@@ -360,6 +376,7 @@ export interface NavItem {
 export interface DocsConfig {
   site: {
     name: string
+    description?: string
     logo?: string
     repo?: GitHubRepo
   }
@@ -371,6 +388,10 @@ export interface DocsConfig {
   theme?: {
     preset?: string
     cssFile?: string
+  }
+  llms?: {
+    enabled?: boolean
+    path?: string
   }
 }
 
@@ -416,6 +437,30 @@ async function writeThemeSource(source: PreparedSource, config: DocsConfig | nul
   }
 
   await writeThemeSourceFile(`/static/${normalizedFile.replace(/\\/g, "/")}`)
+}
+
+async function writeLlmsFile(config: DocsConfig | null) {
+  const enabled = config?.llms?.enabled !== false
+  const outputPath = path.join(projectRoot, "public", "llms.txt")
+  const llmsDir = normalizeLlmsDir(config?.llms?.path)
+  const llmsDirPath = path.join(projectRoot, "public", llmsDir)
+
+  if (!enabled) {
+    await fs.rm(outputPath, { force: true })
+    await fs.rm(llmsDirPath, { recursive: true, force: true })
+    return
+  }
+
+  const pages = await collectDocsPages()
+  const titleByRoute = new Map(pages.map((page) => [page.routePath, page.title]))
+  seedLlmsMaps(pages, llmsDir)
+  const nav = buildNavForLlms(pages, titleByRoute, config?.nav as NavItem[] | undefined)
+  const llmsContent = renderLlmsTxt(nav, config, llmsDir)
+  const withBom = `\uFEFF${llmsContent}`
+
+  await ensureDir(path.dirname(outputPath))
+  await fs.writeFile(outputPath, withBom, "utf-8")
+  await writeLlmsSubpages(pages, llmsDir)
 }
 
 function resolveThemeFile(config: DocsConfig | null) {
@@ -502,6 +547,328 @@ async function writeSourceMap(sourceMap: Record<string, string>) {
 
   await ensureDir(path.dirname(outputPath))
   await fs.writeFile(outputPath, content, "utf-8")
+}
+
+interface LlmsPage {
+  routePath: string
+  sourcePath: string
+  title: string
+  description?: string
+  body: string
+}
+
+async function collectDocsPages(): Promise<LlmsPage[]> {
+  const files = await collectFiles(docsRoot)
+  const pages: LlmsPage[] = []
+
+  for (const filePath of files) {
+    const ext = path.extname(filePath).toLowerCase()
+    if (!docsExtensions.has(ext)) continue
+
+    const relativePath = path.relative(docsRoot, filePath).replace(/\\/g, "/")
+    const routePath = toRoutePath(relativePath)
+    const raw = await fs.readFile(filePath, "utf-8")
+    const title = extractFrontmatterField(raw, "title") || defaultLabel(path.basename(relativePath))
+    const description = extractFrontmatterField(raw, "description") || undefined
+    const body = stripFrontmatter(raw)
+
+    pages.push({ routePath, sourcePath: relativePath, title, description, body })
+  }
+
+  return pages
+}
+
+function stripFrontmatter(content: string): string {
+  if (!content.startsWith("---")) return content
+  const endIndex = content.indexOf("\n---", 3)
+  if (endIndex === -1) return content
+  const body = content.slice(endIndex + 4)
+  return body.replace(/^\s+/, "")
+}
+
+function extractFrontmatterField(content: string, field: string): string | null {
+  if (!content.startsWith("---")) return null
+  const endIndex = content.indexOf("\n---", 3)
+  if (endIndex === -1) return null
+
+  const frontmatter = content.slice(3, endIndex)
+  const pattern = new RegExp(`(^|\\n)\\s*${escapeRegex(field)}\\s*:\\s*(.+)\\s*$`, "m")
+  const match = frontmatter.match(pattern)
+  if (!match) return null
+
+  let value = match[2].trim()
+  if (
+    (value.startsWith("\"") && value.endsWith("\"")) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    value = value.slice(1, -1)
+  }
+
+  return value || null
+}
+
+function buildNavForLlms(
+  pages: LlmsPage[],
+  titleByRoute: Map<string, string>,
+  configNav?: NavItem[]
+): NavItem[] {
+  if (configNav && configNav.length > 0) {
+    return configNav
+  }
+
+  const tree = buildFileTree(pages.map((p) => p.sourcePath))
+  return buildNavFromTree(tree, titleByRoute)
+}
+
+interface FileNode {
+  name: string
+  path: string
+  type: "file" | "directory"
+  children?: FileNode[]
+}
+
+function buildFileTree(paths: string[]): FileNode[] {
+  const root: FileNode = { name: "", path: "", type: "directory", children: [] }
+
+  for (const filePath of paths) {
+    const parts = filePath.split("/").filter(Boolean)
+    let current = root
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i]
+      const isFile = i === parts.length - 1
+      if (!current.children) current.children = []
+
+      let next = current.children.find((child) => child.name === part)
+      if (!next) {
+        next = {
+          name: part,
+          path: current.path ? `${current.path}/${part}` : part,
+          type: isFile ? "file" : "directory",
+          children: isFile ? undefined : [],
+        }
+        current.children.push(next)
+      }
+
+      current = next
+    }
+  }
+
+  return root.children || []
+}
+
+function buildNavFromTree(tree: FileNode[], titleByRoute: Map<string, string>): NavItem[] {
+  const nav: NavItem[] = []
+
+  const sorted = [...tree].sort((a, b) => {
+    const aIsIndex = a.name.startsWith("index.")
+    const bIsIndex = b.name.startsWith("index.")
+
+    if (aIsIndex && !bIsIndex) return -1
+    if (!aIsIndex && bIsIndex) return 1
+
+    const aNum = a.name.match(/^(\d+)-/)
+    const bNum = b.name.match(/^(\d+)-/)
+
+    if (aNum && bNum) return parseInt(aNum[1], 10) - parseInt(bNum[1], 10)
+    if (aNum) return -1
+    if (bNum) return 1
+
+    return a.name.localeCompare(b.name)
+  })
+
+  for (const node of sorted) {
+    if (node.type === "directory" && node.children) {
+      const children = buildNavFromTree(node.children, titleByRoute)
+      if (children.length > 0) {
+        nav.push({
+          label: formatLabel(node.name),
+          items: children,
+        })
+      }
+      continue
+    }
+
+    if (node.type === "file") {
+      const routePath = toRoutePath(node.path.replace(/\.(md|mdx)$/i, ""))
+      const label = titleByRoute.get(routePath) || defaultLabel(node.name)
+      nav.push({ label, path: routePath })
+    }
+  }
+
+  return nav
+}
+
+function defaultLabel(name: string): string {
+  if (name.startsWith("index.")) return "Overview"
+  return formatLabel(name.replace(/\.(md|mdx)$/i, ""))
+}
+
+function formatLabel(name: string): string {
+  const cleanName = name.replace(/^\d+-/, "")
+  return cleanName
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ")
+}
+
+function renderLlmsTxt(nav: NavItem[], config: DocsConfig | null, llmsDir: string): string {
+  const lines: string[] = []
+  const siteName = config?.site?.name || "Documentation"
+  const siteDescription = config?.site?.description
+
+  lines.push(`# ${siteName}`)
+  if (siteDescription) {
+    lines.push("")
+    lines.push(`> ${siteDescription}`)
+  }
+  lines.push("")
+  lines.push(`Paths are site-relative. Use {origin}{path}, not /llms.txt{path}.`)
+  lines.push(`Per-page markdown lives at /${llmsDir}/... by default.`)
+  lines.push("")
+  lines.push("## Table of Contents")
+  lines.push("")
+
+  const standalone: NavItem[] = []
+  const sections: NavItem[] = []
+
+  for (const item of nav) {
+    if (item.items && item.items.length > 0) {
+      sections.push(item)
+    } else if (item.path) {
+      standalone.push(item)
+    }
+  }
+
+  if (standalone.length > 0) {
+    lines.push("### Pages")
+    lines.push(...renderNavItems(standalone))
+    lines.push("")
+  }
+
+  for (const section of sections) {
+    lines.push(`### ${section.label}`)
+    if (section.items) {
+      lines.push(...renderNavItems(section.items))
+    }
+    lines.push("")
+  }
+
+  return lines.join("\n").trimEnd() + "\n"
+}
+
+function renderNavItems(items: NavItem[]): string[] {
+  const lines: string[] = []
+
+  for (const item of items) {
+    if (item.items && item.items.length > 0) {
+      for (const child of item.items) {
+        const normalizedPath = normalizeLlmsPath(child.path)
+        if (!normalizedPath || normalizedPath === "/llms.txt") continue
+        lines.push(renderNavLine(normalizedPath, child.label))
+      }
+      continue
+    }
+
+    const normalizedPath = normalizeLlmsPath(item.path)
+    if (!normalizedPath || normalizedPath === "/llms.txt") continue
+    lines.push(renderNavLine(normalizedPath, item.label))
+  }
+
+  return lines
+}
+
+function seedLlmsMaps(pages: LlmsPage[], llmsDir: string) {
+  llmsTitleByRoute.clear()
+  llmsDescriptionByRoute.clear()
+  llmsPathByRoute.clear()
+  for (const page of pages) {
+    llmsTitleByRoute.set(page.routePath, page.title)
+    if (page.description) {
+      llmsDescriptionByRoute.set(page.routePath, page.description)
+    }
+    llmsPathByRoute.set(page.routePath, buildLlmsPath(page, llmsDir))
+  }
+}
+
+function renderNavLine(pathValue: string, fallbackLabel: string): string {
+  const resolvedPath = resolveLlmsPath(pathValue)
+  const label =
+    llmsTitleByRoute.get(pathValue) ||
+    fallbackLabel ||
+    pathValue
+  const description = llmsDescriptionByRoute.get(pathValue)
+  if (description) {
+    return `- [${label}](${resolvedPath}): ${description}`
+  }
+  return `- [${label}](${resolvedPath})`
+}
+
+function resolveLlmsPath(pathValue: string): string {
+  if (/^https?:\/\//i.test(pathValue)) return pathValue
+  return llmsPathByRoute.get(pathValue) || pathValue
+}
+
+function normalizeLlmsPath(pathValue?: string): string | null {
+  if (!pathValue) return null
+  if (/^https?:\/\//i.test(pathValue)) return pathValue
+  return pathValue.startsWith("/") ? pathValue : `/${pathValue}`
+}
+
+function normalizeLlmsDir(value?: string): string {
+  const raw = (value || "llms").trim().replace(/^\/+|\/+$/g, "")
+  return raw.length > 0 ? raw : "llms"
+}
+
+function buildLlmsPath(page: LlmsPage, llmsDir: string): string {
+  const relative = page.sourcePath.replace(/\.(md|mdx)$/i, ".md").replace(/^\/+/, "")
+  return `/${llmsDir}/${relative}`
+}
+
+async function writeLlmsSubpages(pages: LlmsPage[], llmsDir: string) {
+  const outputRoot = path.join(projectRoot, "public", llmsDir)
+  await fs.rm(outputRoot, { recursive: true, force: true })
+  for (const page of pages) {
+    const outputPath = path.join(
+      outputRoot,
+      page.sourcePath.replace(/\.(md|mdx)$/i, ".md")
+    )
+    await ensureDir(path.dirname(outputPath))
+    const content = `\uFEFF${renderLlmsPage(page)}`
+    await fs.writeFile(outputPath, content, "utf-8")
+  }
+}
+
+function renderLlmsPage(page: LlmsPage): string {
+  const body = page.body.trim()
+
+  if (body.startsWith("#")) {
+    const endOfHeading = body.indexOf("\n")
+    const headingLine = endOfHeading === -1 ? body : body.slice(0, endOfHeading)
+    const rest = endOfHeading === -1 ? "" : body.slice(endOfHeading + 1).trimStart()
+    const lines: string[] = [headingLine]
+
+    if (page.description) {
+      lines.push("")
+      lines.push(`> ${page.description}`)
+    }
+    if (rest) {
+      lines.push("")
+      lines.push(rest)
+    }
+    return lines.join("\n").trimEnd() + "\n"
+  }
+
+  const lines: string[] = [`# ${page.title}`]
+  if (page.description) {
+    lines.push("")
+    lines.push(`> ${page.description}`)
+  }
+  if (body) {
+    lines.push("")
+    lines.push(body)
+  }
+  return lines.join("\n").trimEnd() + "\n"
 }
 
 function toRoutePath(relativePath: string) {

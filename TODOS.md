@@ -7,13 +7,13 @@
   - [x] Parts to update: global styles, theme tokens
 - [ ] Hot reload during development.
   - [ ] Parts to update: dev server config, docs
-- [ ] AI-friendliness:
-  - [ ] A clear llms.txt endpoint + an llms.txt, add it as a new feature called automatic llms.txt.
-    - [ ] Parts to update: server routes, docs
-  - [ ] A 1-shot prompt.
-    - [ ] Parts to update: docs templates
-  - [ ] An AI skill / just reusing llms.txt
-    - [ ] Parts to update: docs, llms.txt generation
+- [x] AI-friendliness:
+  - [x] A clear llms.txt endpoint + an llms.txt, add it as a new feature called automatic llms.txt.
+    - [x] Parts to update: server routes, docs
+  - [x] A 1-shot prompt to tell an AI essentially 'Make my docs using gittydocs'.
+    - [x] Parts to update: docs templates
+  - [x] ~An AI skill / just reusing llms.txt ? (Just maybe but very deprioritized)~
+    - [x] Parts to update: docs, llms.txt generation
 - [ ] Refactor:
   - [ ] Collocate all gittydocs files into a folder so when ejecting, it's very easy to see where gittydocs is.
     - [ ] Parts to update: project structure, eject docs
