@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/drawer"
 import { IconMoonDuo, IconSunDuo } from "@/assets/icons"
 import { useThemeContext } from "@/contexts/theme.context"
-import { useDocsContext } from "@/contexts/docs.context"
+import { useDocsContext } from "@/gittydocs/contexts/docs.context"
 import { withBasePath } from "@/utils/base-path"
 import { DocsNav } from "./docs-nav"
 import { SearchDialog } from "./search-dialog"
-import { useSearchContext } from "@/contexts/search.context"
+import { useSearchContext } from "@/gittydocs/contexts/search.context"
 
 export function DocsHeader() {
   const docs = useDocsContext()

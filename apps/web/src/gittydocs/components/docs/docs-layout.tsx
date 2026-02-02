@@ -1,7 +1,7 @@
 import type { FlowProps } from "solid-js"
-import { DocsHeader } from "@/components/docs/docs-header"
-import { DocsNav } from "@/components/docs/docs-nav"
-import { Sidebar } from "@/components/docs/sidebar"
+import { DocsHeader } from "@/gittydocs/components/docs/docs-header"
+import { DocsNav } from "@/gittydocs/components/docs/docs-nav"
+import { Sidebar } from "@/gittydocs/components/docs/sidebar"
 
 export function DocsLayout(props: FlowProps) {
   return (

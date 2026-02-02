@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
 
 @import "tailwindcss";
-@import "./themes/slate.css";
-@import "./themes/sage.css";
-@import "./themes/ember.css";
-@import "./themes/ocean.css";
-@import "./themes/sand.css";
+@import "../gittydocs/styles/themes/slate.css";
+@import "../gittydocs/styles/themes/sage.css";
+@import "../gittydocs/styles/themes/ember.css";
+@import "../gittydocs/styles/themes/ocean.css";
+@import "../gittydocs/styles/themes/sand.css";
 
 /* HTML Defaults */
 body {

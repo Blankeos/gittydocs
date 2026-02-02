@@ -1,8 +1,8 @@
 import { docs } from "@velite"
 import { createMemo, type FlowComponent } from "solid-js"
 import { createStrictContext } from "@/utils/create-strict-context"
-import type { DocsConfig, NavItem } from "@/lib/docs/config.gen"
-import { gittydocsConfig } from "@/lib/docs/config.gen"
+import type { DocsConfig, NavItem } from "@/gittydocs/lib/docs/config.gen"
+import { gittydocsConfig } from "@/gittydocs/lib/docs/config.gen"
 import { Index } from "flexsearch"
 
 // ===========================================================================

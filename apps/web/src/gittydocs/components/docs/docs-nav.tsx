@@ -1,7 +1,7 @@
 import { For, Show, createMemo, onMount } from "solid-js"
 import { createStore } from "solid-js/store"
 import { usePageContext } from "vike-solid/usePageContext"
-import { useDocsContext, type NavItem } from "@/contexts/docs.context"
+import { useDocsContext, type NavItem } from "@/gittydocs/contexts/docs.context"
 import { stripBasePath, withBasePath } from "@/utils/base-path"
 import { cn } from "@/utils/cn"
 import {

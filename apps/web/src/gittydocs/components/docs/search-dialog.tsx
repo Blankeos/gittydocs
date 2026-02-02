@@ -1,4 +1,4 @@
-import { useSearchContext } from "@/contexts/search.context"
+import { useSearchContext } from "@/gittydocs/contexts/search.context"
 import {
   Command,
   CommandDialog,

@@ -8,8 +8,8 @@ import {
   IconMarkdownLine,
   IconOpenAI,
 } from "@/assets/icons"
-import { Button } from "../ui/button"
-import { DropdownMenuComp } from "../ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
+import { DropdownMenuComp } from "@/components/ui/dropdown-menu"
 
 export function CopyPageButton(props: { markdown: string }) {
   const { copied, copy } = useClipboard()

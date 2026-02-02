@@ -2,7 +2,7 @@
 
 import { type Docs, docs } from "@velite"
 import { type Accessor, createContext, type JSX, useContext } from "solid-js"
-import { type CreateFlexSearchIndexResult, createFlexSearchIndex } from "@/hooks/use-flex-search"
+import { type CreateFlexSearchIndexResult, createFlexSearchIndex } from "@/gittydocs/hooks/use-flex-search"
 
 type SearchContextValue = {
   searchDocs: CreateFlexSearchIndexResult<Docs>["search"]

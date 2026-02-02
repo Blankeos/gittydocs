@@ -2,12 +2,12 @@ import type { FlowProps } from "solid-js"
 
 import "@/styles/app.css"
 import "@/styles/bprogress.css"
-import "@/styles/prose.css"
+import "@/gittydocs/styles/prose.css"
 
 import { useMetadata } from "vike-metadata-solid"
-import { DocsProvider } from "@/components/docs/docs-provider"
+import { DocsProvider } from "@/gittydocs/components/docs/docs-provider"
 import { ThemeContextProvider, themeInitScript, useThemeContext } from "@/contexts/theme.context"
-import { themeCssHref } from "@/lib/themes/theme-source.gen"
+import { themeCssHref } from "@/gittydocs/lib/themes/theme-source.gen"
 import { withBasePath } from "@/utils/base-path"
 import { Toaster } from "solid-sonner"
 

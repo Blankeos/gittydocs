@@ -7,7 +7,7 @@ import {
   type Setter,
 } from "solid-js"
 import { createStrictContext } from "@/utils/create-strict-context"
-import { gittydocsConfig } from "@/lib/docs/config.gen"
+import { gittydocsConfig } from "@/gittydocs/lib/docs/config.gen"
 
 /**
  * Blocking Theme Script (for `<head>`)

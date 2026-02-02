@@ -1,5 +1,5 @@
 import { Show } from "solid-js"
-import { useDocsContext } from "@/contexts/docs.context"
+import { useDocsContext } from "@/gittydocs/contexts/docs.context"
 
 interface DocsFooterProps {
   sourcePath?: string

@@ -1,5 +1,5 @@
 import type { FlowProps } from "solid-js"
-import { DocsLayout } from "@/components/docs/docs-layout"
+import { DocsLayout } from "@/gittydocs/components/docs/docs-layout"
 
 export default function DocsPageLayout(props: FlowProps) {
   return (
