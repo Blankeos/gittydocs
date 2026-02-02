@@ -1,6 +1,9 @@
+import { useClipboard } from "bagon-hooks"
 import type { FlowProps, JSX } from "solid-js"
 import { MDXProvider } from "solid-jsx"
 import { toast } from "solid-sonner"
+
+import { IconCheck, IconCopy } from "@/assets/icons"
 
 type HeadingProps = JSX.IntrinsicElements["h1"] & { level?: number }
 
@@ -37,8 +40,41 @@ export const mdxComponents: Record<string, (properties: never) => JSX.Element> =
   h4: (props: any) => <HeadingLink level={4} {...props} />,
   h5: (props: any) => <HeadingLink level={5} {...props} />,
   h6: (props: any) => <HeadingLink level={6} {...props} />,
+  pre: (props: any) => <CodeBlock {...props} />,
 }
 
 export function MdxContext(props: FlowProps) {
   return <MDXProvider components={mdxComponents}>{props.children}</MDXProvider>
+}
+
+function CodeBlock(props: JSX.IntrinsicElements["pre"]) {
+  const { copied, copy } = useClipboard()
+  let preRef: HTMLPreElement | undefined
+
+  const handleCopy = () => {
+    const code = preRef?.querySelector("code")?.textContent ?? preRef?.textContent ?? ""
+    if (!code.trim()) return
+    copy(code.replace(/\n+$/, ""))
+  }
+
+  return (
+    <div class="code-block">
+      <button
+        type="button"
+        class="code-block-copy"
+        data-copied={copied() ? "true" : "false"}
+        onClick={handleCopy}
+        aria-label={copied() ? "Copied" : "Copy code"}
+        title={copied() ? "Copied" : "Copy code"}
+      >
+        {copied() ? <IconCheck class="size-4 animate-scaleIn" /> : <IconCopy class="size-4 animate-scaleIn" />}
+      </button>
+      <pre
+        ref={(element) => {
+          preRef = element
+        }}
+        {...props}
+      />
+    </div>
+  )
 }
