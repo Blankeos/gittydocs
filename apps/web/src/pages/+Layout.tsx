@@ -5,6 +5,7 @@ import "@/styles/bprogress.css"
 import "@/styles/prose.css"
 
 import { useMetadata } from "vike-metadata-solid"
+import { CodeBlockCopy } from "@/components/docs/code-block-copy"
 import { DocsProvider } from "@/components/docs/docs-provider"
 import { ThemeContextProvider, themeInitScript } from "@/contexts/theme.context"
 import { themeCssHref } from "@/lib/themes/theme-source.gen"
@@ -31,6 +32,7 @@ export default function RootLayout(props: FlowProps) {
     <ThemeContextProvider>
       <DocsProvider>
         {props.children}
+        <CodeBlockCopy />
       </DocsProvider>
     </ThemeContextProvider>
   )

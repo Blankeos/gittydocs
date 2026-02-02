@@ -101,6 +101,48 @@
   line-height: 1.5;
 }
 
+.prose .code-block {
+  position: relative;
+  margin: 1.5em 0;
+}
+
+.prose .code-block pre {
+  margin: 0;
+  padding-right: 3rem;
+}
+
+.prose .code-block-copy {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.45rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #e5e7eb;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.prose .code-block-copy:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #f9fafb;
+}
+
+.prose .code-block-copy:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.prose .code-block-copy[data-copied="true"] {
+  border-color: rgba(74, 222, 128, 0.8);
+  color: #bbf7d0;
+}
+
 /*.prose pre code {
   background: none;
   color: inherit;
