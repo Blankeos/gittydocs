@@ -37,4 +37,4 @@ local.db
 local.db-journal
 
 public/static
-#public/llms
+public/llms
