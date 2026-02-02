@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently --raw \"bun run dev:velite\" \"bun run dev:vite\"",
-    "dev:vite": "bunx --bun vike dev",
-    "dev:velite": "bun run prepare:docs && sleep 0.5 && bunx velite dev",
+    "dev:vite": "sleep 1 && bunx --bun vike dev",
+    "dev:velite": "bun run prepare:docs && bunx velite dev",
     "build": "bun run prepare:docs && bunx velite build && bun run velite:routes && bunx --bun vike build",
     "preview": "NODE_ENV=production bun run dist/server/index.mjs",
     "preview-static": "vike preview",
