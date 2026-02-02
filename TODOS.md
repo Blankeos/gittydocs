@@ -5,8 +5,8 @@
     - [x] Parts to update: README, site footer/header links
 - [x] Theming
   - [x] Parts to update: global styles, theme tokens
-- [ ] Hot reload during development.
-  - [ ] Parts to update: dev server config, docs
+- [x] Hot reload during development.
+  - [x] Parts to update: dev server config, docs
 - [x] AI-friendliness:
   - [x] A clear llms.txt endpoint + an llms.txt, add it as a new feature called automatic llms.txt.
     - [x] Parts to update: server routes, docs
@@ -17,11 +17,11 @@
 - [ ] Refactor:
   - [ ] Collocate all gittydocs files into a folder so when ejecting, it's very easy to see where gittydocs is.
     - [ ] Parts to update: project structure, eject docs
-- [ ] clear distinct approaches:
-  - [ ] out-of-the-box setup
-    - [ ] Better packaging (i.e. binarify the web project, only add the .env and the config, we're good)
-      - [ ] Parts to update: build pipeline, packaging docs
-    - [ ] Possibly a CLI for this at this point?
-      - [ ] Parts to update: CLI entrypoint, docs
-  - [ ] ejectable setup
-    - [ ] Parts to update: scaffolding, docs
+- [x] clear distinct approaches:
+  - [x] out-of-the-box setup
+    - [x] Better packaging (i.e. binarify the web project, only add the .env and the config, we're good)
+      - [x] Parts to update: build pipeline, packaging docs
+    - [x] Possibly a CLI for this at this point?
+      - [x] Parts to update: CLI entrypoint, docs
+  - [x] ejectable setup
+    - [x] Parts to update: scaffolding, docs

@@ -53,6 +53,9 @@ gittydocs dev ./docs
 
 If `./docs/.env` exists, it is loaded automatically (or use `--env`).
 
+Hot reload is automatic for local sources. Edit `.md/.mdx`, `gittydocs.jsonc`, `theme.css`, or files in `[static]` and the browser refreshes.
+For GitHub URLs, restart `gittydocs dev` to pull the latest content.
+
 ### `gittydocs build <GITTYDOCS_SOURCE>`
 
 Build a static site:
