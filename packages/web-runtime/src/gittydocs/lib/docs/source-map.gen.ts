@@ -8,5 +8,5 @@ export const sourcePathByRoute: Record<string, string> = {
   "/deploy/vercel": "deploy/vercel.mdx",
   "/": "index.mdx",
   "/ai-docs-prompt": "ai-docs-prompt.mdx",
-  "/theming": "theming.mdx",
+  "/theming": "theming.mdx"
 }

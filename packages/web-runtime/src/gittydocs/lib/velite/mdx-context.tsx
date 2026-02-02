@@ -104,7 +104,7 @@ function CodeBlock(props: JSX.IntrinsicElements["pre"]) {
     <div class="code-block">
       <button
         type="button"
-        class="code-block-copy"
+        class="code-block-copy backdrop-blur-[1px]"
         data-copied={copied() ? "true" : "false"}
         onClick={handleCopy}
         aria-label={copied() ? "Copied" : "Copy code"}
