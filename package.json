@@ -6,9 +6,9 @@
     "build": "bun run --filter gittydocs build",
     "build:web": "bun run --filter @gittydocs/web-runtime build",
     "dev:web": "bun run --filter @gittydocs/web-runtime dev",
+    "dev:docs": "gittydocs dev docs",
     "lint": "bun run --filter '*' lint",
     "lint:fix": "bun run --filter '*' lint:fix",
-    "typecheck": "bun run --filter gittydocs typecheck",
-    "devdocs": "gittydocs dev docs"
+    "typecheck": "bun run --filter gittydocs typecheck"
   }
 }

@@ -23,6 +23,25 @@ cd docs
 npx gittydocs@latest dev docs
 ```
 
+Recommended: add a dev script in your repo:
+
+```json
+// package.json
+{
+  "scripts": {
+    "dev:docs": "gittydocs dev docs"
+  }
+}
+```
+
+Or if you use a Justfile:
+
+```make
+# justfile
+devdocs:
+	gittydocs dev docs
+```
+
 Or do it manually.
 
 Create a `docs` folder in your repo:
