@@ -4,15 +4,15 @@ import os from "node:os"
 import { spawnSync } from "node:child_process"
 import { fail } from "./errors"
 import { copyDir, ensureDir, pathExists, rmDir, writeFileText } from "./fs"
-import { findBundledPath, getPackageInfo } from "./package"
+import { getPackageInfo, resolvePackageDir } from "./package"
 import { runCommand } from "./exec"
 
 export async function ensureWebRuntimeDir(): Promise<string> {
   assertBunInstalled()
 
-  const bundledWebDir = findBundledPath(["apps", "web"])
+  const bundledWebDir = resolvePackageDir("@gittydocs/web-runtime")
   if (!bundledWebDir) {
-    fail("Could not locate bundled apps/web directory")
+    fail("Could not locate @gittydocs/web-runtime package")
   }
 
   const pkg = getPackageInfo()

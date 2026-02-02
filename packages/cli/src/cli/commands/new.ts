@@ -3,7 +3,7 @@ import path from "node:path"
 import { isCancel, note, outro, select, text } from "@clack/prompts"
 import { fail } from "../lib/errors"
 import { copyDir, ensureDir, isDirEmpty, pathExists, writeFileText } from "../lib/fs"
-import { findBundledPath } from "../lib/package"
+import { findBundledPath, resolvePackageDir } from "../lib/package"
 
 interface NewOptions {
   default?: boolean
@@ -46,8 +46,8 @@ export function registerNewCommand(cli: CAC) {
       }
 
       // ejected
-      const webTemplateDir = findBundledPath(["apps", "web"])
-      if (!webTemplateDir) fail("Missing bundled web template: apps/web")
+      const webTemplateDir = resolvePackageDir("@gittydocs/web-runtime")
+      if (!webTemplateDir) fail("Missing @gittydocs/web-runtime package")
 
       await copyDir(webTemplateDir, targetDir, {
         ignoreNames: new Set([".git", ".DS_Store"]),

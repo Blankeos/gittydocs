@@ -1,6 +1,9 @@
 import fs from "node:fs"
 import path from "node:path"
+import { createRequire } from "node:module"
 import { fileURLToPath } from "node:url"
+
+const require = createRequire(import.meta.url)
 
 export function getPackageInfo(): { rootDir: string | null; version: string | null } {
   const rootDir = findPackageRoot()
@@ -22,6 +25,15 @@ export function findBundledPath(parts: string[]): string | null {
   const candidate = path.join(rootDir, ...parts)
   if (!fs.existsSync(candidate)) return null
   return candidate
+}
+
+export function resolvePackageDir(packageName: string): string | null {
+  try {
+    const pkgJsonPath = require.resolve(`${packageName}/package.json`)
+    return path.dirname(pkgJsonPath)
+  } catch {
+    return null
+  }
 }
 
 function findPackageRoot(): string | null {

@@ -1,36 +1,14 @@
 {
-  "name": "gittydocs",
-  "version": "0.1.0",
-  "description": "Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site",
-  "type": "module",
-  "bin": {
-    "gittydocs": "dist/cli.js"
-  },
-  "files": [
-    "dist",
-    "apps/web",
-    "templates",
-    "LICENSE",
-    "README.md"
-  ],
-  "engines": {
-    "node": ">=18"
-  },
+  "name": "gittydocs-workspace",
+  "private": true,
+  "workspaces": ["packages/*"],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "typecheck": "tsc -p packages/cli/tsconfig.json --noEmit"
-  },
-  "dependencies": {
-    "@clack/prompts": "^0.11.0",
-    "cac": "^6.7.14",
-    "chokidar": "^3.6.0",
-    "dotenv": "^16.4.5",
-    "jsonc-parser": "^3.3.1"
-  },
-  "devDependencies": {
-    "@types/node": "^20.11.30",
-    "tsup": "^8.0.2",
-    "typescript": "^5.4.5"
+    "build": "bun run --filter gittydocs build",
+    "build:web": "bun run --filter @gittydocs/web-runtime build",
+    "dev:web": "bun run --filter @gittydocs/web-runtime dev",
+    "lint": "bun run --filter '*' lint",
+    "lint:fix": "bun run --filter '*' lint:fix",
+    "typecheck": "bun run --filter gittydocs typecheck",
+    "devdocs": "gittydocs dev docs"
   }
 }
