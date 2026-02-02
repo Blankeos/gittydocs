@@ -44,6 +44,7 @@ export default defineConfig({
     },
   },
   mdx: {
+    // jsxImportSource: "solid-jsx", ( Not needed )
     remarkPlugins: [remarkGfm, remarkMath, remarkGithubBlockquoteAlert],
     rehypePlugins: [
       [rehypeShiki, { theme: "one-dark-pro" }],

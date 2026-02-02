@@ -7,9 +7,10 @@ import "@/styles/prose.css"
 import { useMetadata } from "vike-metadata-solid"
 import { CodeBlockCopy } from "@/components/docs/code-block-copy"
 import { DocsProvider } from "@/components/docs/docs-provider"
-import { ThemeContextProvider, themeInitScript } from "@/contexts/theme.context"
+import { ThemeContextProvider, themeInitScript, useThemeContext } from "@/contexts/theme.context"
 import { themeCssHref } from "@/lib/themes/theme-source.gen"
 import { withBasePath } from "@/utils/base-path"
+import { Toaster } from "solid-sonner"
 
 useMetadata.setGlobalDefaults({
   title: "gittydocs",
@@ -32,8 +33,14 @@ export default function RootLayout(props: FlowProps) {
     <ThemeContextProvider>
       <DocsProvider>
         {props.children}
-        <CodeBlockCopy />
+        <_Toaster />
       </DocsProvider>
     </ThemeContextProvider>
   )
+}
+
+
+function _Toaster() {
+  const { inferredTheme } = useThemeContext()
+  return <Toaster theme={inferredTheme()} richColors />
 }

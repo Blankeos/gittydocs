@@ -1,13 +1,19 @@
-import { runSync } from "@mdx-js/mdx"
 import type { JSX } from "solid-js"
 import * as runtime from "solid-jsx"
+import { useMDXComponents } from "solid-jsx"
 
 interface MdxProps {
   code: string
 }
 
+function useMDXComponent(code: string) {
+  const fn = new Function(code) as (rt: any) => { default: any }
+  return fn({ ...runtime }).default
+}
+
 export function MdxContentStatic(props: MdxProps): JSX.Element {
-  const mdxModule = runSync(props.code, { ...(runtime as any), baseUrl: import.meta.url })
-  const Content = () => mdxModule.default || (() => null)
-  return Content as unknown as JSX.Element
+  const Component = useMDXComponent(props.code)
+  const components: any = useMDXComponents({})
+
+  return <Component components={components} />
 }
