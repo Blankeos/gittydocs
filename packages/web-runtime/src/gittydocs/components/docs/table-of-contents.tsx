@@ -1,5 +1,6 @@
-import { createEffect, createSignal, For, onCleanup, Show } from "solid-js"
+import { createEffect, createMemo, createSignal, For, onCleanup, Show } from "solid-js"
 import { cn } from "@/utils/cn"
+import { Collapsible } from "@/components/ui/collapsible"
 
 export interface Heading {
   level: number
@@ -10,10 +11,13 @@ export interface Heading {
 interface TableOfContentsProps {
   headings: Heading[]
   class?: string
+  variant?: "desktop" | "mobile"
 }
 
 export function TableOfContents(props: TableOfContentsProps) {
   const [activeSlug, setActiveSlug] = createSignal<string | null>(null)
+  const [mobileOpen, setMobileOpen] = createSignal(false)
+  let mobileRef: HTMLDivElement | undefined
 
   createEffect(() => {
     const headings = props.headings
@@ -65,7 +69,27 @@ export function TableOfContents(props: TableOfContentsProps) {
     })
   })
 
-  const handleClick = (e: MouseEvent, slug: string) => {
+  createEffect(() => {
+    if (props.variant !== "mobile") return
+    if (!mobileOpen()) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node | null
+      if (mobileRef && target && !mobileRef.contains(target)) {
+        setMobileOpen(false)
+      }
+    }
+
+    window.addEventListener("pointerdown", handlePointerDown)
+    onCleanup(() => window.removeEventListener("pointerdown", handlePointerDown))
+  })
+
+  const activeHeading = createMemo(() => {
+    const slug = activeSlug()
+    return props.headings.find((heading) => heading.slug === slug) ?? props.headings[0] ?? null
+  })
+
+  const handleClick = (e: MouseEvent, slug: string, closeMobile = false) => {
     e.preventDefault()
     const element = document.getElementById(slug)
     if (element) {
@@ -78,7 +102,87 @@ export function TableOfContents(props: TableOfContentsProps) {
         behavior: "smooth",
       })
       window.history.pushState(null, "", `#${slug}`)
+      setActiveSlug(slug)
+      if (closeMobile) setMobileOpen(false)
     }
+  }
+
+  if (props.variant === "mobile") {
+    return (
+      <div ref={mobileRef} class={cn("relative", props.class)}>
+        <button
+          type="button"
+          class="flex w-full items-center justify-between gap-2 rounded-none border-x-0 border-b border-t-0 bg-background/95 px-3 py-2 text-sm shadow-sm backdrop-blur"
+          aria-expanded={mobileOpen()}
+          aria-controls="mobile-toc-panel"
+          onClick={() => setMobileOpen((open) => !open)}
+        >
+          <span class="flex min-w-0 items-center gap-2 text-left">
+            <span class="text-muted-foreground">On this page</span>
+            <span class="text-muted-foreground">&gt;</span>
+            <Show when={activeHeading()} keyed>
+              {(heading) => (
+                <span class="min-w-0 truncate font-medium text-foreground animate-scaleIn">
+                  {heading.text}
+                </span>
+              )}
+            </Show>
+          </span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class={cn(
+              "h-4 w-4 text-muted-foreground transition-transform",
+              mobileOpen() && "rotate-180"
+            )}
+            aria-hidden="true"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
+        <Collapsible
+          id="mobile-toc-panel"
+          role="region"
+          open={mobileOpen()}
+          containerClass="absolute left-0 right-0 top-full z-40"
+        >
+          <div class="border-x-0 border-y border-t-0 bg-popover px-2 py-2 shadow-lg">
+            <ul class="max-h-[60vh] overflow-auto text-sm">
+              <For each={props.headings}>
+                {(heading) => (
+                  <li
+                    class={cn(
+                      "transition-colors",
+                      heading.level === 1 && "font-medium",
+                      heading.level > 2 && "ml-3"
+                    )}
+                  >
+                    <a
+                      href={`#${heading.slug}`}
+                      onClick={(e) => handleClick(e, heading.slug, true)}
+                      aria-current={activeSlug() === heading.slug ? "true" : undefined}
+                      class={cn(
+                        "flex w-full items-center rounded-md px-3 py-2 transition-colors hover:bg-accent hover:text-accent-foreground",
+                        activeSlug() === heading.slug
+                          ? "bg-accent font-medium text-accent-foreground"
+                          : "text-muted-foreground"
+                      )}
+                    >
+                      {heading.text}
+                    </a>
+                  </li>
+                )}
+              </For>
+            </ul>
+          </div>
+        </Collapsible>
+      </div>
+    )
   }
 
   return (
@@ -101,6 +205,7 @@ export function TableOfContents(props: TableOfContentsProps) {
                 <a
                   href={`#${heading.slug}`}
                   onClick={(e) => handleClick(e, heading.slug)}
+                  aria-current={activeSlug() === heading.slug ? "true" : undefined}
                   class={cn(
                     "flex w-full items-center border-transparent border-l-2 px-3 py-1 transition-colors hover:bg-accent hover:text-accent-foreground",
                     activeSlug() === heading.slug

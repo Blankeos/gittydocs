@@ -47,52 +47,63 @@ export function DocContent() {
 
   return (
     <>
-      <div class="mx-auto flex min-h-full w-full min-w-0 max-w-3xl flex-col">
-        <Show
-          when={doc()}
-          fallback={
-            <div class="py-12 text-center">
-              <h1 class="font-bold text-2xl">Page not found</h1>
-              <p class="mt-2 text-muted-foreground">The page you're looking for doesn't exist.</p>
-              <p class="mt-1 text-muted-foreground text-sm">Path: {routePath()}</p>
-            </div>
-          }
-        >
-          {(d) => (
-            <article class="prose prose-slate dark:prose-invert flex min-h-full max-w-none flex-col">
-              <div class="flex-1">
-                <Show when={d().title}>
-                  <div class="mb-0 flex items-center justify-between">
-                    <h1 class="scroll-m-20 font-bold text-3xl tracking-tight">{d().title}</h1>
-                    <CopyPageButton markdown={d().rawMarkdown ?? ""} />
+      <Show
+        when={doc()}
+        fallback={
+          <div class="py-12 text-center">
+            <h1 class="font-bold text-2xl">Page not found</h1>
+            <p class="mt-2 text-muted-foreground">The page you're looking for doesn't exist.</p>
+            <p class="mt-1 text-muted-foreground text-sm">Path: {routePath()}</p>
+          </div>
+        }
+      >
+        {(d) => (
+          <>
+            <Show when={hasHeadings()}>
+              <div class="sticky top-14 z-20 w-full xl:hidden">
+                <TableOfContents headings={headings()} variant="mobile" />
+              </div>
+            </Show>
+            <div class="w-full max-w-6xl">
+              <main class="relative flex flex-1 flex-col px-4 py-6 md:px-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_220px] xl:px-8">
+                <div class="mx-auto flex min-h-full w-full min-w-0 max-w-3xl flex-col">
+                  <article class="prose prose-slate dark:prose-invert flex min-h-full max-w-none flex-col">
+                    <div class="flex-1">
+                      <Show when={d().title}>
+                        <div class="mb-0 flex items-center justify-between">
+                          <h1 class="scroll-m-20 font-bold text-3xl tracking-tight">{d().title}</h1>
+                          <CopyPageButton markdown={d().rawMarkdown ?? ""} />
+                        </div>
+                      </Show>
+
+                      <Show when={d().description}>
+                        <p class="text-muted-foreground text-sm">{d().description}</p>
+                      </Show>
+
+                      <div class="mt-8">
+                        <Show when={d().slug} keyed>
+                          <MdxContext>
+                            <MdxContentStatic code={d().content} />
+                          </MdxContext>
+                        </Show>
+                      </div>
+                    </div>
+
+                    <DocsFooter sourcePath={d().slugAsParams} />
+                  </article>
+                </div>
+
+                <Show when={hasHeadings()}>
+                  <div class="hidden text-sm xl:block">
+                    <div class="sticky top-16 -mt-10 h-[calc(100vh-3.5rem)] overflow-y-auto pt-10">
+                      <TableOfContents headings={headings()} variant="desktop" />
+                    </div>
                   </div>
                 </Show>
-
-                <Show when={d().description}>
-                  <p class="text-muted-foreground text-sm">{d().description}</p>
-                </Show>
-
-                <div class="mt-8">
-                  <Show when={d().slug} keyed>
-                    <MdxContext>
-                      <MdxContentStatic code={d().content} />
-                    </MdxContext>
-                  </Show>
-                </div>
-              </div>
-
-              <DocsFooter sourcePath={d().slugAsParams} />
-            </article>
-          )}
-        </Show>
-      </div>
-
-      <Show when={hasHeadings()}>
-        <div class="hidden text-sm xl:block">
-          <div class="sticky top-16 -mt-10 h-[calc(100vh-3.5rem)] overflow-y-auto pt-10">
-            <TableOfContents headings={headings()} />
-          </div>
-        </div>
+              </main>
+            </div>
+          </>
+        )}
       </Show>
     </>
   )
