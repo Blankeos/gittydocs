@@ -21,16 +21,28 @@ function HeadingLink(props: HeadingProps) {
 
   const sharedProps = {
     onClick: handleClick,
-    get class() { return `${props.class ?? ""} cursor-pointer hover:opacity-80` },
+    get class() { return `${props.class ?? ""} group relative cursor-pointer hover:opacity-80` },
     style: { "scroll-margin-top": "4rem" } as JSX.CSSProperties,
   }
 
-  if ((props.level ?? 1) === 6) return <h6 {...props} {...sharedProps}>{props.children}</h6>
-  if ((props.level ?? 1) === 5) return <h5 {...props} {...sharedProps}>{props.children}</h5>
-  if ((props.level ?? 1) === 4) return <h4 {...props} {...sharedProps}>{props.children}</h4>
-  if ((props.level ?? 1) === 3) return <h3 {...props} {...sharedProps}>{props.children}</h3>
-  if ((props.level ?? 1) === 2) return <h2 {...props} {...sharedProps}>{props.children}</h2>
-  return <h1 {...props} {...sharedProps}>{props.children}</h1>
+  const content = (
+    <>
+      <span
+        class="pointer-events-none absolute -left-4 top-1/2 -translate-y-1/2 text-sm font-normal opacity-0 transition-opacity duration-150 group-hover:opacity-60"
+        aria-hidden="true"
+      >
+        #
+      </span>
+      {props.children}
+    </>
+  )
+
+  if ((props.level ?? 1) === 6) return <h6 {...props} {...sharedProps}>{content}</h6>
+  if ((props.level ?? 1) === 5) return <h5 {...props} {...sharedProps}>{content}</h5>
+  if ((props.level ?? 1) === 4) return <h4 {...props} {...sharedProps}>{content}</h4>
+  if ((props.level ?? 1) === 3) return <h3 {...props} {...sharedProps}>{content}</h3>
+  if ((props.level ?? 1) === 2) return <h2 {...props} {...sharedProps}>{content}</h2>
+  return <h1 {...props} {...sharedProps}>{content}</h1>
 }
 
 export const mdxComponents: Record<string, (properties: never) => JSX.Element> = {
