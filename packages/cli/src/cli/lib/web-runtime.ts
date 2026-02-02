@@ -53,6 +53,22 @@ export async function ensureWebRuntimeDir(): Promise<string> {
   return cacheDir
 }
 
+export async function clearWebRuntimeCache(options?: { all?: boolean }) {
+  const cacheRoot = getCacheRoot()
+  const webRoot = path.join(cacheRoot, "web")
+
+  if (options?.all) {
+    await rmDir(webRoot)
+    return { cleared: [webRoot], scope: "all" as const }
+  }
+
+  const pkg = getPackageInfo()
+  const version = pkg.version ?? "dev"
+  const cacheDir = path.join(webRoot, version)
+  await rmDir(cacheDir)
+  return { cleared: [cacheDir], scope: "version" as const, version }
+}
+
 function assertBunInstalled() {
   const result = spawnSync("bun", ["--version"], { stdio: "ignore" })
   if (result.error || result.status !== 0) {

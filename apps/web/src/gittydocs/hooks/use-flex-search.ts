@@ -6,7 +6,7 @@ function replaceTextWithMarker(text: string, match: string) {
   // create dynamic regex
   const regex = new RegExp(match, "gi")
   // preserves the text casing
-  return text.replaceAll(regex, (match) => `<mark>${match}</mark>`)
+  return text.replace(regex, (value: string) => `<mark>${value}</mark>`)
 }
 
 function getHighlightMatches(text: string, searchTerm: string, limit = 1) {
@@ -17,12 +17,12 @@ function getHighlightMatches(text: string, searchTerm: string, limit = 1) {
   // matches count
   let matches = 0
   // current match in loop
-  let match
+  let match: RegExpExecArray | null = null
 
-  while ((match = regex.exec(text)) !== null && matches < limit) {
-    // push that index
+  while (matches < limit) {
+    match = regex.exec(text)
+    if (!match) break
     indexes.push(match.index)
-    // increment matches
     matches++
   }
 

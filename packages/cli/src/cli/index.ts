@@ -3,6 +3,7 @@ import { registerBuildCommand } from "./commands/build"
 import { registerDeployCommand } from "./commands/deploy"
 import { registerDevCommand } from "./commands/dev"
 import { registerNewCommand } from "./commands/new"
+import { registerRecacheCommand } from "./commands/recache"
 import { getPackageInfo } from "./lib/package"
 
 const pkg = getPackageInfo()
@@ -14,6 +15,7 @@ registerNewCommand(cli)
 registerDevCommand(cli)
 registerBuildCommand(cli)
 registerDeployCommand(cli)
+registerRecacheCommand(cli)
 
 cli.help()
 

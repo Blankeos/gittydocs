@@ -76,6 +76,17 @@ gittydocs deploy --ghpages
 
 Commit the generated workflow(s) in `.github/workflows/`.
 
+### `gittydocs recache`
+
+Clear the cached web runtime used by `gittydocs dev/build`:
+
+```bash
+gittydocs recache
+```
+
+This removes the current version's cached runtime. The next `gittydocs dev/build` recreates it.
+Use `--all` to clear every cached version.
+
 ## Requirements
 
 `gittydocs dev` and `gittydocs build` require `bun`.
