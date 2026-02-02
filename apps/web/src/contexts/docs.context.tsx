@@ -147,8 +147,31 @@ class SearchIndex {
 function extractHeadings(content: string): Heading[] {
   const headings: Heading[] = []
   const lines = content.split("\n")
+  let inFence = false
+  let fenceChar: string | null = null
+  let fenceLength = 0
 
   for (const line of lines) {
+    const fenceMatch = line.match(/^\s*(```+|~~~+)/)
+    if (fenceMatch) {
+      const marker = fenceMatch[1]
+      if (!inFence) {
+        inFence = true
+        fenceChar = marker[0]
+        fenceLength = marker.length
+        continue
+      }
+
+      if (fenceChar && marker[0] === fenceChar && marker.length >= fenceLength) {
+        inFence = false
+        fenceChar = null
+        fenceLength = 0
+        continue
+      }
+    }
+
+    if (inFence) continue
+
     const match = line.match(/^(#{1,6})\s+(.+)$/)
     if (!match) continue
     const level = match[1].length

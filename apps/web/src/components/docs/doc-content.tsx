@@ -34,34 +34,15 @@ export function DocContent() {
 
   const hasHeadings = createMemo(() => {
     const d = doc()
-    // Extract headings from raw markdown
     if (!d?.rawMarkdown) return false
-    return d.rawMarkdown.match(/^#{1,6}\s+/m) !== null
+    return extractHeadingsFromMarkdown(d.rawMarkdown).length > 0
   })
 
   // Extract headings for TOC
   const headings = createMemo(() => {
     const d = doc()
     if (!d?.rawMarkdown) return []
-
-    const headingsList: Array<{ level: number; text: string; slug: string }> = []
-    const lines = d.rawMarkdown.split("\n")
-
-    for (const line of lines) {
-      const match = line.match(/^(#{1,6})\s+(.+)$/)
-      if (!match) continue
-      const level = match[1].length
-      const text = match[2].trim()
-      const slug = text
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-")
-        .trim()
-      headingsList.push({ level, text, slug })
-    }
-
-    return headingsList
+    return extractHeadingsFromMarkdown(d.rawMarkdown)
   })
 
   return (
@@ -117,4 +98,48 @@ export function DocContent() {
       </Show>
     </>
   )
+}
+
+function extractHeadingsFromMarkdown(content: string) {
+  const headingsList: Array<{ level: number; text: string; slug: string }> = []
+  const lines = content.split("\n")
+  let inFence = false
+  let fenceChar: string | null = null
+  let fenceLength = 0
+
+  for (const line of lines) {
+    const fenceMatch = line.match(/^\s*(```+|~~~+)/)
+    if (fenceMatch) {
+      const marker = fenceMatch[1]
+      if (!inFence) {
+        inFence = true
+        fenceChar = marker[0]
+        fenceLength = marker.length
+        continue
+      }
+
+      if (fenceChar && marker[0] === fenceChar && marker.length >= fenceLength) {
+        inFence = false
+        fenceChar = null
+        fenceLength = 0
+        continue
+      }
+    }
+
+    if (inFence) continue
+
+    const match = line.match(/^(#{1,6})\s+(.+)$/)
+    if (!match) continue
+    const level = match[1].length
+    const text = match[2].trim()
+    const slug = text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim()
+    headingsList.push({ level, text, slug })
+  }
+
+  return headingsList
 }
