@@ -4,7 +4,9 @@
   "description": "Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site",
   "type": "module",
   "scripts": {
-    "dev": "bun run prepare:docs && concurrently --raw \"bunx velite dev\" \"bunx --bun vike dev\"",
+    "dev": "concurrently --raw \"bun run dev:velite\" \"bun run dev:vite\"",
+    "dev:vite": "bunx --bun vike dev",
+    "dev:velite": "bun run prepare:docs && sleep 0.5 && bunx velite dev",
     "build": "bun run prepare:docs && bunx velite build && bun run velite:routes && bunx --bun vike build",
     "preview": "NODE_ENV=production bun run dist/server/index.mjs",
     "preview-static": "vike preview",
