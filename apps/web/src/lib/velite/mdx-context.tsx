@@ -55,6 +55,7 @@ function CodeBlock(props: JSX.IntrinsicElements["pre"]) {
     const code = preRef?.querySelector("code")?.textContent ?? preRef?.textContent ?? ""
     if (!code.trim()) return
     copy(code.replace(/\n+$/, ""))
+    toast.success("Copied section url to clipboard")
   }
 
   return (
