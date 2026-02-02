@@ -24,21 +24,27 @@ gittydocs --help
 
 ## Commands
 
-### `gittydocs new <folder>`
+### `gittydocs new [folder]`
 
 Create a new docs folder scaffold:
 
 ```bash
-gittydocs new my-docs
-cd my-docs
+gittydocs new docs
+cd docs
 gittydocs dev docs
+```
+
+If you omit the folder, the CLI will prompt you for a name and scaffold type:
+
+```bash
+gittydocs new
 ```
 
 For the fully customizable app (ejected):
 
 ```bash
-gittydocs new my-docs --ejected
-cd my-docs
+gittydocs new docs --ejected
+cd docs
 bun install
 bun run dev
 ```

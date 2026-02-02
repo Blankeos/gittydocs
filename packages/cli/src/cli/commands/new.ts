@@ -1,6 +1,6 @@
 import type { CAC } from "cac"
 import path from "node:path"
-import { note, outro } from "@clack/prompts"
+import { isCancel, note, outro, select, text } from "@clack/prompts"
 import { fail } from "../lib/errors"
 import { copyDir, ensureDir, isDirEmpty, pathExists, writeFileText } from "../lib/fs"
 import { findBundledPath } from "../lib/package"
@@ -12,12 +12,16 @@ interface NewOptions {
 
 export function registerNewCommand(cli: CAC) {
   cli
-    .command("new <folder>", "Scaffold a new Gittydocs setup")
+    .command("new [folder]", "Scaffold a new Gittydocs setup")
     .option("--default", "Minimal docs-only scaffold (default)")
     .option("--ejected", "Full app scaffold (customizable)")
-    .action(async (folder: string, options: NewOptions) => {
-      const mode = resolveMode(options)
-      const targetDir = path.resolve(process.cwd(), folder)
+    .action(async (folder: string | undefined, options: NewOptions) => {
+      const resolvedFolder = folder ?? (await promptFolder())
+      let mode = resolveMode(options)
+      if (!folder && !options.default && !options.ejected) {
+        mode = await promptMode()
+      }
+      const targetDir = path.resolve(process.cwd(), resolvedFolder)
 
       if (await pathExists(targetDir)) {
         const empty = await isDirEmpty(targetDir)
@@ -33,9 +37,9 @@ export function registerNewCommand(cli: CAC) {
         if (!templateDir) fail("Missing bundled template: templates/default")
         await copyDir(templateDir, targetDir)
         outro(
-          `Created ${folder}.\n\n` +
+          `Created ${resolvedFolder}.\n\n` +
             `Next:\n` +
-            `  cd ${folder}\n` +
+            `  cd ${resolvedFolder}\n` +
             `  gittydocs dev docs\n`
         )
         return
@@ -75,7 +79,7 @@ export function registerNewCommand(cli: CAC) {
       }
 
       note("bun install\nbun run dev", "What next")
-      outro(`Created ejected project at ${folder}`)
+      outro(`Created ejected project at ${resolvedFolder}`)
     })
 }
 
@@ -87,4 +91,33 @@ function resolveMode(options: NewOptions): "default" | "ejected" {
   }
   if (hasEjected) return "ejected"
   return "default"
+}
+
+async function promptFolder(): Promise<string> {
+  const value = await text({
+    message: "Folder name",
+    placeholder: "docs",
+    validate: (input) => (input.trim().length === 0 ? "Folder is required" : undefined),
+  })
+  if (isCancel(value)) process.exit(1)
+  return value.trim()
+}
+
+async function promptMode(): Promise<"default" | "ejected"> {
+  const picked = await select({
+    message: "Select scaffold type",
+    options: [
+      {
+        value: "default",
+        label: "Docs-only: minimal config, easy updates (Recommended)",
+      },
+      {
+        value: "ejected",
+        label: "Ejected: full customization in SolidJS + Vike, you maintain updates",
+      },
+    ],
+    initialValue: "default",
+  })
+  if (isCancel(picked)) process.exit(1)
+  return picked as "default" | "ejected"
 }

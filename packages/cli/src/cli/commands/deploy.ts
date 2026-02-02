@@ -29,7 +29,7 @@ export function registerDeployCommand(cli: CAC) {
       if (!config) {
         fail(
           "Could not find gittydocs config. Expected docs/gittydocs.jsonc (or similar).\n\n" +
-            "Try: gittydocs new <folder>"
+            "Try: gittydocs new"
         )
       }
 
