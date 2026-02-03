@@ -317,7 +317,7 @@ export const DocsContextProvider: FlowComponent = (props) => {
 
       return {
         routePath,
-        sourcePath: doc.slugAsParams,
+        sourcePath: doc.sourcePath || doc.slugAsParams,
         title: doc.title || "Untitled",
         description: doc.description,
         date: doc.date,

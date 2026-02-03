@@ -15,7 +15,8 @@ export function DocsFooter(props: DocsFooterProps) {
     const { owner, name } = repo
     const ref = repo.ref || "main"
     const docsPath = repo.docsPath || "docs"
-    return `https://github.com/${owner}/${name}/edit/${ref}/${docsPath}/${props.sourcePath}`
+    const normalizedSource = normalizeSourcePath(props.sourcePath, docsPath)
+    return `https://github.com/${owner}/${name}/edit/${ref}/${docsPath}/${normalizedSource}`
   }
 
   const githubUrl = () => {
@@ -162,4 +163,14 @@ export function DocsFooter(props: DocsFooterProps) {
       </div>
     </footer>
   )
+}
+
+function normalizeSourcePath(sourcePath: string, docsPath: string) {
+  const normalizedDocsPath = docsPath.replace(/\\/g, "/").replace(/^\//, "").replace(/\/$/, "")
+  const normalizedSource = sourcePath.replace(/\\/g, "/").replace(/^\//, "")
+  const withPrefix = `${normalizedDocsPath}/`
+  if (normalizedSource.startsWith(withPrefix)) {
+    return normalizedSource.slice(withPrefix.length)
+  }
+  return normalizedSource
 }

@@ -1,3 +1,4 @@
+import path from "node:path"
 import rehypeShiki from "@shikijs/rehype"
 import rehypeAutolinkHeadings from "rehype-autolink-headings"
 import rehypeKatex from "rehype-katex"
@@ -29,6 +30,10 @@ export default defineConfig({
           categories: s.string().array().optional(),
           tags: s.string().array().optional(),
           metadata: s.metadata(),
+          sourcePath: s.custom().transform((data, { meta }) => {
+            if (typeof data === "string") return data
+            return path.relative(meta.config.root, meta.path).replace(/\\/g, "/")
+          }),
           content: s.mdx(),
           excerpt: s.excerpt({ length: Infinity }),
           rawMarkdown: s.raw(),

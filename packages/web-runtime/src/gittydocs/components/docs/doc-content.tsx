@@ -102,7 +102,7 @@ export function DocContent() {
                       </div>
                     </div>
 
-                    <DocsFooter sourcePath={d().slugAsParams} />
+                    <DocsFooter sourcePath={d().sourcePath || d().slugAsParams} />
                   </article>
                 </div>
 

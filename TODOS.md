@@ -34,3 +34,4 @@ More ideas:
 Bugs:
 
 - [x] [object Object] when I navigate around the UI, but refresh is okay.
+- [ ] avoid cmd palette from shifting vertical pos based on results. Just make it padded off top so it sticks there (like my next-portfolio)
