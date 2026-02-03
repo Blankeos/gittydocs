@@ -7,13 +7,17 @@
   "bin": {
     "gittydocs": "dist/cli.js"
   },
-  "files": ["dist", "templates"],
+  "files": [
+    "dist",
+    "templates"
+  ],
   "engines": {
     "node": ">=18"
   },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "lint": "bun run typecheck",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
