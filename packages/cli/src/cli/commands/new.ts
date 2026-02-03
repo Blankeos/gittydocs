@@ -1,9 +1,10 @@
-import type { CAC } from "cac"
 import path from "node:path"
 import { isCancel, note, outro, select, text } from "@clack/prompts"
+import type { CAC } from "cac"
 import { fail } from "../lib/errors"
 import { copyDir, ensureDir, isDirEmpty, pathExists, writeFileText } from "../lib/fs"
-import { findBundledPath, resolvePackageDir } from "../lib/package"
+import { findBundledPath } from "../lib/package"
+import { resolveWebRuntimeSourceDir } from "../lib/web-runtime"
 
 interface NewOptions {
   default?: boolean
@@ -46,8 +47,7 @@ export function registerNewCommand(cli: CAC) {
       }
 
       // ejected
-      const webTemplateDir = resolvePackageDir("@gittydocs/web-runtime")
-      if (!webTemplateDir) fail("Missing @gittydocs/web-runtime package")
+      const webTemplateDir = await resolveWebRuntimeSourceDir()
 
       await copyDir(webTemplateDir, targetDir, {
         ignoreNames: new Set([".git", ".DS_Store"]),

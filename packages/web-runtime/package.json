@@ -1,6 +1,7 @@
 {
   "name": "@gittydocs/web-runtime",
   "version": "0.1.0",
+  "private": true,
   "description": "Gittydocs web runtime template",
   "license": "MIT",
   "type": "module",

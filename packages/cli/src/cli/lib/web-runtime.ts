@@ -1,26 +1,41 @@
-import fs from "node:fs/promises"
-import path from "node:path"
-import os from "node:os"
 import { spawnSync } from "node:child_process"
+import fs from "node:fs/promises"
+import os from "node:os"
+import path from "node:path"
 import { fail } from "./errors"
-import { copyDir, ensureDir, pathExists, rmDir, writeFileText } from "./fs"
-import { getPackageInfo, resolvePackageDir } from "./package"
 import { runCommand } from "./exec"
+import { copyDir, ensureDir, pathExists, rmDir, writeFileText } from "./fs"
+import { findBundledPath, getPackageInfo, resolvePackageDir } from "./package"
+
+export async function resolveWebRuntimeSourceDir(): Promise<string> {
+  const bundled = findBundledPath(["templates", "web-runtime"])
+  if (bundled) return bundled
+
+  const pkg = getPackageInfo()
+  if (pkg.rootDir) {
+    const monorepoDir = path.resolve(pkg.rootDir, "..", "web-runtime")
+    if (await pathExists(monorepoDir)) return monorepoDir
+  }
+
+  const packageDir = resolvePackageDir("@gittydocs/web-runtime")
+  if (packageDir) return packageDir
+
+  fail("Missing bundled web runtime")
+}
 
 export async function ensureWebRuntimeDir(): Promise<string> {
   assertBunInstalled()
 
-  const bundledWebDir = resolvePackageDir("@gittydocs/web-runtime")
-  if (!bundledWebDir) {
-    fail("Could not locate @gittydocs/web-runtime package")
-  }
+  const bundledWebDir = await resolveWebRuntimeSourceDir()
 
   const pkg = getPackageInfo()
   const version = pkg.version ?? "dev"
   const cacheDir = path.join(getCacheRoot(), "web", version)
   const markerPath = path.join(cacheDir, ".gittydocs-version")
 
-  const markerOk = (await pathExists(markerPath)) && (await fs.readFile(markerPath, "utf-8").catch(() => "")).trim() === version
+  const markerOk =
+    (await pathExists(markerPath)) &&
+    (await fs.readFile(markerPath, "utf-8").catch(() => "")).trim() === version
   if (!markerOk) {
     await rmDir(cacheDir)
     await ensureDir(cacheDir)

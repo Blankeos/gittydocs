@@ -38,80 +38,80 @@ export interface DocsConfig {
 }
 
 export const gittydocsConfig: DocsConfig | null = {
-  "site": {
-    "name": "gittydocs",
-    "description": "Simple, fast docs from your Markdown.",
-    "logo": "/static/gittydocs_logo.png",
-    "favicon": "/static/gittydocs_logo.png",
-    "repo": {
-      "owner": "blankeos",
-      "name": "gittydocs",
-      "ref": "main",
-      "docsPath": "docs"
-    }
+  site: {
+    name: "gittydocs",
+    description: "Simple, fast docs from your Markdown.",
+    logo: "/static/gittydocs_logo.png",
+    favicon: "/static/gittydocs_logo.png",
+    repo: {
+      owner: "blankeos",
+      name: "gittydocs",
+      ref: "main",
+      docsPath: "docs",
+    },
   },
-  "theme": {
-    "preset": "ocean"
+  theme: {
+    preset: "ocean",
   },
-  "nav": [
+  nav: [
     {
-      "label": "Docs",
-      "items": [
+      label: "Docs",
+      items: [
         {
-          "label": "Introduction",
-          "path": "/"
+          label: "Introduction",
+          path: "/",
         },
         {
-          "label": "Motivation",
-          "path": "/motivation"
+          label: "Motivation",
+          path: "/motivation",
         },
         {
-          "label": "AI Docs Prompt",
-          "path": "/ai-docs-prompt"
+          label: "AI Docs Prompt",
+          path: "/ai-docs-prompt",
         },
         {
-          "label": "Configuration",
-          "path": "/configuration"
+          label: "Configuration",
+          path: "/configuration",
         },
         {
-          "label": "CLI",
-          "path": "/cli"
+          label: "CLI",
+          path: "/cli",
         },
         {
-          "label": "Theming",
-          "path": "/theming"
-        }
-      ]
+          label: "Theming",
+          path: "/theming",
+        },
+      ],
     },
     {
-      "label": "Deploy",
-      "accordion": true,
-      "items": [
+      label: "Deploy",
+      accordion: true,
+      items: [
         {
-          "label": "Overview",
-          "path": "/deploy"
+          label: "Overview",
+          path: "/deploy",
         },
         {
-          "label": "GitHub Pages",
-          "path": "/deploy/github-pages"
+          label: "GitHub Pages",
+          path: "/deploy/github-pages",
         },
         {
-          "label": "Vercel",
-          "path": "/deploy/vercel"
+          label: "Vercel",
+          path: "/deploy/vercel",
         },
         {
-          "label": "Cloudflare Pages",
-          "path": "/deploy/cloudflare"
+          label: "Cloudflare Pages",
+          path: "/deploy/cloudflare",
         },
         {
-          "label": "Netlify",
-          "path": "/deploy/netlify"
-        }
-      ]
-    }
+          label: "Netlify",
+          path: "/deploy/netlify",
+        },
+      ],
+    },
   ],
-  "links": {
-    "github": "https://github.com/blankeos/gittydocs",
-    "issues": "https://github.com/blankeos/gittydocs/issues"
-  }
+  links: {
+    github: "https://github.com/blankeos/gittydocs",
+    issues: "https://github.com/blankeos/gittydocs/issues",
+  },
 }

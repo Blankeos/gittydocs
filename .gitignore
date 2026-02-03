@@ -3,3 +3,4 @@ dist
 .DS_Store
 *.log
 *.tsbuildinfo
+packages/cli/templates/web-runtime
