@@ -14,7 +14,8 @@
       "!**/*.js",
       "!**/*.cjs",
       "!**/*.mjs",
-      "!**/src/route-tree.gen.ts"
+      "!**/src/route-tree.gen.ts",
+      "!**/src/gittydocs/lib/docs/*.gen.ts"
     ]
   },
   "linter": {
