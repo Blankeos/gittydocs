@@ -1,6 +1,6 @@
 import { createEffect, createMemo, createSignal, For, onCleanup, Show } from "solid-js"
-import { cn } from "@/utils/cn"
 import { Collapsible } from "@/components/ui/collapsible"
+import { cn } from "@/utils/cn"
 
 export interface Heading {
   level: number
@@ -112,7 +112,7 @@ export function TableOfContents(props: TableOfContentsProps) {
       <div ref={mobileRef} class={cn("relative", props.class)}>
         <button
           type="button"
-          class="flex w-full items-center justify-between gap-2 rounded-none border-x-0 border-b border-t-0 bg-background/95 px-4 py-3 text-sm backdrop-blur"
+          class="flex w-full items-center justify-between gap-2 rounded-none border-x-0 border-t-0 border-b bg-background/95 px-4 py-3 text-sm backdrop-blur"
           aria-expanded={mobileOpen()}
           aria-controls="mobile-toc-panel"
           onClick={() => setMobileOpen((open) => !open)}
@@ -122,7 +122,7 @@ export function TableOfContents(props: TableOfContentsProps) {
             <span class="text-muted-foreground">&gt;</span>
             <Show when={activeHeading()} keyed>
               {(heading) => (
-                <span class="min-w-0 truncate font-medium text-foreground animate-scaleIn">
+                <span class="min-w-0 animate-scaleIn truncate font-medium text-foreground">
                   {heading.text}
                 </span>
               )}
