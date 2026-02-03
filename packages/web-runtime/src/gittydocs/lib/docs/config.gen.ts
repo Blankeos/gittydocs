@@ -86,6 +86,10 @@ export const gittydocsConfig: DocsConfig | null = {
       "accordion": true,
       "items": [
         {
+          "label": "Overview",
+          "path": "/deploy"
+        },
+        {
           "label": "GitHub Pages",
           "path": "/deploy/github-pages"
         },

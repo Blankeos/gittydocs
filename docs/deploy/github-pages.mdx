@@ -3,7 +3,7 @@ title: GitHub Pages 🚀
 description: Deploy your docs to GitHub Pages.
 ---
 
-## Local Source (Recommended)
+## Local Source
 
 If `GITTYDOCS_SOURCE` points at a folder in this repo, build then deploy `./dist/client`.
 
@@ -47,21 +47,3 @@ jobs:
 If your docs folder isn't `docs/`, update the build path in the workflow.
 
 Enable GitHub Pages in repo settings -> Pages -> Source: GitHub Actions.
-
-## Public GitHub URL
-
-You usually won't deploy this way unless you have a redeploy trigger. When the docs repo updates, the site needs a rebuild.
-
-Example redeploy hook (from the docs repo):
-
-```yaml
-name: Trigger site deploy
-on:
-  push:
-    branches: [main]
-jobs:
-  notify:
-    runs-on: ubuntu-latest
-    steps:
-      - run: curl -X POST "${{ secrets.DEPLOY_HOOK_URL }}"
-```

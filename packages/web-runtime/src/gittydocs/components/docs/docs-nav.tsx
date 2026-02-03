@@ -62,6 +62,8 @@ export function DocsNav() {
           <a
             href={withBasePath("/llms.txt")}
             data-vike="false"
+            target="_blank"
+            rel="noopener noreferrer"
             class={cn(
               "flex w-full items-center border-transparent border-l-2 px-3 py-1 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
               isActive(pathname(), "/llms.txt") &&
@@ -196,10 +198,15 @@ function NavSection(props: NavSectionProps) {
 }
 
 function isActive(currentPath: string, navPath: string): boolean {
-  if (navPath === "/") {
-    return currentPath === "/"
-  }
-  return currentPath.startsWith(navPath)
+  const normalizedCurrent = normalizePath(currentPath)
+  const normalizedNav = normalizePath(navPath)
+  return normalizedCurrent === normalizedNav
+}
+
+function normalizePath(path: string): string {
+  if (!path) return "/"
+  if (path === "/") return "/"
+  return path.endsWith("/") ? path.replace(/\/+$/, "") : path
 }
 
 function removeLlmsItems(items: NavItem[]): NavItem[] {

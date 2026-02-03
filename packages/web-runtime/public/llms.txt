@@ -11,11 +11,12 @@ Per-page markdown lives at /llms/... by default.
 - [Introduction](/llms/index.md): Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site.
 - [Motivation](/llms/motivation.md): Why gittydocs exists.
 - [AI Docs Prompt](/llms/ai-docs-prompt.md): Let an LLM write your docs for you with our llms.txt.
-- [Configuration ⚙️](/llms/configuration.md): Configure your gittydocs site.
+- [Configuration ⚙️](/llms/configuration.md): Everything you need to configure gittydocs from top-to-bottom (like a cheatsheet)
 - [CLI](/llms/cli.md): Scaffold, develop, build, and deploy with the gittydocs CLI.
 - [Theming](/llms/theming.md): Customize app.css, choose a preset, and add custom CSS.
 
 ### Deploy
+- [Deployment Overview](/llms/deploy/index.md): Pick a deployment path and understand the build output.
 - [GitHub Pages 🚀](/llms/deploy/github-pages.md): Deploy your docs to GitHub Pages.
 - [Vercel ▲](/llms/deploy/vercel.md): Deploy your docs to Vercel.
 - [Cloudflare Pages ☁️](/llms/deploy/cloudflare.md): Deploy your docs to Cloudflare Pages.

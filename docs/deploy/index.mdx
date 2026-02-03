@@ -1,0 +1,44 @@
+---
+title: Deployment Overview
+description: Pick a deployment path and understand the build output.
+---
+
+## Deploy sources
+
+### via local source (same repo, recommended)
+
+`gittydocs build` produces a static client bundle in `dist/client` (via Vike).
+That output is compatible with any static host, so the provider guides below
+are examples, not requirements.
+
+- [GitHub Pages](/deploy/github-pages)
+- [Vercel](/deploy/vercel)
+- [Cloudflare Pages](/deploy/cloudflare)
+- [Netlify](/deploy/netlify)
+
+### via public github url
+
+You usually won't deploy this way unless you have a redeploy trigger. When the
+docs repo updates, the site needs a rebuild.
+
+Example redeploy hook (from the docs repo):
+
+```yaml
+name: Trigger site deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -X POST "${{ secrets.DEPLOY_HOOK_URL }}"
+```
+
+## Ejected deployments
+
+If you're serving an ejected version, you're simply deploying a Vike + SolidJS app.
+Follow those docs and examples here: https://github.com/Blankeos/vike-deploy-examples
+
+Ejected deployments mean you're okay maintaining and updating your docs
+independently, since they can diverge significantly from the original.

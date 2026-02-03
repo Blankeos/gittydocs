@@ -1,6 +1,6 @@
 ---
 title: Configuration ⚙️
-description: Configure your gittydocs site.
+description: Everything you need to configure gittydocs from top-to-bottom (like a cheatsheet)
 ---
 
 Create `gittydocs.jsonc` in your docs folder:
@@ -94,9 +94,9 @@ Files sorted by:
 2. Numeric prefix (`01-intro.md`)
 3. Alphabetical
 
-## Customize
+## Fully Customize
 
-The template is a thin wrapper around [Velite](https://velite.js.org/). For full control:
+Gittydocs is essentially a template repackaged as a CLI, thinly wrapped around [Velite](https://velite.js.org/), [SolidJS](https://solidjs.com), and [Vike](https://vike.dev). For full control:
 
 ```bash
 bunx gittydocs@latest new docs --ejected
@@ -105,3 +105,9 @@ bun install
 ```
 
 Edit `velite.config.ts`, components, styles. Deploy the same way.
+
+> When should I eject?
+>
+> - I need custom UI or layout changes beyond the config.
+> - I need to change the content pipeline (custom MDX components or plugins).
+> - I am okay maintaining a fork that can drift from upstream and get outdated.

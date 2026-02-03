@@ -3,11 +3,11 @@ title: Vercel ▲
 description: Deploy your docs to Vercel.
 ---
 
-## Local Source (Recommended)
+## Local Source
 
 If `GITTYDOCS_SOURCE` points at a folder in this repo, build then deploy `./dist/client`.
 
-### Via Vercel (no token needed)
+### via Vercel (recommended)
 
 Connect the repo in Vercel, then set:
 
@@ -16,7 +16,7 @@ Connect the repo in Vercel, then set:
 
 If your docs folder isn't `docs/`, update the build path.
 
-### GitHub Actions (optional)
+### via GitHub Actions
 
 Generate a workflow:
 
@@ -50,22 +50,4 @@ jobs:
       - run: npx vercel@latest deploy --prod --yes --token="${VERCEL_TOKEN}" "./dist/client"
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-```
-
-## Public GitHub URL
-
-You usually won't deploy this way unless you have a redeploy trigger. When the docs repo updates, the site needs a rebuild.
-
-Example redeploy hook (from the docs repo):
-
-```yaml
-name: Trigger site deploy
-on:
-  push:
-    branches: [main]
-jobs:
-  notify:
-    runs-on: ubuntu-latest
-    steps:
-      - run: curl -X POST "${{ secrets.DEPLOY_HOOK_URL }}"
 ```
