@@ -25,3 +25,5 @@
       - [x] Parts to update: CLI entrypoint, docs
   - [x] ejectable setup
     - [x] Parts to update: scaffolding, docs
+
+- [ ] A landing page written in `index.tsx` ?
