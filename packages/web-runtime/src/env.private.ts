@@ -8,8 +8,5 @@ export const privateEnv = createEnv({
     PORT: z.number().default(3000),
     /** Development|Prod. */
     NODE_ENV: z.enum(["development", "production"]).default("development"),
-
-    // GitHub API (for server-side fetching)
-    GITHUB_TOKEN: z.string().optional(),
   },
 })
