@@ -68,7 +68,7 @@ export { useThemeContext }
 export const ThemeContextProvider: FlowComponent = (props) => {
   const [theme, setTheme] = useLocalStorage<Theme>({
     key: "app-theme",
-    defaultValue: "system",
+    defaultValue: "light",
   })
 
   /** For logic that relies on literally just `light` or `dark` themes (i.e. CodeMirror). Also infers system. */

@@ -20,6 +20,7 @@ interface DocsConfig {
     name?: string
     description?: string
     logo?: string
+    favicon?: string
     repo?: GitHubSource
   }
   nav?: unknown
@@ -202,16 +203,17 @@ async function copyLocalDocs(input: string) {
 
 async function processStaticFolders(sourcePath: string) {
   const entries = await fs.readdir(sourcePath, { withFileTypes: true })
+  const staticFolderNames = new Set(["[static]", "[images]"])
 
   for (const entry of entries) {
-    if (entry.isDirectory() && entry.name === "[static]") {
+    if (entry.isDirectory() && staticFolderNames.has(entry.name)) {
       const staticFolderPath = path.join(sourcePath, entry.name)
-      await copyStaticFolderContents(staticFolderPath)
+      await copyStaticFolderContents(staticFolderPath, entry.name)
     }
   }
 }
 
-async function copyStaticFolderContents(staticFolderPath: string) {
+async function copyStaticFolderContents(staticFolderPath: string, folderLabel: string) {
   await ensureDir(publicStaticRoot)
 
   const files = await collectFiles(staticFolderPath)
@@ -223,7 +225,7 @@ async function copyStaticFolderContents(staticFolderPath: string) {
     const destPath = path.join(publicStaticRoot, relativePath)
     await ensureDir(path.dirname(destPath))
     await fs.copyFile(filePath, destPath)
-    console.log(`[static] Copied: ${relativePath}`)
+    console.log(`${folderLabel} Copied: ${relativePath}`)
   }
 }
 
@@ -254,26 +256,30 @@ async function fetchGitHubDocs(repo: GitHubSource) {
 }
 
 async function fetchGitHubStaticFolder(repo: GitHubSource) {
-  const staticPath = repo.docsPath ? `${repo.docsPath}/[static]` : "[static]"
+  const staticFolders = ["[static]", "[images]"]
 
-  try {
-    const entries = await listGitHubEntries(repo, staticPath)
-    await ensureDir(publicStaticRoot)
+  for (const folderName of staticFolders) {
+    const staticPath = repo.docsPath ? `${repo.docsPath}/${folderName}` : folderName
 
-    for (const entry of entries) {
-      if (entry.type === "dir") continue
-      const ext = path.extname(entry.path).toLowerCase()
-      if (!staticExtensions.has(ext)) continue
+    try {
+      const entries = await listGitHubEntries(repo, staticPath)
+      await ensureDir(publicStaticRoot)
 
-      const fileContent = await fetchGitHubFile(entry)
-      const relativePath = entry.path.replace(new RegExp(`^${escapeRegex(staticPath)}/?`), "")
-      const destPath = path.join(publicStaticRoot, relativePath)
-      await ensureDir(path.dirname(destPath))
-      await fs.writeFile(destPath, fileContent)
-      console.log(`[static] Downloaded: ${relativePath}`)
+      for (const entry of entries) {
+        if (entry.type === "dir") continue
+        const ext = path.extname(entry.path).toLowerCase()
+        if (!staticExtensions.has(ext)) continue
+
+        const fileContent = await fetchGitHubFile(entry)
+        const relativePath = entry.path.replace(new RegExp(`^${escapeRegex(staticPath)}/?`), "")
+        const destPath = path.join(publicStaticRoot, relativePath)
+        await ensureDir(path.dirname(destPath))
+        await fs.writeFile(destPath, fileContent)
+        console.log(`${folderName} Downloaded: ${relativePath}`)
+      }
+    } catch (error) {
+      console.log(`No ${folderName} folder found in GitHub repo (or error fetching): ${error}`)
     }
-  } catch (error) {
-    console.log(`No [static] folder found in GitHub repo (or error fetching): ${error}`)
   }
 }
 
@@ -378,6 +384,7 @@ export interface DocsConfig {
     name: string
     description?: string
     logo?: string
+    favicon?: string
     repo?: GitHubRepo
   }
   nav?: NavItem[]

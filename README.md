@@ -2,6 +2,8 @@
 
 Simple, but ejectable modern docs for simple devs.
 
+![gittydocs main banner](docs/%5Bimages%5D/gittydocs_mainbanner.jpg)
+
 Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site.
 
 **[Documentation →](https://gittydocs.carlo.tl)**
