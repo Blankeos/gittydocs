@@ -56,7 +56,20 @@ Create `gittydocs.jsonc` in your docs folder:
 | `llms.path`          | string  | Folder for per-page LLM markdown (default: `llms`)   |
 
 `site.logo` and `site.favicon` can be full URLs or paths to files in `public/`. Relative paths are resolved with the base URL.
-For local assets in the default setup, drop files in `docs/[static]/` or `docs/[images]/` and reference them as `/static/...`.
+
+## Static Assets / Images
+
+Place images and other static assets in `docs/[static]/` or `docs/[images]/`. Both folders are special: their contents are copied to `public/static/` and served from `/static/...`.
+
+```text
+docs/
+  [images]/
+    hero.png
+```
+
+```md
+![Hero](/static/hero.png)
+```
 
 For more theming details and presets, see `/theming`.
 
@@ -96,6 +109,14 @@ Files sorted by:
 1. `index.*` first
 2. Numeric prefix (`01-intro.md`)
 3. Alphabetical
+
+Routing follows the folder structure:
+
+```text
+index.mdx            # /
+subtopic/index.mdx   # /subtopic
+subtopic/topic.mdx   # /subtopic/topic
+```
 
 ## Fully Customize
 
