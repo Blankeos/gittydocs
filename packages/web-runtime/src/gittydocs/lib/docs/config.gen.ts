@@ -18,9 +18,6 @@ export const gittydocsConfig: DocsConfig | null = {
       "docsPath": "docs"
     }
   },
-  "theme": {
-    "preset": "ocean"
-  },
   "nav": [
     {
       "label": "Docs",
@@ -53,7 +50,6 @@ export const gittydocsConfig: DocsConfig | null = {
     },
     {
       "label": "Deploy",
-      "accordion": true,
       "items": [
         {
           "label": "Overview",
@@ -75,11 +71,15 @@ export const gittydocsConfig: DocsConfig | null = {
           "label": "Netlify",
           "path": "/deploy/netlify"
         }
-      ]
+      ],
+      "accordion": true
     }
   ],
   "links": {
     "github": "https://github.com/blankeos/gittydocs",
     "issues": "https://github.com/blankeos/gittydocs/issues"
+  },
+  "theme": {
+    "preset": "ocean"
   }
 }
