@@ -78,10 +78,15 @@ export function DocsHeader() {
               </DrawerTrigger>
               <DrawerContent class="w-[280px] p-0">
                 <DrawerHeader class="border-b px-4 py-3">
-                  <DrawerTitle class="text-left">{siteName()}</DrawerTitle>
+                  <DrawerTitle class="flex items-center gap-2 text-left">
+                    <Show when={logoUrl()}>
+                      {(src) => <img src={src()} alt={siteName()} class="h-6 w-6 object-contain" />}
+                    </Show>
+                    <span class="font-semibold">{siteName()}</span>
+                  </DrawerTitle>
                 </DrawerHeader>
                 <div class="flex-1 overflow-auto py-4">
-                  <DocsNav />
+                  <DocsNav onNavigate={() => setMobileMenuOpen(false)} />
                 </div>
               </DrawerContent>
             </Drawer>
@@ -95,7 +100,7 @@ export function DocsHeader() {
           </div>
 
           <div class="flex flex-1 items-center justify-end gap-4">
-            <nav class="flex items-center gap-2">
+            <nav class="hidden items-center gap-2 md:flex">
               <Button variant="ghost" size="icon" onClick={toggleTheme} class="h-9 w-9">
                 <Show when={inferredTheme() === "dark"} fallback={<IconSunDuo class="h-5 w-5" />}>
                   <IconMoonDuo class="h-5 w-5" />
@@ -122,7 +127,7 @@ export function DocsHeader() {
               </Show>
             </nav>
 
-            <div class="w-full max-w-md flex-1 md:w-auto md:flex-none">
+            <div class="w-full max-w-[11rem] flex-1 sm:max-w-xs md:w-auto md:max-w-md md:flex-none">
               <Button
                 variant="outline"
                 class="relative flex h-8 w-full items-center justify-start rounded-[0.5rem] bg-background font-normal text-muted-foreground text-sm shadow-none hover:bg-accent hover:text-accent-foreground"
@@ -141,8 +146,9 @@ export function DocsHeader() {
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.3-4.3" />
                 </svg>
-                Search...
-                <kbd class="pointer-events-none ml-auto flex h-5 select-none items-center justify-center gap-1 rounded border bg-muted px-1.5 font-medium font-mono text-[10px] opacity-100">
+                <span class="sm:hidden">Search</span>
+                <span class="hidden sm:inline">Search...</span>
+                <kbd class="pointer-events-none ml-auto hidden h-5 select-none items-center justify-center gap-1 rounded border bg-muted px-1.5 font-medium font-mono text-[10px] opacity-100 md:flex">
                   <span class="text-xs">⌘</span>
                   <span>K</span>
                 </kbd>
@@ -152,7 +158,13 @@ export function DocsHeader() {
         </div>
       </header>
 
-      <SearchDialog open={searchOpen()} onOpenChange={setSearchOpen} />
+      <SearchDialog
+        open={searchOpen()}
+        onOpenChange={setSearchOpen}
+        onToggleTheme={toggleTheme}
+        themeLabel={inferredTheme() === "dark" ? "Switch to light" : "Switch to dark"}
+        githubUrl={githubUrl()}
+      />
     </>
   )
 }

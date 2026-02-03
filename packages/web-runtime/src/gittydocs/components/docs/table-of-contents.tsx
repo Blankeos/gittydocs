@@ -118,7 +118,7 @@ export function TableOfContents(props: TableOfContentsProps) {
           onClick={() => setMobileOpen((open) => !open)}
         >
           <span class="flex min-w-0 items-center gap-2 text-left">
-            <span class="text-muted-foreground">On this page</span>
+            <span class="whitespace-nowrap text-muted-foreground">On this page</span>
             <span class="text-muted-foreground">&gt;</span>
             <Show when={activeHeading()} keyed>
               {(heading) => (

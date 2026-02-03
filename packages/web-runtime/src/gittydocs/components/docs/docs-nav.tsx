@@ -15,7 +15,11 @@ interface AccordionState {
   openAccordions: Record<string, boolean>
 }
 
-export function DocsNav() {
+interface DocsNavProps {
+  onNavigate?: () => void
+}
+
+export function DocsNav(props: DocsNavProps = {}) {
   const docs = useDocsContext()
   const pageContext = usePageContext()
   const pathname = () => stripBasePath(pageContext.urlParsed?.pathname || "/")
@@ -54,6 +58,7 @@ export function DocsNav() {
             item={item}
             isOpen={accordionState.openAccordions[item.label] || false}
             onToggle={() => toggleAccordion(item.label)}
+            onNavigate={props.onNavigate}
           />
         )}
       </For>
@@ -64,6 +69,7 @@ export function DocsNav() {
             data-vike="false"
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => props.onNavigate?.()}
             class={cn(
               "flex w-full items-center border-transparent border-l-2 px-3 py-1 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
               isActive(pathname(), "/llms.txt") &&
@@ -82,6 +88,7 @@ interface NavSectionProps {
   item: NavItem
   isOpen: boolean
   onToggle: () => void
+  onNavigate?: () => void
 }
 
 function NavSection(props: NavSectionProps) {
@@ -108,6 +115,7 @@ function NavSection(props: NavSectionProps) {
             {(path) => (
               <a
                 href={withBasePath(path())}
+                onClick={() => props.onNavigate?.()}
                 class={cn(
                   "flex w-full items-center border-transparent border-l-2 px-3 py-1 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
                   isActive(pathname(), path()) &&
@@ -135,6 +143,7 @@ function NavSection(props: NavSectionProps) {
                         {(path) => (
                           <a
                             href={withBasePath(path())}
+                            onClick={() => props.onNavigate?.()}
                             class={cn(
                               "flex w-full items-center border-transparent border-l-2 px-3 py-1 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
                               isActive(pathname(), path()) &&
@@ -174,6 +183,7 @@ function NavSection(props: NavSectionProps) {
                           {(path) => (
                             <a
                               href={withBasePath(path())}
+                              onClick={() => props.onNavigate?.()}
                               class={cn(
                                 "flex w-full items-center border-transparent border-l-2 px-3 py-1 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
                                 isActive(pathname(), path()) &&
