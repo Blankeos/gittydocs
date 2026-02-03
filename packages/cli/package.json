@@ -1,6 +1,6 @@
 {
   "name": "gittydocs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site",
   "license": "MIT",
   "type": "module",
