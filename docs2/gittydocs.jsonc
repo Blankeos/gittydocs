@@ -1,12 +1,13 @@
 {
+  "$schema": "https://raw.githubusercontent.com/blankeos/gittydocs/main/gittydocs.schema.json",
   "site": {
     "name": "Coffee Brewing Guide",
     "repo": {
       "owner": "blankeos",
       "name": "gittydocs",
       "ref": "main",
-      "docsPath": "docs2",
-    },
+      "docsPath": "docs2"
+    }
   },
   "nav": [
     {
@@ -14,11 +15,11 @@
       "items": [
         { "label": "Introduction", "path": "/" },
         { "label": "Roasting", "path": "/test-page" },
-        { "label": "Equipment", "path": "/api-reference" },
-      ],
-    },
+        { "label": "Equipment", "path": "/api-reference" }
+      ]
+    }
   ],
   "links": {
-    "issues": "https://github.com/blankeos/gittydocs/issues",
-  },
+    "issues": "https://github.com/blankeos/gittydocs/issues"
+  }
 }

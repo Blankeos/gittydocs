@@ -1,4 +1,5 @@
 {
+  "$schema": "https://raw.githubusercontent.com/blankeos/gittydocs/main/gittydocs.schema.json",
   "site": {
     "name": "My Project",
     "description": "Documentation for My Project.",

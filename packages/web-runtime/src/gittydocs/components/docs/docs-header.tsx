@@ -46,7 +46,7 @@ export function DocsHeader() {
   const repoUrl = () => {
     const repo = docs.config?.site?.repo
     if (repo) {
-      return `https://github.com/${repo.owner}/${repo.repo}`
+      return `https://github.com/${repo.owner}/${repo.name}`
     }
     return null
   }

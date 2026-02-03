@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "site": {
+      "description": "Site metadata",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Site title"
+        },
+        "description": {
+          "description": "Short site description used in /llms.txt",
+          "type": "string"
+        },
+        "logo": {
+          "description": "Logo image URL or public path",
+          "type": "string"
+        },
+        "favicon": {
+          "description": "Favicon URL or public path",
+          "type": "string"
+        },
+        "socialBanner": {
+          "description": "Social preview image (Open Graph/Twitter) URL or path",
+          "type": "string"
+        },
+        "repo": {
+          "description": "Repository metadata for edit links",
+          "type": "object",
+          "properties": {
+            "owner": {
+              "type": "string",
+              "description": "GitHub username or org"
+            },
+            "name": {
+              "type": "string",
+              "description": "Repository name"
+            },
+            "ref": {
+              "description": "Branch or tag",
+              "type": "string"
+            },
+            "docsPath": {
+              "description": "Path to docs folder",
+              "type": "string"
+            }
+          },
+          "required": [
+            "owner",
+            "name"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "nav": {
+      "description": "Custom navigation sections",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/__schema0"
+      }
+    },
+    "links": {
+      "description": "External links",
+      "type": "object",
+      "properties": {
+        "github": {
+          "description": "URL to repository or org",
+          "type": "string"
+        },
+        "issues": {
+          "description": "URL to issues page",
+          "type": "string"
+        },
+        "discord": {
+          "description": "URL to Discord server",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "theme": {
+      "description": "Theme configuration",
+      "type": "object",
+      "properties": {
+        "preset": {
+          "description": "Preset theme name (see /theming)",
+          "type": "string"
+        },
+        "cssFile": {
+          "description": "Path to a CSS file in your docs folder",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "llms": {
+      "description": "LLM output configuration",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Generate /llms.txt at build time",
+          "type": "boolean"
+        },
+        "path": {
+          "description": "Folder for per-page LLM markdown",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "$schema": {
+      "description": "JSON Schema reference",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Navigation label"
+        },
+        "path": {
+          "description": "Route path or external URL",
+          "type": "string"
+        },
+        "items": {
+          "description": "Nested navigation items",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema0"
+          }
+        },
+        "accordion": {
+          "description": "Render as collapsible section",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "label"
+      ],
+      "additionalProperties": false,
+      "description": "Navigation item"
+    }
+  },
+  "$id": "https://raw.githubusercontent.com/blankeos/gittydocs/main/gittydocs.schema.json",
+  "title": "GittydocsConfig"
+}

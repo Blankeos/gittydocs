@@ -12,16 +12,17 @@ export function DocsFooter(props: DocsFooterProps) {
     if (!props.sourcePath) return null
     const repo = docs.config?.site?.repo
     if (!repo) return null
-    const { owner, repo: repoName, ref } = repo
+    const { owner, name } = repo
+    const ref = repo.ref || "main"
     const docsPath = repo.docsPath || "docs"
-    return `https://github.com/${owner}/${repoName}/edit/${ref}/${docsPath}/${props.sourcePath}`
+    return `https://github.com/${owner}/${name}/edit/${ref}/${docsPath}/${props.sourcePath}`
   }
 
   const githubUrl = () => {
     if (docs.config?.links?.github) return docs.config.links.github
     const repo = docs.config?.site?.repo
     if (repo) {
-      return `https://github.com/${repo.owner}/${repo.repo}`
+      return `https://github.com/${repo.owner}/${repo.name}`
     }
     return null
   }
@@ -30,7 +31,7 @@ export function DocsFooter(props: DocsFooterProps) {
     if (docs.config?.links?.issues) return docs.config.links.issues
     const repo = docs.config?.site?.repo
     if (repo) {
-      return `https://github.com/${repo.owner}/${repo.repo}/issues`
+      return `https://github.com/${repo.owner}/${repo.name}/issues`
     }
     return null
   }

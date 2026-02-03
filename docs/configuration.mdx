@@ -8,6 +8,7 @@ Create `gittydocs.jsonc` in your docs folder:
 ```jsonc
 // docs/gittydocs.jsonc
 {
+  "$schema": "https://raw.githubusercontent.com/blankeos/gittydocs/main/gittydocs.schema.json",
   "site": {
     "name": "Site Name",
     "logo": "/logo.svg",
@@ -36,26 +37,29 @@ Create `gittydocs.jsonc` in your docs folder:
 }
 ```
 
+`$schema` enables autocomplete + validation in editors. For a pinned version, swap `main` for a tag.
+
 ## Options
 
-| Field                | Type    | Description                                          |
-| -------------------- | ------- | ---------------------------------------------------- |
-| `site.name`          | string  | Site title                                           |
-| `site.description`   | string  | Short site description used in `/llms.txt`           |
-| `site.logo`          | string  | Logo image URL or public path                        |
-| `site.favicon`       | string  | Favicon URL or public path                           |
-| `site.socialBanner`  | string  | Social preview image (Open Graph/Twitter) URL or path |
-| `site.repo.owner`    | string  | GitHub username or org                               |
-| `site.repo.name`     | string  | Repository name                                      |
-| `site.repo.ref`      | string  | Branch or tag (default: `main`)                      |
-| `site.repo.docsPath` | string  | Path to docs folder                                  |
-| `nav`                | array   | Custom navigation sections                           |
-| `links.github`       | string  | URL to repository or org                             |
-| `links.issues`       | string  | URL to issues page                                   |
-| `theme.preset`       | string  | Preset theme name (see `/theming`)                   |
-| `theme.cssFile`      | string  | Path to a CSS file in your docs folder               |
-| `llms.enabled`       | boolean | Generate `/llms.txt` at build time (default: `true`) |
-| `llms.path`          | string  | Folder for per-page LLM markdown (default: `llms`)   |
+| Field                | Type    | Description                                                   |
+| -------------------- | ------- | ------------------------------------------------------------- |
+| `site.name`          | string  | Site title                                                    |
+| `site.description`   | string  | Short site description used in `/llms.txt`                    |
+| `site.logo`          | string  | Logo image URL or public path                                 |
+| `site.favicon`       | string  | Favicon URL or public path                                    |
+| `site.socialBanner`  | string  | Social preview image (Open Graph/Twitter) URL or path         |
+| `site.repo.owner`    | string  | GitHub username or org                                        |
+| `site.repo.name`     | string  | Repository name                                               |
+| `site.repo.ref`      | string  | Branch or tag (default: `main`)                               |
+| `site.repo.docsPath` | string  | Path to docs folder (default: `docs`)                         |
+| `nav`                | array   | Custom navigation sections                                    |
+| `links.github`       | string  | URL to repository or org                                      |
+| `links.issues`       | string  | URL to issues page                                            |
+| `links.discord`      | string  | URL to Discord server                                         |
+| `theme.preset`       | string  | Preset theme name (see `/theming`)                            |
+| `theme.cssFile`      | string  | Path to a CSS file in your docs folder (default: `theme.css`) |
+| `llms.enabled`       | boolean | Generate `/llms.txt` at build time (default: `true`)          |
+| `llms.path`          | string  | Folder for per-page LLM markdown (default: `llms`)            |
 
 `site.logo`, `site.favicon`, and `site.socialBanner` can be full URLs or paths to files in `public/`. Relative paths are resolved with the base URL.
 
@@ -114,7 +118,7 @@ Files sorted by:
 
 Routing follows the folder structure:
 
-```text
+```sh
 index.mdx            # /
 subtopic/index.mdx   # /subtopic
 subtopic/topic.mdx   # /subtopic/topic

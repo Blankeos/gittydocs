@@ -18,6 +18,7 @@
     "cleanmods": "rm -rf node_modules",
     "icon": "iconmate --folder src/assets/icons/",
     "prepare:docs": "bun run scripts/prepare-docs.ts",
+    "generate:config-schema": "bun run scripts/generate-config-schema.ts",
     "velite:routes": "bun run scripts/gen-velite-routes.ts"
   },
   "dependencies": {
