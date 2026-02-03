@@ -33,4 +33,4 @@ More ideas:
 
 Bugs:
 
-- [ ] [object Object] when I navigate around the UI, but refresh is okay.
+- [x] [object Object] when I navigate around the UI, but refresh is okay.
