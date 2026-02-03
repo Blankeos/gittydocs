@@ -1,4 +1,4 @@
-import type { JSX } from "solid-js"
+import { createMemo, type JSX } from "solid-js"
 import * as runtime from "solid-jsx"
 import { useMDXComponents } from "solid-jsx"
 
@@ -8,7 +8,7 @@ interface MdxProps {
 
 function useMDXComponent(code: string) {
   const fn = new Function(code) as (rt: any) => { default: any }
-  return fn({ ...runtime }).default
+  return createMemo(() => fn({ ...runtime }).default) as any
 }
 
 export function MdxContentStatic(props: MdxProps): JSX.Element {
