@@ -20,6 +20,7 @@ export interface DocsConfig {
     description?: string
     logo?: string
     favicon?: string
+    socialBanner?: string
     repo?: GitHubRepo
   }
   nav?: NavItem[]
@@ -43,6 +44,7 @@ export const gittydocsConfig: DocsConfig | null = {
     description: "Simple, fast docs from your Markdown.",
     logo: "/static/gittydocs_logo.png",
     favicon: "/static/gittydocs_logo.png",
+    socialBanner: "/static/gittydocs_mainbanner.jpg",
     repo: {
       owner: "blankeos",
       name: "gittydocs",

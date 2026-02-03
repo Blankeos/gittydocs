@@ -26,4 +26,11 @@
   - [x] ejectable setup
     - [x] Parts to update: scaffolding, docs
 
+More ideas:
+
 - [ ] A landing page written in `index.tsx` ?
+- [x] The social banner `socialBanner` config.
+
+Bugs:
+
+- [ ] [object Object] when I navigate around the UI, but refresh is okay.

@@ -13,10 +13,18 @@ import { themeCssHref } from "@/gittydocs/lib/themes/theme-source.gen"
 import { withBasePath } from "@/utils/base-path"
 
 const faviconHref = resolveAssetHref(gittydocsConfig?.site?.favicon)
+const socialBannerHref = resolveAssetHref(gittydocsConfig?.site?.socialBanner)
 
 useMetadata.setGlobalDefaults({
   title: "gittydocs",
   description: "Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site",
+  openGraph: socialBannerHref ? { images: socialBannerHref } : undefined,
+  twitter: socialBannerHref
+    ? {
+        card: "summary_large_image",
+        images: socialBannerHref,
+      }
+    : undefined,
   viewport: {
     width: "device-width",
     initialScale: 1,

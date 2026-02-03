@@ -12,6 +12,7 @@ Create `gittydocs.jsonc` in your docs folder:
     "name": "Site Name",
     "logo": "/logo.svg",
     "favicon": "/static/favicon.ico",
+    "socialBanner": "/static/social-card.png",
     "repo": {
       "owner": "username",
       "name": "repo",
@@ -43,6 +44,7 @@ Create `gittydocs.jsonc` in your docs folder:
 | `site.description`   | string  | Short site description used in `/llms.txt`           |
 | `site.logo`          | string  | Logo image URL or public path                        |
 | `site.favicon`       | string  | Favicon URL or public path                           |
+| `site.socialBanner`  | string  | Social preview image (Open Graph/Twitter) URL or path |
 | `site.repo.owner`    | string  | GitHub username or org                               |
 | `site.repo.name`     | string  | Repository name                                      |
 | `site.repo.ref`      | string  | Branch or tag (default: `main`)                      |
@@ -55,7 +57,7 @@ Create `gittydocs.jsonc` in your docs folder:
 | `llms.enabled`       | boolean | Generate `/llms.txt` at build time (default: `true`) |
 | `llms.path`          | string  | Folder for per-page LLM markdown (default: `llms`)   |
 
-`site.logo` and `site.favicon` can be full URLs or paths to files in `public/`. Relative paths are resolved with the base URL.
+`site.logo`, `site.favicon`, and `site.socialBanner` can be full URLs or paths to files in `public/`. Relative paths are resolved with the base URL.
 
 ## Static Assets / Images
 

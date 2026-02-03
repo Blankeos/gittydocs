@@ -21,6 +21,7 @@ interface DocsConfig {
     description?: string
     logo?: string
     favicon?: string
+    socialBanner?: string
     repo?: GitHubSource
   }
   nav?: unknown
@@ -394,6 +395,7 @@ export interface DocsConfig {
     description?: string
     logo?: string
     favicon?: string
+    socialBanner?: string
     repo?: GitHubRepo
   }
   nav?: NavItem[]
