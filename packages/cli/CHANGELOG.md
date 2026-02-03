@@ -1,5 +1,13 @@
 # gittydocs
 
+## 0.0.4
+
+### Patch Changes
+
+- [`c93481d`](https://github.com/Blankeos/gittydocs/commit/c93481de14e56af9326ff41d264c1261c6b53e41) Thanks [@Blankeos](https://github.com/Blankeos)! - fix: ui responsiveness for mobile docs.
+
+- [`c93481d`](https://github.com/Blankeos/gittydocs/commit/c93481de14e56af9326ff41d264c1261c6b53e41) Thanks [@Blankeos](https://github.com/Blankeos)! - fix: proper mdx rendering clientside.
+
 ## 0.0.3
 
 ### Patch Changes
