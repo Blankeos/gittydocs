@@ -63,11 +63,7 @@ export default defineConfig({
   plugins: [
     tsConfigPaths(),
     gittydocsHotReload(),
-    vike({
-      prerender: {
-        partial: true,
-      },
-    }),
+    vike({}),
     vikeSolid(),
     vikeRoutegen(),
     solidSvg(),
