@@ -15,7 +15,8 @@
     "lint": "bun run --filter '*' lint",
     "lint:fix": "bun run --filter '*' lint:fix",
     "publish-ci": "bun run lint && bun run build && changeset publish",
-    "typecheck": "bun run --filter gittydocs typecheck"
+    "typecheck": "bun run --filter gittydocs typecheck",
+    "cleanmod": "rm -rf node_modules && find packages -type d -name node_modules -prune -exec rm -rf {} +"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.13",
