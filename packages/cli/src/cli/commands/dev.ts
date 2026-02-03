@@ -1,14 +1,27 @@
-import type { CAC } from "cac"
-import { spinner } from "@clack/prompts"
-import chokidar from "chokidar"
 import path from "node:path"
+import type { CAC } from "cac"
+import chokidar from "chokidar"
+import { findGittydocsConfigPath } from "../lib/config"
 import { loadEnv } from "../lib/env"
 import { fail } from "../lib/errors"
 import { runCommand, spawnLongRunning } from "../lib/exec"
 import { openUrl } from "../lib/open"
 import { resolveSource } from "../lib/source"
 import { ensureWebRuntimeDir } from "../lib/web-runtime"
-import { findGittydocsConfigPath } from "../lib/config"
+
+const shield = "\u{1F6E1}"
+const useColor = process.stdout.isTTY && !process.env.NO_COLOR
+const colors = {
+  reset: "\x1b[0m",
+  cyan: "\x1b[36m",
+  gray: "\x1b[90m",
+}
+
+const colorize = (value: string, color: string) =>
+  useColor ? `${color}${value}${colors.reset}` : value
+
+const logPrefix = colorize(`[${shield} gittydocs]`, colors.cyan)
+const label = (value: string) => colorize(value, colors.gray)
 
 interface DevOptions {
   env?: string
@@ -29,8 +42,7 @@ export function registerDevCommand(cli: CAC) {
       const webDir = await ensureWebRuntimeDir()
       const port = options.port ? parsePort(options.port) : 3000
 
-      const prep = spinner()
-      prep.start("Preparing docs")
+      process.stdout.write(`${logPrefix} preparing docs\n`)
       await runCommand({
         cwd: webDir,
         command: "bun",
@@ -40,17 +52,17 @@ export function registerDevCommand(cli: CAC) {
           GITTYDOCS_SOURCE: source.value,
         },
       })
-      prep.stop("Docs ready")
+      process.stdout.write(`${logPrefix} docs ready ✔︎\n\n`)
 
-      process.stdout.write("\n")
-      process.stdout.write(`Source: ${source.value}\n`)
+      process.stdout.write(`${logPrefix} dev server\n`)
+      process.stdout.write(`  ${label("source")}: ${source.value}\n`)
       if (source.kind === "local" && source.absPath) {
         const configPath = await findGittydocsConfigPath(source.absPath)
-        process.stdout.write(`Config: ${configPath ?? "(none)"}\n`)
+        process.stdout.write(`  ${label("config")}: ${configPath ?? "(none)"}\n`)
       }
-      process.stdout.write(`Env: ${envInfo.envPath ?? "(none)"}\n`)
-      process.stdout.write(`Web runtime: ${webDir}\n`)
-      process.stdout.write(`URL: http://localhost:${port}\n\n`)
+      process.stdout.write(`  ${label("env")}: ${envInfo.envPath ?? "(none)"}\n`)
+      process.stdout.write(`  ${label("web runtime")}: ${webDir}\n`)
+      process.stdout.write(`  ${label("url")}: http://localhost:${port}\n\n`)
 
       const velite = spawnLongRunning({
         cwd: webDir,
@@ -128,11 +140,7 @@ function startPrepareDocsWatcher(input: {
       stabilityThreshold: 250,
       pollInterval: 50,
     },
-    ignored: [
-      "**/.git/**",
-      "**/node_modules/**",
-      "**/dist/**",
-    ],
+    ignored: ["**/.git/**", "**/node_modules/**", "**/dist/**"],
   })
 
   let running = false
@@ -159,7 +167,7 @@ function startPrepareDocsWatcher(input: {
         },
       })
     } catch (error) {
-      process.stderr.write(`\n[watch] prepare:docs failed: ${String(error)}\n`)
+      process.stderr.write(`\n${logPrefix} [watch] prepare:docs failed: ${String(error)}\n`)
     } finally {
       running = false
       if (queued) {

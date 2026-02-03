@@ -71,6 +71,15 @@ const staticExtensions = new Set([
   ".eot",
 ])
 const configFiles = ["gittydocs.jsonc", "gittydocs.json"]
+const shield = "\u{1F6E1}"
+const useColor = process.stdout.isTTY && !process.env.NO_COLOR
+const colors = {
+  reset: "\x1b[0m",
+  cyan: "\x1b[36m",
+}
+const colorize = (value: string, color: string) =>
+  useColor ? `${color}${value}${colors.reset}` : value
+const logPrefix = colorize(`[${shield} gittydocs]`, colors.cyan)
 
 const llmsTitleByRoute = new Map<string, string>()
 const llmsDescriptionByRoute = new Map<string, string>()
@@ -78,10 +87,10 @@ const llmsPathByRoute = new Map<string, string>()
 
 try {
   await prepareDocs()
-  console.log("✓ prepare:docs completed successfully")
+  console.log(`\n${logPrefix} ✓ prepare:docs complete`)
   process.exit(0)
 } catch (error) {
-  console.error("✗ prepare:docs failed:", error)
+  console.error(`\n${logPrefix} ✗ prepare:docs failed:`, error)
   process.exit(1)
 }
 
@@ -225,7 +234,7 @@ async function copyStaticFolderContents(staticFolderPath: string, folderLabel: s
     const destPath = path.join(publicStaticRoot, relativePath)
     await ensureDir(path.dirname(destPath))
     await fs.copyFile(filePath, destPath)
-    console.log(`${folderLabel} Copied: ${relativePath}`)
+    console.log(`${logPrefix} ${folderLabel} Copied: ${relativePath}`)
   }
 }
 
@@ -275,10 +284,10 @@ async function fetchGitHubStaticFolder(repo: GitHubSource) {
         const destPath = path.join(publicStaticRoot, relativePath)
         await ensureDir(path.dirname(destPath))
         await fs.writeFile(destPath, fileContent)
-        console.log(`${folderName} Downloaded: ${relativePath}`)
+        console.log(`${logPrefix} ${folderName} Downloaded: ${relativePath}`)
       }
     } catch (error) {
-      console.log(`No ${folderName} folder found in GitHub repo (or error fetching): ${error}`)
+      console.log(`${logPrefix} ${folderName} Skipped (not found or fetch error): ${error}`)
     }
   }
 }
