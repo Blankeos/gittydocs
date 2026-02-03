@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "gittydocs",
+      "devDependencies": {
+        "@biomejs/biome": "^2.3.13",
+      },
     },
     "packages/cli": {
       "name": "gittydocs",
@@ -52,7 +55,7 @@
         "solid-sonner": "^0.2.8",
         "tailwind-merge": "^3.4.0",
         "vike": "^0.4.252",
-        "vike-metadata-solid": "^1.0.4",
+        "vike-metadata-solid": "^1.0.5",
         "vike-solid": "^0.8.0",
         "zod": "^4.3.6",
       },
@@ -1075,7 +1078,7 @@
 
     "vike": ["vike@0.4.253", "", { "dependencies": { "@babel/core": "^7.28.5", "@babel/types": "^7.28.5", "@brillout/import": "^0.2.6", "@brillout/json-serializer": "^0.5.21", "@brillout/picocolors": "^1.0.30", "@brillout/require-shim": "^0.1.2", "@brillout/vite-plugin-server-entry": "^0.7.17", "cac": "^6.0.0", "es-module-lexer": "^1.0.0", "esbuild": ">=0.19.0", "json5": "^2.0.0", "magic-string": "^0.30.17", "picomatch": "^4.0.2", "semver": "^7.0.0", "sirv": "^3.0.1", "source-map-support": "^0.5.0", "tinyglobby": "^0.2.10", "vite": ">=6.3.0" }, "peerDependencies": { "react-streaming": ">=0.3.42" }, "optionalPeers": ["react-streaming"], "bin": { "vike": "bin.js" } }, "sha512-glS8FidhqnK6I/wLs48BYtqsAMXs8QtOB0uxeZ0G93G2a0ZkymuZ5rjbcZHUCBLoUYS/8i0h4d4NhK2mAsUhTA=="],
 
-    "vike-metadata-solid": ["vike-metadata-solid@1.0.4", "", { "peerDependencies": { "solid-js": "^1.6.0" } }, "sha512-LGJNVs1FJVQU/O8VicZKKwdnlTNwoRWn0JHbxzYrDZEYidYyGFnUSwmoPubBE/AVxHEUaiIDvzeb2pG6V/Q91g=="],
+    "vike-metadata-solid": ["vike-metadata-solid@1.0.5", "", { "peerDependencies": { "solid-js": "^1.6.0" } }, "sha512-PxbEA45S/6dZQ6rNt22UXgs6PXHUjW9P/oX0MEdrZ7WrCsPc3T9owQwBVGfDRVRQh5nFdDyXEWgAbnAK7oapsw=="],
 
     "vike-solid": ["vike-solid@0.8.0", "", { "dependencies": { "isbot-fast": "^1.2.0" }, "peerDependencies": { "solid-js": "^1.8.7", "vike": ">=0.4.250", "vite-plugin-solid": "^2.11.10" } }, "sha512-niwCFwIp9Qii3D+cFVLWM8Vn9tSmpuhNN3F5QV79a6LkLHIh1hBkPG8QBPpYsSmuE0Y6q70YNtzk/cP3A6a5jw=="],
 

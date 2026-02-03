@@ -1,5 +1,5 @@
 import { docs } from "@velite"
-import { createMemo, Show } from "solid-js"
+import { createEffect, createMemo, on, Show } from "solid-js"
 import { useMetadata } from "vike-metadata-solid"
 import { usePageContext } from "vike-solid/usePageContext"
 import { CopyPageButton } from "@/gittydocs/components/docs/copy-page-button"
@@ -9,21 +9,26 @@ import { MdxContentStatic } from "@/gittydocs/lib/velite/mdx-content"
 import { MdxContext } from "@/gittydocs/lib/velite/mdx-context"
 import { useParams } from "@/route-tree.gen"
 import { stripBasePath } from "@/utils/base-path"
+import getTitle from "@/utils/get-title"
 
 export function DocContent() {
-  useMetadata({})
-
   const params = useParams({ from: "/@" })
   const slug = createMemo(() => params()["_@"] ?? "/")
 
   // Use velite's docs directly with slugAsParams
   // Handle root path (slugAsParams is "" for index.mdx)
-  const doc = createMemo(() =>
+  const currentDoc = createMemo(() =>
     docs.find((d) => {
       const docSlug = d.slugAsParams === "" ? "/" : `/${d.slugAsParams}`
       return docSlug === slug()
     })
   )
+
+  // Set page metadata based on the current doc
+  useMetadata(() => ({
+    title: currentDoc()?.title ? getTitle(currentDoc()!.title) : undefined,
+    description: currentDoc()?.description,
+  }))
 
   const pageContext = usePageContext()
   const routePath = createMemo(() => {
@@ -33,14 +38,14 @@ export function DocContent() {
   })
 
   const hasHeadings = createMemo(() => {
-    const d = doc()
+    const d = currentDoc()
     if (!d?.rawMarkdown) return false
     return extractHeadingsFromMarkdown(d.rawMarkdown).length > 0
   })
 
   // Extract headings for TOC
   const headings = createMemo(() => {
-    const d = doc()
+    const d = currentDoc()
     if (!d?.rawMarkdown) return []
     return extractHeadingsFromMarkdown(d.rawMarkdown)
   })
@@ -48,12 +53,20 @@ export function DocContent() {
   return (
     <>
       <Show
-        when={doc()}
+        when={currentDoc()}
         fallback={
-          <div class="py-12 text-center">
-            <h1 class="font-bold text-2xl">Page not found</h1>
-            <p class="mt-2 text-muted-foreground">The page you're looking for doesn't exist.</p>
-            <p class="mt-1 text-muted-foreground text-sm">Path: {routePath()}</p>
+          <div class="w-full max-w-6xl">
+            <main class="relative flex flex-1 flex-col px-4 py-6 md:px-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_220px] xl:px-8">
+              <div class="mx-auto flex min-h-full w-full min-w-0 max-w-3xl flex-col">
+                <div>
+                  <h1 class="font-bold text-2xl">Page not found</h1>
+                  <p class="mt-2 text-muted-foreground">
+                    The page you're looking for doesn't exist.
+                  </p>
+                  <p class="mt-1 text-muted-foreground text-sm">Path: {routePath()}</p>
+                </div>
+              </div>
+            </main>
           </div>
         }
       >

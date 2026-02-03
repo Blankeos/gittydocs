@@ -10,5 +10,8 @@
     "lint": "bun run --filter '*' lint",
     "lint:fix": "bun run --filter '*' lint:fix",
     "typecheck": "bun run --filter gittydocs typecheck"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.13"
   }
 }
