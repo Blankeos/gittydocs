@@ -15,17 +15,42 @@ Write docs in Markdown. Push to GitHub. Get a beautiful docs site.
 
 ![gittydocs main banner](/static/gittydocs_mainbanner.jpg)
 
+## Features
+
+- **LLMs-ready** — Automatic llms.txt generation, so AI agents can explore your docs with efficient tokens
+- **Easy & Minimal** — One `.jsonc` config file, a couple of `.mdx`, push to GitHub, deploy anywhere
+- **Partial-Text Search** — `Ctrl+K` to search (w/ flexsearch)
+- **Table of Contents** — Auto-generated with scroll spy showing current section
+- **Copy Page** — Copy entire page as Markdown with one click
+- **Dark Mode** — Built-in toggle`
+- **GitHub Integration** — "Edit this page" links
+- **Fully Customizable** — Built on Velite + Vike + Solid. Eject anytime and own your stack
+- **Static Export** — Deploy to any host
+
 ## Quick Start
 
-Scaffold with the CLI:
+To get started, all you really need is a folder with `.mdx` and `gittydocs.jsonc` files. But for convenience, you can also use the CLI to scaffold.
+
+1. Scaffold with the CLI:
 
 ```bash
-npx gittydocs@latest new docs
-cd docs
-npx gittydocs@latest dev docs
+npx gittydocs@latest new docs # Creates a "docs" folder
+npx gittydocs@latest dev docs # Live preview & hot-reload
 ```
 
-Recommended: add a dev script in your repo:
+> This creates this file structure:
+>
+> ```sh
+> 📁 docs
+> ├── 📁 [static]           # assets are stored here
+> │   └── logo.svg
+> ├── gittydocs.jsonc       # config
+> ├── index.mdx             # the home page
+> ├── getting-started.mdx   # a page
+> └── theme.css             # custom styles
+> ```
+
+2. (Optional) Recommended: add a dev script in your repo:
 
 ```json
 // package.json
@@ -36,44 +61,26 @@ Recommended: add a dev script in your repo:
 }
 ```
 
-Or if you use a Justfile:
+3. Make it yours w/ the `gittydocs.jsonc`! (More in [Configuration#Options](http://localhost:3000/configuration#options))
 
-```make
-# justfile
-devdocs:
-	gittydocs dev docs
-```
-
-Or do it manually.
-
-Create a `docs` folder in your repo:
-
-```bash
-mkdir -p docs
-```
-
-Add `gittydocs.jsonc`:
-
-```jsonc
-// docs/gittydocs.jsonc
+```diff
 {
+  "$schema": "https://raw.githubusercontent.com/blankeos/gittydocs/main/gittydocs.schema.json",
   "site": {
-    "name": "My Project",
-    "repo": {
-      "owner": "yourusername",
-      "name": "yourrepo",
-      "ref": "main",
-      "docsPath": "docs",
-    },
-  },
++    "name": "MyDocs",
++    "description": "Documentation about my tools!",
++    "logo": "/static/logo.svg",
++    "socialBanner": "/static/banner.png",
+    ...
 }
 ```
 
-Add a page (i.e. `docs/index.mdx`):
+4. Add some pages with `about-us.mdx` (More in [Configuration#Writing-Content](http://localhost:3000/configuration#writing-content))
 
 ```mdx
 ---
-title: Welcome
+title: About Us
+description: A little about the team
 ---
 
 # Welcome
@@ -81,21 +88,11 @@ title: Welcome
 Your content here.
 ```
 
-Push to GitHub. Pick a deployment option:
+5. Push to GitHub. Pick a deployment option:
 
-- [Deployment Overview](/deploy)
 - [GitHub Pages](/deploy/github-pages)
 - [Vercel](/deploy/vercel)
 - [Cloudflare Pages](/deploy/cloudflare)
 - [Netlify](/deploy/netlify)
 
-## Features
-
-- **Quick & Easy** — One config file, push to GitHub, deploy anywhere
-- **Full-Text Search** — `Ctrl+K` for instant search across all docs
-- **Table of Contents** — Auto-generated with scroll spy showing current section
-- **Copy Page** — Copy entire page as Markdown with one click
-- **Dark Mode** — Built-in toggle
-- **GitHub Integration** — "Edit this page" links
-- **Fully Customizable** — Built on Velite + Vike + Solid. Eject anytime and own your stack
-- **Static Export** — Deploy to any host
+<p class="text-lg">🎉 That's literally it! You have docs now!</p>
