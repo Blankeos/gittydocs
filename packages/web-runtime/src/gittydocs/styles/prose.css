@@ -98,8 +98,9 @@
 
 /* Code container*/
 .prose pre {
-  background: black;
-  color: lightgray;
+  background: var(--code-block-bg);
+  color: var(--code-block-fg);
+  border: 1px solid var(--code-block-border);
   padding: 1em;
   margin-bottom: 1.5em;
   border-radius: 0.5em;
@@ -128,9 +129,9 @@
   width: 1.7rem;
   height: 1.7rem;
   border-radius: 0.45rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
-  color: #e5e7eb;
+  border: 1px solid var(--code-block-button-border);
+  background: var(--code-block-button-bg);
+  color: var(--code-block-button-fg);
   transition:
     background 150ms ease,
     border-color 150ms ease,
@@ -138,9 +139,9 @@
 }
 
 .prose .code-block-copy:hover {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.35);
-  color: #f9fafb;
+  background: var(--code-block-button-bg-hover);
+  border-color: var(--code-block-button-border-hover);
+  color: var(--code-block-button-fg-hover);
 }
 
 .prose .code-block-copy:focus-visible {
@@ -149,8 +150,8 @@
 }
 
 .prose .code-block-copy[data-copied="true"] {
-  border-color: rgba(74, 222, 128, 0.8);
-  color: #bbf7d0;
+  border-color: var(--code-block-button-copied);
+  color: var(--code-block-button-copied);
 }
 
 .prose hr {

@@ -91,7 +91,15 @@
       "properties": {
         "preset": {
           "description": "Preset theme name (see /theming)",
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "default",
+            "slate",
+            "sage",
+            "ember",
+            "ocean",
+            "sand"
+          ]
         },
         "cssFile": {
           "description": "Path to a CSS file in your docs folder",

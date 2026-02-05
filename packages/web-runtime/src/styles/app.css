@@ -87,6 +87,17 @@ input::-ms-clear {
     --info: oklch(0.665 0.127 251);
     --info-foreground: oklch(1 0 0);
 
+    --code-block-bg: oklch(0.975 0 0);
+    --code-block-fg: oklch(0.2 0 0);
+    --code-block-border: oklch(0.9 0 0);
+    --code-block-button-bg: color-mix(in oklch, var(--code-block-fg) 6%, transparent);
+    --code-block-button-border: color-mix(in oklch, var(--code-block-fg) 18%, transparent);
+    --code-block-button-fg: var(--code-block-fg);
+    --code-block-button-bg-hover: color-mix(in oklch, var(--code-block-fg) 14%, transparent);
+    --code-block-button-border-hover: color-mix(in oklch, var(--code-block-fg) 28%, transparent);
+    --code-block-button-fg-hover: var(--code-block-fg);
+    --code-block-button-copied: var(--success);
+
     /* Sidebars */
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
@@ -143,6 +154,17 @@ input::-ms-clear {
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.439 0 0);
+
+    --code-block-bg: oklch(0.18 0 0);
+    --code-block-fg: oklch(0.9 0 0);
+    --code-block-border: oklch(0.3 0 0);
+    --code-block-button-bg: color-mix(in oklch, var(--code-block-fg) 8%, transparent);
+    --code-block-button-border: color-mix(in oklch, var(--code-block-fg) 24%, transparent);
+    --code-block-button-fg: var(--code-block-fg);
+    --code-block-button-bg-hover: color-mix(in oklch, var(--code-block-fg) 16%, transparent);
+    --code-block-button-border-hover: color-mix(in oklch, var(--code-block-fg) 36%, transparent);
+    --code-block-button-fg-hover: var(--code-block-fg);
+    --code-block-button-copied: var(--success);
   }
 }
 

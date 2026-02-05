@@ -18,6 +18,8 @@ export type NavItem = {
   accordion?: boolean
 }
 
+const themePresets = ["default", "slate", "sage", "ember", "ocean", "sand"] as const
+
 export const navItemSchema: z.ZodType<NavItem> = z.lazy(() =>
   z
     .object({
@@ -56,7 +58,7 @@ export const docsConfigSchema = z
       .describe("External links"),
     theme: z
       .object({
-        preset: z.string().optional().describe("Preset theme name (see /theming)"),
+        preset: z.enum(themePresets).optional().describe("Preset theme name (see /theming)"),
         cssFile: z.string().optional().describe("Path to a CSS file in your docs folder"),
       })
       .optional()

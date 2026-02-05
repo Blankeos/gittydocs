@@ -11,7 +11,7 @@
     "ci": "bun run lint && bun run build",
     "dev:web": "bun run --filter @gittydocs/web-runtime dev",
     "dev:docs": "gittydocs dev docs",
-    "generate:config-schema": "bun run --filter @gittydocs/web-runtime generate:config-schema",
+    "gen:schemajson": "bun run --filter @gittydocs/web-runtime generate:config-schema",
     "build:docs": "gittydocs build docs",
     "lint": "bun run --filter '*' lint",
     "lint:fix": "bun run --filter '*' lint:fix",
