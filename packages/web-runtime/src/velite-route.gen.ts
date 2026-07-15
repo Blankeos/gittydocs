@@ -8,6 +8,7 @@ export const veliteRoutes = [
   "/deploy/github-pages",
   "/deploy/netlify",
   "/deploy/vercel",
+  "/introduction",
   "/motivation",
   "/theming"
 ] as const

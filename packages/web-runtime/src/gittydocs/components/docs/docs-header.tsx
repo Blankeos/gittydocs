@@ -12,6 +12,7 @@ import {
 import { useThemeContext } from "@/contexts/theme.context"
 import { useDocsContext } from "@/gittydocs/contexts/docs.context"
 import { useSearchContext } from "@/gittydocs/contexts/search.context"
+import { usePageLayout } from "@/gittydocs/hooks/use-page-layout"
 import { withBasePath } from "@/utils/base-path"
 import { cn } from "@/utils/cn"
 import { DocsNav } from "./docs-nav"
@@ -19,6 +20,7 @@ import { SearchDialog } from "./search-dialog"
 
 export function DocsHeader() {
   const docs = useDocsContext()
+  const { sidebar } = usePageLayout()
   const { inferredTheme, toggleTheme } = useThemeContext()
   const [searchOpen, setSearchOpen] = createSignal(false)
   const [mobileMenuOpen, setMobileMenuOpen] = createSignal(false)
@@ -59,38 +61,40 @@ export function DocsHeader() {
         <div class="mx-auto flex h-14 items-center px-4">
           <div class="mr-4 flex items-center gap-2">
             {/* Mobile Menu Button */}
-            <Drawer side="left" open={mobileMenuOpen()} onOpenChange={setMobileMenuOpen}>
-              <DrawerTrigger as={Button} variant="ghost" size="icon" class="md:hidden">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="h-5 w-5"
-                >
-                  <line x1="4" x2="20" y1="12" y2="12" />
-                  <line x1="4" x2="20" y1="6" y2="6" />
-                  <line x1="4" x2="20" y1="18" y2="18" />
-                </svg>
-                <span class="sr-only">Toggle menu</span>
-              </DrawerTrigger>
-              <DrawerContent class="w-[280px] p-0">
-                <DrawerHeader class="border-b px-4 py-3">
-                  <DrawerTitle class="flex items-center gap-2 text-left">
-                    <Show when={logoUrl()}>
-                      {(src) => <img src={src()} alt={siteName()} class="h-6 w-6 object-contain" />}
-                    </Show>
-                    <span class="font-semibold">{siteName()}</span>
-                  </DrawerTitle>
-                </DrawerHeader>
-                <div class="flex-1 overflow-auto py-4">
-                  <DocsNav onNavigate={() => setMobileMenuOpen(false)} />
-                </div>
-              </DrawerContent>
-            </Drawer>
+            <Show when={sidebar()}>
+              <Drawer side="left" open={mobileMenuOpen()} onOpenChange={setMobileMenuOpen}>
+                <DrawerTrigger as={Button} variant="ghost" size="icon" class="md:hidden">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="h-5 w-5"
+                  >
+                    <line x1="4" x2="20" y1="12" y2="12" />
+                    <line x1="4" x2="20" y1="6" y2="6" />
+                    <line x1="4" x2="20" y1="18" y2="18" />
+                  </svg>
+                  <span class="sr-only">Toggle menu</span>
+                </DrawerTrigger>
+                <DrawerContent class="w-[280px] p-0">
+                  <DrawerHeader class="border-b px-4 py-3">
+                    <DrawerTitle class="flex items-center gap-2 text-left">
+                      <Show when={logoUrl()}>
+                        {(src) => <img src={src()} alt={siteName()} class="h-6 w-6 object-contain" />}
+                      </Show>
+                      <span class="font-semibold">{siteName()}</span>
+                    </DrawerTitle>
+                  </DrawerHeader>
+                  <div class="flex-1 overflow-auto py-4">
+                    <DocsNav onNavigate={() => setMobileMenuOpen(false)} />
+                  </div>
+                </DrawerContent>
+              </Drawer>
+            </Show>
 
             <a href={withBasePath("/")} class="mr-6 flex items-center gap-2">
               <Show when={logoUrl()}>

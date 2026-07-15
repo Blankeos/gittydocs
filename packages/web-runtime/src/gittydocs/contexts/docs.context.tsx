@@ -3,8 +3,11 @@ import { Index } from "flexsearch"
 import { createMemo, type FlowComponent } from "solid-js"
 import type { DocsConfig, NavItem } from "@/gittydocs/lib/docs/config.gen"
 import { gittydocsConfig } from "@/gittydocs/lib/docs/config.gen"
+import { customPagesByRoute } from "@/gittydocs/lib/docs/custom-pages"
 import { extractHeadingsFromMarkdown, type DocHeading } from "@/gittydocs/lib/heading-utils"
 import { createStrictContext } from "@/utils/create-strict-context"
+
+export type { NavItem }
 
 // ===========================================================================
 // Types
@@ -230,7 +233,7 @@ function buildNavFromTree(tree: FileNode[], pages: DocsPage[]): NavItem[] {
     }
 
     if (node.type === "file") {
-      const routePath = toRoutePath(node.path.replace(/\.(md|mdx)$/i, ""))
+      const routePath = toRoutePath(node.path.replace(/\.(md|mdx|tsx|jsx)$/i, ""))
       const page = pages.find((p) => p.routePath === routePath)
       const label = page?.title || defaultLabel(node.name)
       nav.push({ label, path: routePath })
@@ -242,7 +245,7 @@ function buildNavFromTree(tree: FileNode[], pages: DocsPage[]): NavItem[] {
 
 function defaultLabel(name: string): string {
   if (name.startsWith("index.")) return "Overview"
-  return formatLabel(name.replace(/\.(md|mdx)$/i, ""))
+  return formatLabel(name.replace(/\.(md|mdx|tsx|jsx)$/i, ""))
 }
 
 function formatLabel(name: string): string {
@@ -258,9 +261,9 @@ function formatLabel(name: string): string {
 // ===========================================================================
 
 export const DocsContextProvider: FlowComponent = (props) => {
-  // Transform velite docs to our format
+  // Transform velite docs + custom TSX pages to our format
   const pages = createMemo<DocsPage[]>(() => {
-    return docs.map((doc) => {
+    const mdxPages = docs.map((doc) => {
       const routePath = toRoutePath(doc.slugAsParams)
       const headings = extractHeadingsFromMarkdown(doc.rawMarkdown || "")
 
@@ -274,8 +277,22 @@ export const DocsContextProvider: FlowComponent = (props) => {
         headings,
         content: doc.content,
         rawContent: doc.rawMarkdown || "",
-      }
+      } satisfies DocsPage
     })
+
+    const customPages = Object.entries(customPagesByRoute).map(([routePath, page]) => {
+      return {
+        routePath,
+        sourcePath: page.sourcePath,
+        title: page.title || defaultLabel(page.sourcePath.split("/").pop() || page.sourcePath),
+        description: page.description,
+        headings: [],
+        content: "",
+        rawContent: page.description || page.title || "",
+      } satisfies DocsPage
+    })
+
+    return [...mdxPages, ...customPages]
   })
 
   // Build navigation

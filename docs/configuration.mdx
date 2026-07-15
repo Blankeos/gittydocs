@@ -97,18 +97,71 @@ GITTYDOCS_SOURCE=/absolute/path/to/docs
 
 ## Writing Content
 
-Use `.md` or `.mdx` files. Frontmatter optional:
+Use `.md`, `.mdx`, or `.tsx` files. Frontmatter optional for Markdown/MDX:
 
 ```mdx
 ---
 title: Page Title
 description: Description for SEO
+sidebar: true
+toc: true
 ---
 
 # Heading
 
 Content here.
 ```
+
+| Field         | Type    | Description                                      |
+| ------------- | ------- | ------------------------------------------------ |
+| `title`       | string  | Page title                                       |
+| `description` | string  | Description for SEO                              |
+| `sidebar`     | boolean | Show the left docs sidenav (default: `true`)     |
+| `toc`         | boolean | Show the on-page table of contents (default: `true`) |
+
+### Custom pages (`.tsx`)
+
+For fully custom layouts (landings, marketing pages), add a SolidJS page:
+
+```tsx
+// docs/index.tsx
+export const sidebar = false
+export const toc = false
+export const title = "Home"
+export const description = "Welcome"
+
+export default function Page() {
+  return (
+    <main class="mx-auto max-w-3xl px-6 py-16">
+      <h1 class="text-4xl font-bold">Welcome</h1>
+      <p class="mt-4 text-muted-foreground">Custom landing page.</p>
+    </main>
+  )
+}
+```
+
+Named exports mirror MDX frontmatter. `sideNav` is accepted as an alias for `sidebar`.
+
+Every route must have exactly one page file. Gittydocs reports an error when multiple files resolve to the same route—for example, `index.tsx` and `index.mdx` both resolve to `/`. Move the previous home content to an explicit route only when that is your intended information architecture; Gittydocs does not automatically create an `/introduction` route.
+
+Custom pages can keep private components beside the docs in an underscore-prefixed folder. Gittydocs copies these files for bundling but excludes them from routes, navigation, search, source maps, and `llms.txt`:
+
+```text
+docs/
+  index.tsx
+  _components/
+    Hero.tsx
+    icons.tsx
+    landing.css
+```
+
+```tsx
+// docs/index.tsx
+import { Hero } from "./_components/Hero"
+import "./_components/landing.css"
+```
+
+Private component folders support `.ts`, `.tsx`, `.js`, `.jsx`, and `.css` files.
 
 Files sorted by:
 
@@ -120,6 +173,7 @@ Routing follows the folder structure:
 
 ```sh
 index.mdx            # /
+index.tsx            # / (custom page; cannot coexist with index.mdx)
 subtopic/index.mdx   # /subtopic
 subtopic/topic.mdx   # /subtopic/topic
 ```

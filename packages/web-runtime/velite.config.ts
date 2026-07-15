@@ -29,6 +29,8 @@ export default defineConfig({
           date: s.string().optional(),
           categories: s.string().array().optional(),
           tags: s.string().array().optional(),
+          sidebar: s.boolean().optional(),
+          toc: s.boolean().optional(),
           metadata: s.metadata(),
           sourcePath: s.custom().transform((data, { meta }) => {
             if (typeof data === "string") return data

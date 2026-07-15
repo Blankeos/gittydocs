@@ -26,6 +26,8 @@ const sourceInput = process.env.GITTYDOCS_SOURCE || "../../docs"
 const githubToken = process.env.GITHUB_TOKEN
 
 const docsExtensions = new Set([".md", ".mdx"])
+const pageExtensions = new Set([".md", ".mdx", ".tsx", ".jsx"])
+const privateComponentExtensions = new Set([".ts", ".tsx", ".js", ".jsx", ".css"])
 const staticExtensions = new Set([
   ".png",
   ".jpg",
@@ -79,6 +81,8 @@ async function prepareDocs() {
   } else {
     await copyLocalDocs(sourceInput)
   }
+
+  await assertUniquePageRoutes()
 
   const configPath = await findConfigPath()
   const config = configPath ? await readConfig(configPath) : null
@@ -165,7 +169,11 @@ async function copyLocalDocs(input: string) {
     const relativePath = path.relative(sourcePath, filePath)
     const ext = path.extname(relativePath).toLowerCase()
 
-    if (docsExtensions.has(ext)) {
+    const normalizedRelativePath = relativePath.replace(/\\/g, "/")
+    const isPrivateComponent =
+      isPrivateSourcePath(normalizedRelativePath) && privateComponentExtensions.has(ext)
+
+    if (pageExtensions.has(ext) || isPrivateComponent) {
       const destPath = path.join(docsRoot, relativePath)
       await ensureDir(path.dirname(destPath))
       await fs.copyFile(filePath, destPath)
@@ -219,18 +227,22 @@ async function fetchGitHubDocs(repo: GitHubSource) {
   for (const entry of entries) {
     if (entry.type === "dir") continue
     const ext = path.extname(entry.path).toLowerCase()
-    if (!docsExtensions.has(ext)) continue
-
-    const fileContent = await fetchGitHubFile(entry)
     const relativePath = repo.docsPath
       ? entry.path.replace(new RegExp(`^${escapeRegex(repo.docsPath)}/?`), "")
       : entry.path
+    const isPrivateComponent =
+      isPrivateSourcePath(relativePath) && privateComponentExtensions.has(ext)
+    if (!pageExtensions.has(ext) && !isPrivateComponent) continue
+
+    const fileContent = await fetchGitHubFile(entry)
     const destPath = path.join(docsRoot, relativePath)
     await ensureDir(path.dirname(destPath))
     await fs.writeFile(destPath, fileContent, "utf-8")
 
-    const routePath = toRoutePath(relativePath)
-    sourceMap[routePath] = relativePath.replace(/\\/g, "/")
+    if (!isPrivateSourcePath(relativePath)) {
+      const routePath = toRoutePath(relativePath)
+      sourceMap[routePath] = relativePath.replace(/\\/g, "/")
+    }
   }
 
   await writeSourceMap(sourceMap)
@@ -484,8 +496,9 @@ async function buildSourceMapFromLocal() {
 
   for (const filePath of files) {
     const ext = path.extname(filePath).toLowerCase()
-    if (!docsExtensions.has(ext)) continue
+    if (!pageExtensions.has(ext)) continue
     const relativePath = path.relative(docsRoot, filePath).replace(/\\/g, "/")
+    if (isPrivateSourcePath(relativePath)) continue
     const routePath = toRoutePath(relativePath)
     sourceMap[routePath] = relativePath
   }
@@ -534,6 +547,7 @@ async function collectDocsPages(): Promise<LlmsPage[]> {
     if (!docsExtensions.has(ext)) continue
 
     const relativePath = path.relative(docsRoot, filePath).replace(/\\/g, "/")
+    if (isPrivateSourcePath(relativePath)) continue
     const routePath = toRoutePath(relativePath)
     const raw = await fs.readFile(filePath, "utf-8")
     const title = extractFrontmatterField(raw, "title") || defaultLabel(path.basename(relativePath))
@@ -658,7 +672,7 @@ function buildNavFromTree(tree: FileNode[], titleByRoute: Map<string, string>): 
     }
 
     if (node.type === "file") {
-      const routePath = toRoutePath(node.path.replace(/\.(md|mdx)$/i, ""))
+      const routePath = toRoutePath(node.path.replace(/\.(md|mdx|tsx|jsx)$/i, ""))
       const label = titleByRoute.get(routePath) || defaultLabel(node.name)
       nav.push({ label, path: routePath })
     }
@@ -669,7 +683,7 @@ function buildNavFromTree(tree: FileNode[], titleByRoute: Map<string, string>): 
 
 function defaultLabel(name: string): string {
   if (name.startsWith("index.")) return "Overview"
-  return formatLabel(name.replace(/\.(md|mdx)$/i, ""))
+  return formatLabel(name.replace(/\.(md|mdx|tsx|jsx)$/i, ""))
 }
 
 function formatLabel(name: string): string {
@@ -833,8 +847,49 @@ function renderLlmsPage(page: LlmsPage): string {
   return lines.join("\n").trimEnd() + "\n"
 }
 
+function isPrivateSourcePath(relativePath: string) {
+  return relativePath
+    .replace(/\\/g, "/")
+    .split("/")
+    .some((segment) => segment.startsWith("_"))
+}
+
+async function assertUniquePageRoutes() {
+  const files = await collectFiles(docsRoot)
+  const sourcePathsByRoute = new Map<string, string[]>()
+
+  for (const filePath of files) {
+    const ext = path.extname(filePath).toLowerCase()
+    if (!pageExtensions.has(ext)) continue
+
+    const relativePath = path.relative(docsRoot, filePath).replace(/\\/g, "/")
+    if (isPrivateSourcePath(relativePath)) continue
+
+    const routePath = toRoutePath(relativePath)
+    const sourcePaths = sourcePathsByRoute.get(routePath) ?? []
+    sourcePaths.push(relativePath)
+    sourcePathsByRoute.set(routePath, sourcePaths)
+  }
+
+  const conflicts = Array.from(sourcePathsByRoute.entries()).filter(
+    ([, sourcePaths]) => sourcePaths.length > 1
+  )
+  if (conflicts.length === 0) return
+
+  const details = conflicts
+    .map(([routePath, sourcePaths]) => {
+      const files = sourcePaths.sort().map((sourcePath) => `    - ${sourcePath}`).join("\n")
+      return `  ${routePath}\n${files}`
+    })
+    .join("\n")
+
+  throw new Error(
+    `Multiple page files resolve to the same route:\n${details}\n\nKeep exactly one page file for each route.`
+  )
+}
+
 function toRoutePath(relativePath: string) {
-  let route = relativePath.replace(/\\/g, "/").replace(/\.(md|mdx)$/i, "")
+  let route = relativePath.replace(/\\/g, "/").replace(/\.(md|mdx|tsx|jsx)$/i, "")
   if (route.endsWith("/index") || route === "index") {
     route = route.replace(/\/?index$/, "") || "/"
   }

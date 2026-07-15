@@ -67,7 +67,12 @@ export default defineConfig({
     solidSvg(),
     tailwindcss(),
   ],
-  resolve: { tsconfigPaths: true },
+  resolve: {
+    tsconfigPaths: true,
+    alias: {
+      "@": path.resolve(import.meta.dirname, "src"),
+    },
+  },
   server: {
     port: 3000,
   },

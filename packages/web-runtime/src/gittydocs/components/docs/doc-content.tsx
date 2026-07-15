@@ -1,76 +1,52 @@
-import { docs } from "@velite"
-import { createEffect, createMemo, on, Show } from "solid-js"
+import { createMemo, Show } from "solid-js"
+import { Dynamic } from "solid-js/web"
 import { useMetadata } from "vike-metadata-solid"
-import { usePageContext } from "vike-solid/usePageContext"
 import { CopyPageButton } from "@/gittydocs/components/docs/copy-page-button"
 import { DocsFooter } from "@/gittydocs/components/docs/docs-footer"
 import { TableOfContents } from "@/gittydocs/components/docs/table-of-contents"
+import { usePageLayout } from "@/gittydocs/hooks/use-page-layout"
+import { extractHeadingsFromMarkdown } from "@/gittydocs/lib/heading-utils"
 import { MdxContentStatic } from "@/gittydocs/lib/velite/mdx-content"
 import { MdxContext } from "@/gittydocs/lib/velite/mdx-context"
-import { useParams } from "@/route-tree.gen"
-import { stripBasePath } from "@/utils/base-path"
-import { extractHeadingsFromMarkdown } from "@/gittydocs/lib/heading-utils"
 import getTitle from "@/utils/get-title"
 
 export function DocContent() {
-  const params = useParams({ from: "/@" })
-  const slug = createMemo(() => params()["_@"] ?? "/")
+  const { routePath, page, toc } = usePageLayout()
 
-  // Use velite's docs directly with slugAsParams
-  // Handle root path (slugAsParams is "" for index.mdx)
-  const currentDoc = createMemo(() =>
-    docs.find((d) => {
-      const docSlug = d.slugAsParams === "" ? "/" : `/${d.slugAsParams}`
-      return docSlug === slug()
-    })
-  )
-
-  // Set page metadata based on the current doc
-  useMetadata(() => ({
-    title: currentDoc()?.title ? getTitle(currentDoc()!.title) : undefined,
-    description: currentDoc()?.description,
-  }))
-
-  const pageContext = usePageContext()
-  const routePath = createMemo(() => {
-    const url = pageContext.urlParsed
-    const pathname = url.pathname || "/"
-    return stripBasePath(pathname)
+  useMetadata(() => {
+    const current = page()
+    return {
+      title: current.title ? getTitle(current.title) : undefined,
+      description: current.description,
+    }
   })
 
+  const mdxDoc = createMemo(() => page().mdx)
+
   const hasHeadings = createMemo(() => {
-    const d = currentDoc()
+    if (!toc()) return false
+    const d = mdxDoc()
     if (!d?.rawMarkdown) return false
     return extractHeadingsFromMarkdown(d.rawMarkdown).length > 0
   })
 
-  // Extract headings for TOC
   const headings = createMemo(() => {
-    const d = currentDoc()
+    const d = mdxDoc()
     if (!d?.rawMarkdown) return []
     return extractHeadingsFromMarkdown(d.rawMarkdown)
   })
 
+  const customComponent = createMemo(() =>
+    page().kind === "custom" ? page().CustomComponent : undefined
+  )
+
   return (
     <>
-      <Show
-        when={currentDoc()}
-        fallback={
-          <div class="w-full max-w-6xl">
-            <main class="relative flex flex-1 flex-col px-4 py-6 md:px-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_220px] xl:px-8">
-              <div class="mx-auto flex min-h-full w-full min-w-0 max-w-3xl flex-col overflow-x-hidden">
-                <div>
-                  <h1 class="font-bold text-2xl">Page not found</h1>
-                  <p class="mt-2 text-muted-foreground">
-                    The page you're looking for doesn't exist.
-                  </p>
-                  <p class="mt-1 text-muted-foreground text-sm">Path: {routePath()}</p>
-                </div>
-              </div>
-            </main>
-          </div>
-        }
-      >
+      <Show when={customComponent()} keyed>
+        {(Comp) => <Dynamic component={Comp} />}
+      </Show>
+
+      <Show when={page().kind === "mdx" && mdxDoc()}>
         {(d) => (
           <>
             <Show when={hasHeadings()}>
@@ -79,7 +55,13 @@ export function DocContent() {
               </div>
             </Show>
             <div class="w-full min-w-0 max-w-6xl">
-              <main class="relative flex min-w-0 flex-1 flex-col px-4 py-6 md:px-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[minmax(0,1fr)_220px] xl:px-8">
+              <main
+                class={
+                  hasHeadings()
+                    ? "relative flex min-w-0 flex-1 flex-col px-4 py-6 md:px-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[minmax(0,1fr)_220px] xl:px-8"
+                    : "relative flex min-w-0 flex-1 flex-col px-4 py-6 md:px-6 lg:py-8 xl:px-8"
+                }
+              >
                 <div class="mx-auto flex min-h-full w-full min-w-0 max-w-3xl flex-col overflow-x-hidden">
                   <article class="prose prose-slate dark:prose-invert flex min-h-full min-w-0 max-w-none flex-col">
                     <div class="flex-1">
@@ -118,6 +100,20 @@ export function DocContent() {
             </div>
           </>
         )}
+      </Show>
+
+      <Show when={page().kind === "missing"}>
+        <div class="w-full max-w-6xl">
+          <main class="relative flex flex-1 flex-col px-4 py-6 md:px-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_220px] xl:px-8">
+            <div class="mx-auto flex min-h-full w-full min-w-0 max-w-3xl flex-col overflow-x-hidden">
+              <div>
+                <h1 class="font-bold text-2xl">Page not found</h1>
+                <p class="mt-2 text-muted-foreground">The page you're looking for doesn't exist.</p>
+                <p class="mt-1 text-muted-foreground text-sm">Path: {routePath()}</p>
+              </div>
+            </div>
+          </main>
+        </div>
       </Show>
     </>
   )

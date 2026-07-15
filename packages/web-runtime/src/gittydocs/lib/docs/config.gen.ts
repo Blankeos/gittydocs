@@ -24,7 +24,7 @@ export const gittydocsConfig: DocsConfig | null = {
       "items": [
         {
           "label": "Introduction",
-          "path": "/"
+          "path": "/introduction"
         },
         {
           "label": "Motivation",

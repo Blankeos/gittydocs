@@ -28,7 +28,8 @@
 
 More ideas:
 
-- [ ] A customizable landing page written in `index.tsx` ?
+- [x] A customizable landing page written in `index.tsx` ?
+  - Layout flags via MDX frontmatter (`sidebar`, `toc`) and matching `.tsx` named exports
 - [x] The social banner `socialBanner` config.
 
 Bugs:
@@ -37,3 +38,5 @@ Bugs:
 - [x] Big bug for tables that are too long-width'd, they'd take up the space and introduce horizontal scroll and worse be covered by the scrollspy.
 - [ ] Support .ts configs on top of just gittydocs.jsonc
 - [ ] avoid cmd palette from shifting vertical pos based on results. Just make it padded off top so it sticks there (like my next-portfolio)
+- [ ] Changelog
+- [ ] API References (maybe using scalar)

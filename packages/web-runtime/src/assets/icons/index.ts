@@ -36,3 +36,4 @@ export { default as IconChevronsRight } from "./solar:double-alt-arrow-right-bro
 export { default as IconSettings } from "./solar:settings-broken.svg";
 export { default as IconSolid } from "./solid.svg";
 export { default as IconAlertFilled } from "./tabler:alert-triangle-filled.svg";
+

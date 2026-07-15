@@ -20,7 +20,7 @@
     {
       "label": "Docs",
       "items": [
-        { "label": "Introduction", "path": "/" },
+        { "label": "Introduction", "path": "/introduction" },
         { "label": "Motivation", "path": "/motivation" },
         { "label": "AI Docs Prompt", "path": "/ai-docs-prompt" },
         { "label": "Configuration", "path": "/configuration" },

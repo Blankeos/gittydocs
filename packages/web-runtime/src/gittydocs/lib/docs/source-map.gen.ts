@@ -1,4 +1,5 @@
 export const sourcePathByRoute: Record<string, string> = {
+  "/": "index.tsx",
   "/configuration": "configuration.mdx",
   "/motivation": "motivation.mdx",
   "/cli": "cli.mdx",
@@ -7,7 +8,7 @@ export const sourcePathByRoute: Record<string, string> = {
   "/deploy/netlify": "deploy/netlify.mdx",
   "/deploy": "deploy/index.mdx",
   "/deploy/vercel": "deploy/vercel.mdx",
-  "/": "index.mdx",
   "/ai-docs-prompt": "ai-docs-prompt.mdx",
+  "/introduction": "introduction.mdx",
   "/theming": "theming.mdx"
 }

@@ -3,10 +3,6 @@ title: Introduction
 description: Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site.
 ---
 
-> [!WARNING]  
-> This project is in alpha 🐺. I use it for my personal projects
-> at the moment.
-
 # gittydocs ✨
 
 Simple, but ejectable modern docs for simple devs.
@@ -45,7 +41,8 @@ npx gittydocs@latest dev docs # Live preview & hot-reload
 > ├── 📁 [static]           # assets are stored here
 > │   └── logo.svg
 > ├── gittydocs.jsonc       # config
-> ├── index.mdx             # the home page
+> ├── index.tsx             # optional custom landing (/)
+> ├── introduction.mdx      # /introduction
 > ├── getting-started.mdx   # a page
 > └── theme.css             # custom styles
 > ```

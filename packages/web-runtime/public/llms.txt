@@ -8,7 +8,7 @@ Per-page markdown lives at /llms/... by default.
 ## Table of Contents
 
 ### Docs
-- [Introduction](/llms/index.md): Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site.
+- [Introduction](/llms/introduction.md): Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site.
 - [Motivation](/llms/motivation.md): Why gittydocs exists.
 - [AI Docs Prompt](/llms/ai-docs-prompt.md): Let an LLM write your docs for you with our llms.txt.
 - [Configuration ⚙️](/llms/configuration.md): Everything you need to configure gittydocs from top-to-bottom (like a cheatsheet)
