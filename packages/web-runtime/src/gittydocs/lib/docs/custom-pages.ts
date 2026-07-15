@@ -18,12 +18,12 @@ export type CustomPage = {
   sourcePath: string
 }
 
-const modules = import.meta.glob<CustomPageModule>([
-  "/content/docs/**/*.{tsx,jsx}",
-  "!/content/docs/**/_*/**/*.{tsx,jsx}",
-], {
-  eager: true,
-})
+const modules = import.meta.glob<CustomPageModule>(
+  ["/content/docs/**/*.{tsx,jsx}", "!/content/docs/**/_*/**/*.{tsx,jsx}"],
+  {
+    eager: true,
+  }
+)
 
 function isPrivateSourcePath(filePath: string): boolean {
   return filePath
@@ -60,8 +60,8 @@ function resolveSidebar(module: CustomPageModule): boolean {
 
 export const customPagesByRoute: Record<string, CustomPage> = Object.fromEntries(
   Object.entries(modules)
-    .filter(([filePath, module]) =>
-      !isPrivateSourcePath(filePath) && typeof module.default === "function"
+    .filter(
+      ([filePath, module]) => !isPrivateSourcePath(filePath) && typeof module.default === "function"
     )
     .map(([filePath, module]) => {
       const routePath = filePathToRoute(filePath)

@@ -878,7 +878,10 @@ async function assertUniquePageRoutes() {
 
   const details = conflicts
     .map(([routePath, sourcePaths]) => {
-      const files = sourcePaths.sort().map((sourcePath) => `    - ${sourcePath}`).join("\n")
+      const files = sourcePaths
+        .sort()
+        .map((sourcePath) => `    - ${sourcePath}`)
+        .join("\n")
       return `  ${routePath}\n${files}`
     })
     .join("\n")

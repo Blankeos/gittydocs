@@ -84,7 +84,9 @@ export function DocsHeader() {
                   <DrawerHeader class="border-b px-4 py-3">
                     <DrawerTitle class="flex items-center gap-2 text-left">
                       <Show when={logoUrl()}>
-                        {(src) => <img src={src()} alt={siteName()} class="h-6 w-6 object-contain" />}
+                        {(src) => (
+                          <img src={src()} alt={siteName()} class="h-6 w-6 object-contain" />
+                        )}
                       </Show>
                       <span class="font-semibold">{siteName()}</span>
                     </DrawerTitle>

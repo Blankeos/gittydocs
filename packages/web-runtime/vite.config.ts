@@ -59,14 +59,7 @@ function isWithinPath(filePath: string, rootPath: string) {
 }
 
 export default defineConfig({
-  plugins: [
-    gittydocsHotReload(),
-    vike(),
-    vikeSolid(),
-    vikeRoutegen(),
-    solidSvg(),
-    tailwindcss(),
-  ],
+  plugins: [gittydocsHotReload(), vike(), vikeSolid(), vikeRoutegen(), solidSvg(), tailwindcss()],
   resolve: {
     tsconfigPaths: true,
     alias: {

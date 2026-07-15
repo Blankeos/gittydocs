@@ -10,7 +10,7 @@ export const veliteRoutes = [
   "/deploy/vercel",
   "/introduction",
   "/motivation",
-  "/theming"
+  "/theming",
 ] as const
 
-export type VeliteRoute = typeof veliteRoutes[number]
+export type VeliteRoute = (typeof veliteRoutes)[number]

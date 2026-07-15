@@ -17,7 +17,8 @@ export function DocsLayout(props: FlowProps) {
         <div
           class={cn(
             "min-h-0 flex-1 items-start",
-            sidebar() && "md:grid md:grid-cols-[240px_minmax(0,1fr)] lg:grid-cols-[288px_minmax(0,1fr)]"
+            sidebar() &&
+              "md:grid md:grid-cols-[240px_minmax(0,1fr)] lg:grid-cols-[288px_minmax(0,1fr)]"
           )}
         >
           <Show when={sidebar()}>

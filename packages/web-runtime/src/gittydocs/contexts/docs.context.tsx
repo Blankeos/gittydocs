@@ -4,7 +4,7 @@ import { createMemo, type FlowComponent } from "solid-js"
 import type { DocsConfig, NavItem } from "@/gittydocs/lib/docs/config.gen"
 import { gittydocsConfig } from "@/gittydocs/lib/docs/config.gen"
 import { customPagesByRoute } from "@/gittydocs/lib/docs/custom-pages"
-import { extractHeadingsFromMarkdown, type DocHeading } from "@/gittydocs/lib/heading-utils"
+import { type DocHeading, extractHeadingsFromMarkdown } from "@/gittydocs/lib/heading-utils"
 import { createStrictContext } from "@/utils/create-strict-context"
 
 export type { NavItem }

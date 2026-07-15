@@ -1,7 +1,7 @@
 import { createEffect, createMemo, createSignal, For, onCleanup, Show } from "solid-js"
+import { Collapsible } from "@/components/ui/collapsible"
 import { HeadingInlineContent } from "@/gittydocs/components/docs/heading-inline-content"
 import type { DocHeading } from "@/gittydocs/lib/heading-utils"
-import { Collapsible } from "@/components/ui/collapsible"
 import { cn } from "@/utils/cn"
 
 export type Heading = DocHeading

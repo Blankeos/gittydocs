@@ -4,9 +4,7 @@ export interface DocHeading {
   slug: string
 }
 
-export type HeadingInlineSegment =
-  | { type: "text"; value: string }
-  | { type: "code"; value: string }
+export type HeadingInlineSegment = { type: "text"; value: string } | { type: "code"; value: string }
 
 export function parseHeadingInlineContent(text: string): HeadingInlineSegment[] {
   const segments: HeadingInlineSegment[] = []
