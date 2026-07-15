@@ -20,7 +20,6 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
           package-manager-cache: false
       - uses: oven-sh/setup-bun@v2
         with:
@@ -30,6 +29,8 @@ jobs:
 
       - name: Create Release Pull Request or Publish
         id: changesets
-        uses: changesets/action@v2
+        uses: changesets/action@v1
         with:
-          publish-script: bun run publish-ci
+          publish: bun run publish-ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
