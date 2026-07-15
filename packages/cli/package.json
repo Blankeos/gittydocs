@@ -3,6 +3,10 @@
   "version": "0.0.5",
   "description": "Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blankeos/gittydocs.git"
+  },
   "type": "module",
   "bin": {
     "gittydocs": "dist/cli.js"
