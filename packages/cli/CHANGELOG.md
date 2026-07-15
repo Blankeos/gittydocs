@@ -1,5 +1,21 @@
 # gittydocs
 
+## 0.0.5
+
+### Patch Changes
+
+- [`53a089d`](https://github.com/Blankeos/gittydocs/commit/53a089d0b0d4c8b30154159d41077057c21fc887) Thanks [@Blankeos](https://github.com/Blankeos)! - feat: inline code headings in toc are displayed as format
+
+- [`53a089d`](https://github.com/Blankeos/gittydocs/commit/53a089d0b0d4c8b30154159d41077057c21fc887) Thanks [@Blankeos](https://github.com/Blankeos)! - feat: custom landing pages using .tsx files
+
+- [`53a089d`](https://github.com/Blankeos/gittydocs/commit/53a089d0b0d4c8b30154159d41077057c21fc887) Thanks [@Blankeos](https://github.com/Blankeos)! - fix: command palette vertical position when searching is stable
+
+- [`53a089d`](https://github.com/Blankeos/gittydocs/commit/53a089d0b0d4c8b30154159d41077057c21fc887) Thanks [@Blankeos](https://github.com/Blankeos)! - fix: codeblock colors fixed
+
+- [`53a089d`](https://github.com/Blankeos/gittydocs/commit/53a089d0b0d4c8b30154159d41077057c21fc887) Thanks [@Blankeos](https://github.com/Blankeos)! - feat: upgraded to latest vike+hono versions
+
+- [`53a089d`](https://github.com/Blankeos/gittydocs/commit/53a089d0b0d4c8b30154159d41077057c21fc887) Thanks [@Blankeos](https://github.com/Blankeos)! - fix: bad styling
+
 ## 0.0.4
 
 ### Patch Changes
