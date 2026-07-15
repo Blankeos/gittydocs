@@ -97,7 +97,7 @@ async function promptFolder(): Promise<string> {
   const value = await text({
     message: "Folder name",
     placeholder: "docs",
-    validate: (input) => (input.trim().length === 0 ? "Folder is required" : undefined),
+    validate: (input) => (input?.trim().length ? undefined : "Folder is required"),
   })
   if (isCancel(value)) process.exit(1)
   return value.trim()
