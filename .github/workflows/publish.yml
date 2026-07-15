@@ -9,6 +9,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
   contents: write
+  id-token: write
   pull-requests: write
 
 jobs:
@@ -19,6 +20,8 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+      - name: Update npm for trusted publishing
+        run: npm install --global npm@latest
       - run: bun install --frozen-lockfile
       - run: bun run ci
 
@@ -28,5 +31,4 @@ jobs:
         with:
           publish: bun run publish-ci
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
