@@ -1,5 +1,5 @@
 import { createEffect, createSignal, onCleanup, Show } from "solid-js"
-import { IconMoonDuo, IconSunDuo } from "@/assets/icons"
+import { IconMoon, IconSun } from "@/assets/icons"
 import { Button } from "@/components/ui/button"
 import {
   Drawer,
@@ -13,6 +13,7 @@ import { useThemeContext } from "@/contexts/theme.context"
 import { useDocsContext } from "@/gittydocs/contexts/docs.context"
 import { useSearchContext } from "@/gittydocs/contexts/search.context"
 import { withBasePath } from "@/utils/base-path"
+import { cn } from "@/utils/cn"
 import { DocsNav } from "./docs-nav"
 import { SearchDialog } from "./search-dialog"
 
@@ -99,11 +100,11 @@ export function DocsHeader() {
             </a>
           </div>
 
-          <div class="flex flex-1 items-center justify-end gap-4">
-            <nav class="hidden items-center gap-2 md:flex">
+          <div class="ml-auto flex items-center justify-end gap-2 md:gap-3">
+            <nav class="hidden items-center gap-1 md:flex">
               <Button variant="ghost" size="icon" onClick={toggleTheme} class="h-9 w-9">
-                <Show when={inferredTheme() === "dark"} fallback={<IconSunDuo class="h-5 w-5" />}>
-                  <IconMoonDuo class="h-5 w-5" />
+                <Show when={inferredTheme() === "dark"} fallback={<IconSun class="h-5 w-5" />}>
+                  <IconMoon class="h-5 w-5" />
                 </Show>
                 <span class="sr-only">Toggle theme</span>
               </Button>
@@ -127,33 +128,38 @@ export function DocsHeader() {
               </Show>
             </nav>
 
-            <div class="w-full max-w-[11rem] flex-1 sm:max-w-xs md:w-auto md:max-w-md md:flex-none">
-              <Button
-                variant="outline"
-                class="relative flex h-8 w-full items-center justify-start rounded-[0.5rem] bg-background font-normal text-muted-foreground text-sm shadow-none hover:bg-accent hover:text-accent-foreground"
-                onClick={() => setSearchOpen(true)}
+            <Button
+              variant="outline"
+              size="sm"
+              class={cn(
+                "h-9 w-9 shrink-0 px-0 font-normal text-sm shadow-none",
+                "md:w-52 md:justify-start md:gap-2 md:px-3 lg:w-60"
+              )}
+              onClick={() => setSearchOpen(true)}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="size-4 shrink-0 text-muted-foreground"
+                aria-hidden="true"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="mr-2 h-4 w-4"
-                >
-                  <circle cx="11" cy="11" r="8" />
-                  <path d="m21 21-4.3-4.3" />
-                </svg>
-                <span class="sm:hidden">Search</span>
-                <span class="hidden sm:inline">Search...</span>
-                <kbd class="pointer-events-none ml-auto hidden h-5 select-none items-center justify-center gap-1 rounded border bg-muted px-1.5 font-medium font-mono text-[10px] opacity-100 md:flex">
-                  <span class="text-xs">⌘</span>
-                  <span>K</span>
-                </kbd>
-              </Button>
-            </div>
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <span class="hidden flex-1 truncate text-left text-muted-foreground md:block">
+                Search...
+              </span>
+              <kbd class="pointer-events-none ml-auto hidden h-5 shrink-0 select-none items-center gap-0.5 rounded border border-border bg-muted px-1.5 font-medium font-mono text-[10px] text-muted-foreground md:inline-flex">
+                <span>⌘</span>
+                <span>K</span>
+              </kbd>
+              <span class="sr-only md:hidden">Search</span>
+            </Button>
           </div>
         </div>
       </header>

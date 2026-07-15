@@ -51,7 +51,7 @@ export function TableOfContents(props: TableOfContentsProps) {
         }
       },
       {
-        rootMargin: "-80px 0px -40%",
+        rootMargin: "-92px 0px -40%",
         threshold: [0, 0.25, 0.5, 0.75, 1],
       }
     )
@@ -93,7 +93,7 @@ export function TableOfContents(props: TableOfContentsProps) {
     e.preventDefault()
     const element = document.getElementById(slug)
     if (element) {
-      const headerOffset = 80 // Account for sticky header height + some padding
+      const headerOffset = 92 // Account for sticky header (3.5rem) + mobile toc bar
       const elementPosition = element.getBoundingClientRect().top
       const offsetPosition = elementPosition + window.scrollY - headerOffset
 
@@ -112,7 +112,7 @@ export function TableOfContents(props: TableOfContentsProps) {
       <div ref={mobileRef} class={cn("relative", props.class)}>
         <button
           type="button"
-          class="flex w-full items-center justify-between gap-2 rounded-none border-x-0 border-t-0 border-b bg-background/95 px-4 py-3 text-sm backdrop-blur"
+          class="flex h-9 w-full items-center justify-between gap-1.5 rounded-none border-x-0 border-t-0 border-b bg-background/95 px-3 text-xs backdrop-blur"
           aria-expanded={mobileOpen()}
           aria-controls="mobile-toc-panel"
           onClick={() => setMobileOpen((open) => !open)}
@@ -122,7 +122,7 @@ export function TableOfContents(props: TableOfContentsProps) {
             <span class="text-muted-foreground">&gt;</span>
             <Show when={activeHeading()} keyed>
               {(heading) => (
-                <span class="min-w-0 animate-scaleIn truncate font-medium text-foreground">
+                <span class="min-w-0 truncate font-medium text-foreground">
                   {heading.text}
                 </span>
               )}

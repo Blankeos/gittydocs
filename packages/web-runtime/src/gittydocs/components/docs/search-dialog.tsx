@@ -1,6 +1,6 @@
 import { createMemo, createSignal, Show } from "solid-js"
 import { navigate } from "vike/client/router"
-import { IconMoonDuo, IconSunDuo } from "@/assets/icons"
+import { IconMoon, IconSun } from "@/assets/icons"
 import {
   Command,
   CommandDialog,
@@ -67,9 +67,9 @@ export function SearchDialog(props: SearchDialogProps) {
                 >
                   <Show
                     when={props.themeLabel?.toLowerCase().includes("dark")}
-                    fallback={<IconSunDuo class="h-4 w-4" />}
+                    fallback={<IconSun class="h-4 w-4" />}
                   >
-                    <IconMoonDuo class="h-4 w-4" />
+                    <IconMoon class="h-4 w-4" />
                   </Show>
                   <span>{props.themeLabel}</span>
                 </CommandItem>

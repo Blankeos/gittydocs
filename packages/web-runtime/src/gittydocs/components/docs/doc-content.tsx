@@ -57,7 +57,7 @@ export function DocContent() {
         fallback={
           <div class="w-full max-w-6xl">
             <main class="relative flex flex-1 flex-col px-4 py-6 md:px-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_220px] xl:px-8">
-              <div class="mx-auto flex min-h-full w-full min-w-0 max-w-3xl flex-col">
+              <div class="mx-auto flex min-h-full w-full min-w-0 max-w-3xl flex-col overflow-x-hidden">
                 <div>
                   <h1 class="font-bold text-2xl">Page not found</h1>
                   <p class="mt-2 text-muted-foreground">
@@ -77,9 +77,9 @@ export function DocContent() {
                 <TableOfContents headings={headings()} variant="mobile" />
               </div>
             </Show>
-            <div class="w-full min-w-0 max-w-6xl overflow-x-hidden">
+            <div class="w-full min-w-0 max-w-6xl">
               <main class="relative flex min-w-0 flex-1 flex-col px-4 py-6 md:px-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[minmax(0,1fr)_220px] xl:px-8">
-                <div class="mx-auto flex min-h-full w-full min-w-0 max-w-3xl flex-col">
+                <div class="mx-auto flex min-h-full w-full min-w-0 max-w-3xl flex-col overflow-x-hidden">
                   <article class="prose prose-slate dark:prose-invert flex min-h-full min-w-0 max-w-none flex-col">
                     <div class="flex-1">
                       <Show when={d().title}>
