@@ -10,14 +10,15 @@ export function parseHeadingInlineContent(text: string): HeadingInlineSegment[] 
   const segments: HeadingInlineSegment[] = []
   const regex = /`([^`]+)`/g
   let lastIndex = 0
-  let match: RegExpExecArray | null
+  let match = regex.exec(text)
 
-  while ((match = regex.exec(text)) !== null) {
+  while (match !== null) {
     if (match.index > lastIndex) {
       segments.push({ type: "text", value: text.slice(lastIndex, match.index) })
     }
     segments.push({ type: "code", value: match[1] })
     lastIndex = match.index + match[0].length
+    match = regex.exec(text)
   }
 
   if (lastIndex < text.length) {
