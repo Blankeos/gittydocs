@@ -92,6 +92,7 @@
 
 .prose pre code {
   background: none;
+  color: var(--code-block-fg);
   padding: 0;
   font-size: inherit;
 }

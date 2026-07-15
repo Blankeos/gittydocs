@@ -349,7 +349,7 @@ const landingCss = `
 
 .gd-btn--primary {
   background: var(--primary);
-  color: var(--primary-foreground);
+  color: oklch(1 0 0);
 }
 
 .gd-btn--primary:hover {
