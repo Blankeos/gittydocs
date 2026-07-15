@@ -1,12 +1,10 @@
 import { createEffect, createMemo, createSignal, For, onCleanup, Show } from "solid-js"
+import { HeadingInlineContent } from "@/gittydocs/components/docs/heading-inline-content"
+import type { DocHeading } from "@/gittydocs/lib/heading-utils"
 import { Collapsible } from "@/components/ui/collapsible"
 import { cn } from "@/utils/cn"
 
-export interface Heading {
-  level: number
-  text: string
-  slug: string
-}
+export type Heading = DocHeading
 
 interface TableOfContentsProps {
   headings: Heading[]
@@ -123,7 +121,7 @@ export function TableOfContents(props: TableOfContentsProps) {
             <Show when={activeHeading()} keyed>
               {(heading) => (
                 <span class="min-w-0 truncate font-medium text-foreground">
-                  {heading.text}
+                  <HeadingInlineContent text={heading.text} />
                 </span>
               )}
             </Show>
@@ -173,7 +171,7 @@ export function TableOfContents(props: TableOfContentsProps) {
                           : "text-muted-foreground"
                       )}
                     >
-                      {heading.text}
+                      <HeadingInlineContent text={heading.text} />
                     </a>
                   </li>
                 )}
@@ -213,7 +211,7 @@ export function TableOfContents(props: TableOfContentsProps) {
                       : "text-muted-foreground"
                   )}
                 >
-                  {heading.text}
+                  <HeadingInlineContent text={heading.text} />
                 </a>
               </li>
             )}

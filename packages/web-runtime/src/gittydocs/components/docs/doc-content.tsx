@@ -9,6 +9,7 @@ import { MdxContentStatic } from "@/gittydocs/lib/velite/mdx-content"
 import { MdxContext } from "@/gittydocs/lib/velite/mdx-context"
 import { useParams } from "@/route-tree.gen"
 import { stripBasePath } from "@/utils/base-path"
+import { extractHeadingsFromMarkdown } from "@/gittydocs/lib/heading-utils"
 import getTitle from "@/utils/get-title"
 
 export function DocContent() {
@@ -120,48 +121,4 @@ export function DocContent() {
       </Show>
     </>
   )
-}
-
-function extractHeadingsFromMarkdown(content: string) {
-  const headingsList: Array<{ level: number; text: string; slug: string }> = []
-  const lines = content.split("\n")
-  let inFence = false
-  let fenceChar: string | null = null
-  let fenceLength = 0
-
-  for (const line of lines) {
-    const fenceMatch = line.match(/^\s*(```+|~~~+)/)
-    if (fenceMatch) {
-      const marker = fenceMatch[1]
-      if (!inFence) {
-        inFence = true
-        fenceChar = marker[0]
-        fenceLength = marker.length
-        continue
-      }
-
-      if (fenceChar && marker[0] === fenceChar && marker.length >= fenceLength) {
-        inFence = false
-        fenceChar = null
-        fenceLength = 0
-        continue
-      }
-    }
-
-    if (inFence) continue
-
-    const match = line.match(/^(#{1,6})\s+(.+)$/)
-    if (!match) continue
-    const level = match[1].length
-    const text = match[2].trim()
-    const slug = text
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/-+/g, "-")
-      .trim()
-    headingsList.push({ level, text, slug })
-  }
-
-  return headingsList
 }

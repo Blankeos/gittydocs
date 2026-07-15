@@ -3,17 +3,14 @@ import { Index } from "flexsearch"
 import { createMemo, type FlowComponent } from "solid-js"
 import type { DocsConfig, NavItem } from "@/gittydocs/lib/docs/config.gen"
 import { gittydocsConfig } from "@/gittydocs/lib/docs/config.gen"
+import { extractHeadingsFromMarkdown, type DocHeading } from "@/gittydocs/lib/heading-utils"
 import { createStrictContext } from "@/utils/create-strict-context"
 
 // ===========================================================================
 // Types
 // ===========================================================================
 
-export interface Heading {
-  level: number
-  text: string
-  slug: string
-}
+export type Heading = DocHeading
 
 export interface DocsPage {
   routePath: string
@@ -142,54 +139,6 @@ class SearchIndex {
 // Helper Functions
 // ===========================================================================
 
-function extractHeadings(content: string): Heading[] {
-  const headings: Heading[] = []
-  const lines = content.split("\n")
-  let inFence = false
-  let fenceChar: string | null = null
-  let fenceLength = 0
-
-  for (const line of lines) {
-    const fenceMatch = line.match(/^\s*(```+|~~~+)/)
-    if (fenceMatch) {
-      const marker = fenceMatch[1]
-      if (!inFence) {
-        inFence = true
-        fenceChar = marker[0]
-        fenceLength = marker.length
-        continue
-      }
-
-      if (fenceChar && marker[0] === fenceChar && marker.length >= fenceLength) {
-        inFence = false
-        fenceChar = null
-        fenceLength = 0
-        continue
-      }
-    }
-
-    if (inFence) continue
-
-    const match = line.match(/^(#{1,6})\s+(.+)$/)
-    if (!match) continue
-    const level = match[1].length
-    const text = match[2].trim()
-    const slug = slugify(text)
-    headings.push({ level, text, slug })
-  }
-
-  return headings
-}
-
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .trim()
-}
-
 function toRoutePath(slug: string): string {
   let route = slug.replace(/^\/?/, "")
   if (route.endsWith("/index") || route === "index") {
@@ -313,7 +262,7 @@ export const DocsContextProvider: FlowComponent = (props) => {
   const pages = createMemo<DocsPage[]>(() => {
     return docs.map((doc) => {
       const routePath = toRoutePath(doc.slugAsParams)
-      const headings = extractHeadings(doc.rawMarkdown || "")
+      const headings = extractHeadingsFromMarkdown(doc.rawMarkdown || "")
 
       return {
         routePath,
