@@ -14,7 +14,9 @@ export function DocsLayout(props: FlowProps) {
             <DocsNav />
           </Sidebar>
 
-          <div class="flex min-h-[calc(100vh-3.5rem)] flex-col items-start">{props.children}</div>
+          <div class="flex min-h-[calc(100vh-3.5rem)] min-w-0 flex-col items-start overflow-x-hidden">
+            {props.children}
+          </div>
         </div>
       </div>
     </div>

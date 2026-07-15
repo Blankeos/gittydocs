@@ -14,3 +14,17 @@ Analyze this current project first on what can be added to the docs.
 
 For specific references, follow configuration instructions in https://gittydocs.carlo.tl/llms.txt
 ```
+
+{/*  This is a sample */}
+| Area / setting | OpenCode | crabcode | Type | Required | Example | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| `model` | ✅ | ✅ | string | No | `"anthropic/claude-sonnet-4"` | Default model when no persisted active model is set. |
+| `small_model` / `smallModel` | ✅ | ✅ | string | No | `"openai/gpt-4.1-mini"` | Not enabled by default. When configured, crabcode uses it for lightweight tasks such as session title generation. |
+| `default_agent` | ✅ | ✅ | string | No | `"build"` | Selects the startup agent mode. |
+
+| Area / setting | OpenCode | crabcode | Notes |
+| --- | --- | --- | --- |
+| `model` | ✅ | ✅ | Default model when no persisted active model is set. |
+| `small_model` / `smallModel` | ✅ | ✅ | Not enabled by default. When configured, crabcode uses it for lightweight tasks such as session title generation. |
+| `default_agent` | ✅ | ✅ | Selects the startup agent mode. |
+| `command` config | ✅ | ✅ | JSON-defined slash commands with `template`, `description`, `agent`, `model`, and `subtask`. |

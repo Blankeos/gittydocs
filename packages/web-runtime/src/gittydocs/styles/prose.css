@@ -178,16 +178,82 @@
   margin-top: 0.5em;
 }
 
-.prose table {
-  width: 100%;
-  border-collapse: collapse;
+.prose .table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
   margin: 1.5em 0;
+  padding-bottom: 0.35rem;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklch, var(--foreground) 18%, transparent) transparent;
+}
+
+.prose .table-scroll[data-overflow-left="true"][data-overflow-right="true"] {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 1rem,
+    black calc(100% - 1rem),
+    transparent
+  );
+}
+
+.prose .table-scroll[data-overflow-left="true"][data-overflow-right="false"] {
+  mask-image: linear-gradient(to right, transparent, black 1rem);
+}
+
+.prose .table-scroll[data-overflow-left="false"][data-overflow-right="true"] {
+  mask-image: linear-gradient(to right, black calc(100% - 1rem), transparent);
+}
+
+.prose .table-scroll:hover {
+  scrollbar-color: color-mix(in oklch, var(--foreground) 28%, transparent) transparent;
+}
+
+.prose .table-scroll::-webkit-scrollbar {
+  height: 0.625rem;
+}
+
+.prose .table-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.prose .table-scroll::-webkit-scrollbar-thumb {
+  min-width: 2rem;
+  border: 0.1875rem solid transparent;
+  border-radius: 9999px;
+  background: color-mix(in oklch, var(--foreground) 18%, transparent);
+  background-clip: content-box;
+}
+
+.prose .table-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklch, var(--foreground) 28%, transparent);
+}
+
+.prose .table-scroll::-webkit-scrollbar-thumb:active {
+  background-color: color-mix(in oklch, var(--foreground) 38%, transparent);
+}
+
+.prose .table-scroll table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  margin: 0;
 }
 
 .prose th,
 .prose td {
+  min-width: 8rem;
+  max-width: 28rem;
   padding: 0.75em 1em;
   border: 1px solid var(--border);
+  vertical-align: top;
+  overflow-wrap: break-word;
+}
+
+.prose :is(th, td) code {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .prose th {

@@ -1,5 +1,5 @@
 import { useClipboard } from "bagon-hooks"
-import type { FlowProps, JSX } from "solid-js"
+import { createSignal, type FlowProps, type JSX, onCleanup, onMount } from "solid-js"
 import { MDXProvider } from "solid-jsx"
 import { toast } from "solid-sonner"
 
@@ -76,6 +76,55 @@ function HeadingLink(props: HeadingProps) {
   )
 }
 
+function TableScroll(props: JSX.IntrinsicElements["table"]) {
+  const [overflowLeft, setOverflowLeft] = createSignal(false)
+  const [overflowRight, setOverflowRight] = createSignal(false)
+  let scrollRef: HTMLDivElement | undefined
+
+  const updateOverflow = () => {
+    if (!scrollRef) return
+
+    const maxScrollLeft = scrollRef.scrollWidth - scrollRef.clientWidth
+    const scrollLeft = scrollRef.scrollLeft
+    const threshold = 1
+
+    setOverflowLeft(scrollLeft > threshold)
+    setOverflowRight(maxScrollLeft - scrollLeft > threshold)
+  }
+
+  onMount(() => {
+    updateOverflow()
+
+    const resizeObserver = new ResizeObserver(updateOverflow)
+    if (scrollRef) {
+      resizeObserver.observe(scrollRef)
+      const table = scrollRef.querySelector("table")
+      if (table) resizeObserver.observe(table)
+    }
+
+    window.addEventListener("resize", updateOverflow)
+
+    onCleanup(() => {
+      resizeObserver.disconnect()
+      window.removeEventListener("resize", updateOverflow)
+    })
+  })
+
+  return (
+    <div
+      ref={(element) => {
+        scrollRef = element
+      }}
+      class="table-scroll scrollbar-thin"
+      data-overflow-left={overflowLeft() ? "true" : "false"}
+      data-overflow-right={overflowRight() ? "true" : "false"}
+      onScroll={updateOverflow}
+    >
+      <table {...props} />
+    </div>
+  )
+}
+
 export const mdxComponents: Record<string, (properties: never) => JSX.Element> = {
   h1: (props: any) => <HeadingLink level={1} {...props} />,
   h2: (props: any) => <HeadingLink level={2} {...props} />,
@@ -84,6 +133,7 @@ export const mdxComponents: Record<string, (properties: never) => JSX.Element> =
   h5: (props: any) => <HeadingLink level={5} {...props} />,
   h6: (props: any) => <HeadingLink level={6} {...props} />,
   pre: (props: any) => <CodeBlock {...props} />,
+  table: (props: any) => <TableScroll {...props} />,
 }
 
 export function MdxContext(props: FlowProps) {
