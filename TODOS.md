@@ -37,6 +37,6 @@ Bugs:
 - [x] [object Object] when I navigate around the UI, but refresh is okay.
 - [x] Big bug for tables that are too long-width'd, they'd take up the space and introduce horizontal scroll and worse be covered by the scrollspy.
 - [ ] Support .ts configs on top of just gittydocs.jsonc
-- [ ] avoid cmd palette from shifting vertical pos based on results. Just make it padded off top so it sticks there (like my next-portfolio)
+- [x] avoid cmd palette from shifting vertical pos based on results. Just make it padded off top so it sticks there (like my next-portfolio)
 - [ ] Changelog
 - [ ] API References (maybe using scalar)

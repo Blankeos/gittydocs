@@ -25,7 +25,10 @@ const CommandDialog: Component<ParentProps<DialogRootProps>> = (props) => {
 
   return (
     <Dialog {...others}>
-      <DialogContent class="overflow-hidden p-0">
+      <DialogContent
+        showClose={false}
+        class="top-[8%] left-1/2 max-w-lg -translate-x-1/2 translate-y-0 overflow-hidden p-0 sm:top-[8%]"
+      >
         <Command class="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:size-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:size-5">
           {local.children}
         </Command>
@@ -68,7 +71,7 @@ const CommandList: Component<ParentProps<CommandPrimitive.CommandListProps>> = (
 
   return (
     <CommandPrimitive.CommandList
-      class={cn("max-h-[300px] overflow-y-auto overflow-x-hidden", local.class)}
+      class={cn("max-h-[min(400px,50vh)] overflow-y-auto overflow-x-hidden", local.class)}
       {...others}
     />
   )
