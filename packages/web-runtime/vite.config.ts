@@ -5,7 +5,6 @@ import vike from "vike/plugin"
 import vikeSolid from "vike-solid/vite"
 import { defineConfig, type Plugin } from "vite"
 import solidSvg from "vite-plugin-solid-svg"
-import tsConfigPaths from "vite-tsconfig-paths"
 
 const hotReloadRoots = [
   ".velite",
@@ -61,14 +60,14 @@ function isWithinPath(filePath: string, rootPath: string) {
 
 export default defineConfig({
   plugins: [
-    tsConfigPaths(),
     gittydocsHotReload(),
-    vike({}),
+    vike(),
     vikeSolid(),
     vikeRoutegen(),
     solidSvg(),
     tailwindcss(),
   ],
+  resolve: { tsconfigPaths: true },
   server: {
     port: 3000,
   },

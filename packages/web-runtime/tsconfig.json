@@ -24,11 +24,10 @@
       "@types/bun",
       "vite-plugin-solid-svg/types-component-solid",
       "vite/client",
-      "vike-solid/client",
-      ".velite/**/*"
+      "vike-solid/client"
     ]
   },
-  "include": ["src", "scripts"],
+  "include": ["src", "scripts", ".velite"],
   "references": [
     {
       "path": "./tsconfig.node.json"

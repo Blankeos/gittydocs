@@ -28,10 +28,11 @@
 
 More ideas:
 
-- [ ] A landing page written in `index.tsx` ?
+- [ ] A customizable landing page written in `index.tsx` ?
 - [x] The social banner `socialBanner` config.
 
 Bugs:
 
 - [x] [object Object] when I navigate around the UI, but refresh is okay.
+- [ ] Big bug for tables that are too long-width'd, they'd take up the space and introduce horizontal scroll and worse be covered by the scrollspy.
 - [ ] avoid cmd palette from shifting vertical pos based on results. Just make it padded off top so it sticks there (like my next-portfolio)

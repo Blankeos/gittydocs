@@ -23,15 +23,15 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@clack/prompts": "^0.11.0",
-    "cac": "^6.7.14",
-    "chokidar": "^3.6.0",
-    "dotenv": "^16.4.5",
+    "@clack/prompts": "^1.7.0",
+    "cac": "^7.0.0",
+    "chokidar": "^5.0.0",
+    "dotenv": "^17.4.2",
     "jsonc-parser": "^3.3.1"
   },
   "devDependencies": {
-    "@types/node": "^20.11.30",
-    "tsup": "^8.0.2",
-    "typescript": "^5.4.5"
+    "@types/node": "^26.1.1",
+    "tsup": "^8.5.1",
+    "typescript": "^7.0.2"
   }
 }
