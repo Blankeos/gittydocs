@@ -12,7 +12,7 @@
     - [x] Parts to update: server routes, docs
   - [x] A 1-shot prompt to tell an AI essentially 'Make my docs using gittydocs'.
     - [x] Parts to update: docs templates
-  - [x] ~An AI skill / just reusing llms.txt ? (Just maybe but very deprioritized)~
+  - [x] ~~An AI skill / just reusing llms.txt ? (Just maybe but very deprioritized)~~
     - [x] Parts to update: docs, llms.txt generation
 - [x] Refactor:
   - [x] Collocate all gittydocs files into a folder so when ejecting, it's very easy to see where gittydocs is.
@@ -34,5 +34,6 @@ More ideas:
 Bugs:
 
 - [x] [object Object] when I navigate around the UI, but refresh is okay.
-- [ ] Big bug for tables that are too long-width'd, they'd take up the space and introduce horizontal scroll and worse be covered by the scrollspy.
+- [x] Big bug for tables that are too long-width'd, they'd take up the space and introduce horizontal scroll and worse be covered by the scrollspy.
+- [ ] Support .ts configs on top of just gittydocs.jsonc
 - [ ] avoid cmd palette from shifting vertical pos based on results. Just make it padded off top so it sticks there (like my next-portfolio)

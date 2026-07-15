@@ -31,9 +31,9 @@
   --sidebar-accent-foreground: oklch(0.3 0.06 220);
   --sidebar-border: oklch(0.9 0.015 215);
   --sidebar-ring: oklch(0.7 0.08 220);
-  --code-block-bg: oklch(0.97 0.012 215);
-  --code-block-fg: oklch(0.22 0.04 220);
-  --code-block-border: oklch(0.88 0.02 215);
+  --code-block-bg: oklch(0.22 0.03 220);
+  --code-block-fg: oklch(0.92 0.01 215);
+  --code-block-border: oklch(0.36 0.03 220);
 }
 
 :root[data-theme="ocean"].dark {

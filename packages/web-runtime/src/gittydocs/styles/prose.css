@@ -112,11 +112,25 @@
 .prose .code-block {
   position: relative;
   margin: 1.5em 0;
+  background: var(--code-block-bg);
+  border: 1px solid var(--code-block-border);
+  border-radius: 0.5em;
+  overflow: hidden;
 }
 
 .prose .code-block pre {
   margin: 0;
+  margin-bottom: 0;
+  padding: 1em;
   padding-right: 3rem;
+  border: none;
+  border-radius: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  background: var(--code-block-bg);
+  color: var(--code-block-fg);
+  font-size: 0.875em;
+  line-height: 1.5;
 }
 
 .prose .code-block-copy {
