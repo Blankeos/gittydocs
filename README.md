@@ -8,9 +8,6 @@ Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site.
 
 **[Documentation →](https://gittydocs.carlo.tl)**
 
-> [!WARNING]
-> This project is in alpha.
-
 ## Quick Start
 
 Scaffold with the CLI:
