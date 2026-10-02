@@ -2,6 +2,7 @@
   "$schema": "../gittydocs.schema.json",
   "site": {
     "name": "gittydocs",
+    "version": { "packageJson": "../packages/cli/package.json" },
     "description": "Simple, fast docs from your Markdown.",
     "logo": "/static/gittydocs_logo.png",
     "favicon": "/static/gittydocs_logo.png",
@@ -19,17 +20,39 @@
   "nav": [
     {
       "label": "Docs",
+      "icon": "book",
       "items": [
-        { "label": "Introduction", "path": "/introduction" },
-        { "label": "Motivation", "path": "/motivation" },
-        { "label": "AI Docs Prompt", "path": "/ai-docs-prompt" },
-        { "label": "Configuration", "path": "/configuration" },
-        { "label": "CLI", "path": "/cli" },
-        { "label": "Theming", "path": "/theming" },
+        { "label": "Introduction", "path": "/introduction", "icon": "book" },
+        { "label": "Motivation", "path": "/motivation", "icon": "rocket" },
+        { "label": "AI Docs Prompt", "path": "/ai-docs-prompt", "icon": "file" },
+        { "label": "Configuration", "path": "/configuration", "icon": "settings" },
+        { "label": "Navigation", "path": "/navigation", "icon": "folder" },
+        { "label": "CLI", "path": "/cli", "icon": "terminal" },
+        { "label": "Theming", "path": "/theming", "icon": "settings" },
+      ],
+    },
+    {
+      "label": "Components",
+      "path": "/components",
+      "icon": "package",
+      "items": [
+        { "label": "Code blocks", "path": "/components/code-blocks", "icon": "code" },
+        {
+          "label": "Authoring",
+          "icon": "book",
+          "accordion": true,
+          "defaultOpen": true,
+          "items": [
+            { "label": "Steps", "path": "/components/steps", "icon": "hash" },
+            { "label": "Files", "path": "/components/files", "icon": "folder" },
+            { "label": "Accordion", "path": "/components/accordion", "icon": "file" },
+          ],
+        },
       ],
     },
     {
       "label": "Deploy",
+      "icon": "rocket",
       "accordion": true,
       "items": [
         { "label": "Overview", "path": "/deploy" },
@@ -39,6 +62,9 @@
         { "label": "Netlify", "path": "/deploy/netlify" },
       ],
     },
+  ],
+  "navFooter": [
+    { "label": "GitHub", "path": "https://github.com/blankeos/gittydocs", "icon": "github" },
   ],
   "links": {
     "github": "https://github.com/blankeos/gittydocs",

@@ -1,0 +1,91 @@
+---
+title: Accordion
+description: Keep optional details in import-free expandable sections.
+---
+
+Use `Accordion` for an expandable section and `Accordions` to control whether a group allows one or multiple sections to stay open. The components are built into `.mdx` pages—no imports are required.
+
+## Single-open demo
+
+A group defaults to `type="single"`: opening one item closes the other. All items may also be closed.
+
+<Accordions type="single">
+  <Accordion title="Can I use Markdown inside?" id="markdown-content" defaultOpen>
+
+Yes. Use **formatting**, [links](/components), lists, and fenced code blocks in the body. Leave blank lines around Markdown content inside the tags.
+
+  </Accordion>
+  <Accordion title="Do I need to import these components?" id="no-imports">
+
+No. `Accordions` and `Accordion` are available directly in every Gittydocs MDX page.
+
+  </Accordion>
+</Accordions>
+
+```mdx title="faq.mdx"
+<Accordions type="single">
+  <Accordion title="Can I use Markdown inside?" id="markdown-content" defaultOpen>
+
+Yes. Use **formatting**, [links](/components), lists, and fenced code blocks in the body. Leave blank lines around Markdown content inside the tags.
+
+  </Accordion>
+  <Accordion title="Do I need to import these components?" id="no-imports">
+
+No. `Accordions` and `Accordion` are available directly in every Gittydocs MDX page.
+
+  </Accordion>
+</Accordions>
+```
+
+## Multiple-open demo
+
+Use `type="multiple"` to let readers keep several sections open. Each item controls its own initial state:
+
+<Accordions type="multiple">
+  <Accordion title="Local preview" defaultOpen>
+
+Run `gittydocs dev ./docs` and save a page to see your changes.
+
+  </Accordion>
+  <Accordion title="Static deployment" defaultOpen>
+
+Build your docs and deploy the static output to your preferred [host](/deploy).
+
+  </Accordion>
+</Accordions>
+
+```mdx title="workflow.mdx"
+<Accordions type="multiple">
+  <Accordion title="Local preview" defaultOpen>
+
+Run `gittydocs dev ./docs` and save a page to see your changes.
+
+  </Accordion>
+  <Accordion title="Static deployment" defaultOpen>
+
+Build your docs and deploy the static output to your preferred [host](/deploy).
+
+  </Accordion>
+</Accordions>
+```
+
+## Props
+
+| Component | Prop | Type | Default / behavior |
+| --- | --- | --- | --- |
+| `Accordions` | `type` | `"single"` or `"multiple"` | `"single"`; use `"multiple"` to allow several open items. |
+| `Accordions` | children | `Accordion` elements | The grouped sections. |
+| `Accordion` | `title` | string | Required trigger label. |
+| `Accordion` | `id` | string | Optional stable HTML ID; generated if omitted. Use a unique ID per page. |
+| `Accordion` | `defaultOpen` | boolean | `false`; set `true` to start open. |
+| `Accordion` | children | MDX content | The expandable body. |
+
+In a single-open group, if several children request `defaultOpen`, only the first stays open. A standalone `Accordion` also works without an `Accordions` wrapper when you do not need group behavior.
+
+The native disclosure summary is keyboard-operable: focus it and press Enter or Space to toggle. `id` identifies the section for links; it does not add a Markdown heading to the table of contents.
+
+Opening and closing a section animates its body and disclosure chevron. The animations are removed when the reader prefers reduced motion; keyboard controls and single-/multiple-open behavior stay the same. See [Reduced motion](/theming#reduced-motion).
+
+## Markdown output
+
+[Markdown exports](/components#markdown-exports) convert every live accordion into a heading and its full body, regardless of whether it starts open or closed. Fenced component examples stay as source code. Keep essential instructions outside collapsed sections when readers should see them immediately.

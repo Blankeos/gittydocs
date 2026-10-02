@@ -1,17 +1,18 @@
 ---
 title: Configuration ⚙️
-description: Everything you need to configure gittydocs from top-to-bottom (like a cheatsheet)
+description: A reference for site metadata, versions, navigation and footer links, and content.
 ---
 
 Create `gittydocs.jsonc` in your docs folder:
 
-```jsonc
-// docs/gittydocs.jsonc
+```jsonc title="gittydocs.jsonc"
 {
   "$schema": "https://raw.githubusercontent.com/blankeos/gittydocs/main/gittydocs.schema.json",
   "site": {
     "name": "Site Name",
-    "logo": "/logo.svg",
+    "description": "Documentation for my project.",
+    "version": { "packageJson": "../package.json" },
+    "logo": "/static/logo.svg",
     "favicon": "/static/favicon.ico",
     "socialBanner": "/static/social-card.png",
     "repo": {
@@ -23,45 +24,176 @@ Create `gittydocs.jsonc` in your docs folder:
   },
   "nav": [
     {
-      "label": "Section",
+      "label": "Guide",
+      "icon": "book",
       "items": [
-        { "label": "Page", "path": "/" },
-        { "label": "Subpage", "path": "/subpage" },
+        { "label": "Introduction", "path": "/introduction", "icon": "file" },
+        { "label": "Getting started", "path": "/getting-started", "icon": "rocket" },
       ],
     },
   ],
+  "navFooter": [
+    { "label": "GitHub", "path": "https://github.com/user/repo", "icon": "github" },
+  ],
+  "ui": {
+    "breadcrumbs": true,
+    "pageNavigation": true,
+  },
   "links": {
     "github": "https://github.com/user/repo",
     "issues": "https://github.com/user/repo/issues",
+  },
+  "theme": {
+    "preset": "default",
+    "cssFile": "theme.css",
+  },
+  "llms": {
+    "enabled": true,
+    "path": "llms",
   },
 }
 ```
 
 `$schema` enables autocomplete + validation in editors. For a pinned version, swap `main` for a tag.
 
+All top-level sections are optional. If you provide `site`, its `name` is required. The manifest-version example assumes `package.json` exists one directory above your docs folder; use a [literal version](#site-version) or omit `version` if it does not.
+
 ## Options
 
-| Field                | Type    | Description                                                   |
-| -------------------- | ------- | ------------------------------------------------------------- |
-| `site.name`          | string  | Site title                                                    |
-| `site.description`   | string  | Short site description used in `/llms.txt`                    |
-| `site.logo`          | string  | Logo image URL or public path                                 |
-| `site.favicon`       | string  | Favicon URL or public path                                    |
-| `site.socialBanner`  | string  | Social preview image (Open Graph/Twitter) URL or path         |
-| `site.repo.owner`    | string  | GitHub username or org                                        |
-| `site.repo.name`     | string  | Repository name                                               |
-| `site.repo.ref`      | string  | Branch or tag (default: `main`)                               |
-| `site.repo.docsPath` | string  | Path to docs folder (default: `docs`)                         |
-| `nav`                | array   | Custom navigation sections                                    |
-| `links.github`       | string  | URL to repository or org                                      |
-| `links.issues`       | string  | URL to issues page                                            |
-| `links.discord`      | string  | URL to Discord server                                         |
-| `theme.preset`       | string  | Preset theme name (see `/theming`)                            |
-| `theme.cssFile`      | string  | Path to a CSS file in your docs folder (default: `theme.css`) |
-| `llms.enabled`       | boolean | Generate `/llms.txt` at build time (default: `true`)          |
-| `llms.path`          | string  | Folder for per-page LLM markdown (default: `llms`)            |
+| Field | Type | Description / default |
+| --- | --- | --- |
+| `$schema` | string | JSON Schema URL for editor autocomplete and validation. |
+| `site.name` | string | Site title; required when `site` is present. |
+| `site.version` | string or object | Optional version label or manifest reference; see [Site version](#site-version). |
+| `site.description` | string | Short site description used in `/llms.txt`. |
+| `site.logo` | string | Logo image URL or public path. |
+| `site.favicon` | string | Favicon URL or public path. |
+| `site.socialBanner` | string | Social preview image (Open Graph/Twitter) URL or path. |
+| `site.repo.owner` | string | GitHub username or org; required when `site.repo` is present. |
+| `site.repo.name` | string | Repository name; required when `site.repo` is present. |
+| `site.repo.ref` | string | Branch or tag; default: `main`. |
+| `site.repo.docsPath` | string | Repository-relative docs folder; default: `docs`. Use `""` for the repository root. |
+| `nav` | array of navigation items | Recursive custom navigation; omitted or empty uses the file structure. See [Navigation](/navigation). |
+| `navFooter` | array of footer links | Optional ordered, link-only sidebar footer entries alongside automatic `llms.txt`, above the version. Omitted or empty adds no custom links. See [Footer navigation](#footer-navigation). |
+| `ui.breadcrumbs` | boolean | Show breadcrumbs on Markdown/MDX pages; default: `true`. Set `false` to hide. |
+| `ui.pageNavigation` | boolean | Show previous/next page links on Markdown/MDX pages; default: `true`. Set `false` to hide. |
+| `links.github` | string | URL to repository or org for GitHub actions; does not automatically add a sidebar footer link. |
+| `links.issues` | string | URL to issues page. |
+| `links.discord` | string | URL to Discord server. |
+| `theme.preset` | string | `default`, `slate`, `sage`, `ember`, `ocean`, or `sand`; default: `default`. |
+| `theme.cssFile` | string | CSS file relative to your docs folder; default: `theme.css`. |
+| `llms.enabled` | boolean | Generate `/llms.txt` and per-page Markdown; default: `true`. |
+| `llms.path` | string | Output folder for per-page Markdown; default: `llms`. Does not change `/llms.txt`. |
 
 `site.logo`, `site.favicon`, and `site.socialBanner` can be full URLs or paths to files in `public/`. Relative paths are resolved with the base URL.
+
+### Navigation item options
+
+Every item in `nav`, including nested `items`, accepts the same fields:
+
+| Field | Type | Description / default |
+| --- | --- | --- |
+| `label` | string | Required display label. |
+| `path` | string | Optional internal route or external URL. A group with a path has a clickable label. |
+| `items` | array of navigation items | Optional children; nesting is recursive and unrestricted. |
+| `accordion` | boolean | Make a group collapsible; default: `false`. |
+| `defaultOpen` | boolean | Initially expand a collapsible group; default: `false`. Active ancestors expand automatically. |
+| `icon` | string | Optional curated icon name; see [supported icons](/navigation#icons). Not an arbitrary icon library name or image URL. |
+| `newTab` | boolean | Default: `true` for external HTTP(S) links, `false` for internal routes. Override either behavior explicitly. |
+
+See [Navigation](/navigation) for nested groups, breadcrumbs, search, and previous/next ordering.
+
+### Footer navigation
+
+Use `navFooter` to place utility links in the sidebar's bottom group rather than a main-nav Resources section. Entries render as compact rows in the order you configure, alongside the automatic `llms.txt` link and **above the site version**. The version text aligns with the left edge of the footer icons.
+
+| Field | Type | Description / default |
+| --- | --- | --- |
+| `label` | string | Required display label. |
+| `path` | string | Required internal route or external URL. |
+| `icon` | string | Optional [curated navigation icon](/navigation#icons). |
+| `newTab` | boolean | Default: `true` for external HTTP(S) links, `false` for internal routes. Override either behavior explicitly. |
+
+The footer schema is strict and link-only: `items`, `accordion`, `defaultOpen`, and unknown fields are rejected. `nav` remains recursive and unchanged. In TypeScript, the configuration shape is:
+
+```ts
+type FooterNavItem = {
+  label: string
+  path: string
+  icon?: string
+  newTab?: boolean
+}
+
+type FooterNavigationConfig = {
+  navFooter?: FooterNavItem[]
+}
+```
+
+Footer links use the same safe new-tab handling as main navigation: new tabs have `rel="noopener noreferrer"`, an arrow, and a screen-reader announcement. Omit `navFooter` or set `[]` to add no custom footer links. `links.github` and `site.repo` do not generate a GitHub footer entry; configure it once in `navFooter` if you want it there.
+
+The built-in `llms.txt` link is automatic when LLM output is enabled and must not be repeated in `nav` or `navFooter`. `llms.enabled: false` hides that link without hiding your configured footer links or version. Footer links do not change breadcrumb ancestry, previous/next ordering, or search grouping; those use `nav`.
+
+## Site version
+
+Set `site.version` to one of three forms. The version appears in the sidebar footer beneath `navFooter` links and the automatic `llms.txt` link, aligned with the left edge of their icons, with a `v` prefix (for example, `v1.2.3`). An existing `v` prefix is not doubled. If LLM output is disabled, the version can still appear with custom footer links or on its own. Omit `version` to hide it.
+
+| Form | Example value for `site.version` | Version source |
+| --- | --- | --- |
+| Literal | `"1.2.3"` or `"v1.2.3"` | A nonempty string that you maintain yourself. |
+| Package JSON | `{ "packageJson": "../packages/cli/package.json" }` | The manifest's top-level `version` string. |
+| Cargo TOML | `{ "cargoToml": "../Cargo.toml" }` | `[package].version`, including workspace inheritance. |
+
+A manifest object must contain exactly one of `packageJson` or `cargoToml`, with a nonempty path pointing to a file named `package.json` or `Cargo.toml` respectively. Only these two manifest formats are supported intentionally. For Go, Python, Java, or .NET projects, use a literal version; Gittydocs does not infer versions from those ecosystems' files.
+
+```jsonc title="gittydocs.jsonc"
+{
+  "site": {
+    "name": "My project",
+    "version": { "packageJson": "../packages/cli/package.json" },
+  },
+}
+```
+
+Manifest paths are resolved relative to the **original docs/config folder**, not the current working directory or Gittydocs' copied runtime cache. For `repo/docs/gittydocs.jsonc`, `../package.json` means `repo/package.json`; `../packages/cli/package.json` means `repo/packages/cli/package.json`. Local manifest paths can point outside the docs folder.
+
+When loading docs from GitHub, manifests come from the **same source repository and GitHub ref** as the docs. Paths are relative to the source docs folder (`docsPath`), and `..` may reach a parent inside the repository but must not escape its root. Absolute paths, backslash paths, and remote manifest URLs are not supported for GitHub sources. These restrictions also apply to inherited Cargo workspace paths.
+
+### Cargo workspace inheritance
+
+Use a Cargo manifest reference:
+
+```jsonc title="gittydocs.jsonc"
+{
+  "site": {
+    "name": "My Rust project",
+    "version": { "cargoToml": "../crates/cli/Cargo.toml" },
+  },
+}
+```
+
+The member can inherit its version from a workspace:
+
+```toml title="crates/cli/Cargo.toml"
+[package]
+name = "my-cli"
+version.workspace = true
+```
+
+```toml title="Cargo.toml"
+[workspace]
+members = ["crates/cli"]
+
+[workspace.package]
+version = "1.2.3"
+```
+
+Gittydocs reads `[workspace.package].version` from the same manifest when available, or looks for an ancestor workspace `Cargo.toml`. An explicit `[package].workspace` directory is resolved relative to the member manifest. `version = { workspace = true }` is also supported. Point to a member manifest with `[package].version` when using a virtual workspace root that only contains `[workspace]`.
+
+### Missing or invalid manifests
+
+A missing file, invalid JSON/TOML, empty or missing version, or unresolved inherited workspace is an error—not a silently hidden version. Errors identify the manifest path and expected field. Check the original config-relative path, file permissions, or GitHub ref and repository access as applicable.
+
+During local development, referenced manifests and inherited Cargo workspace manifests are watched, including ones outside your docs folder. A failed refresh keeps the watcher running so correcting or recreating the manifest triggers another refresh. Fix initial startup errors before starting the server. GitHub sources are fetched again on restart or rebuild, not watched remotely.
 
 ## Static Assets / Images
 
@@ -77,7 +209,7 @@ docs/
 ![Hero](/static/hero.png)
 ```
 
-For more theming details and presets, see `/theming`.
+For more theming details, presets, and sidebar spacing overrides, see [Theming](/theming).
 
 ## Source
 
@@ -94,6 +226,19 @@ GITTYDOCS_SOURCE=https://github.com/owner/repo/tree/main/docs
 ```bash
 GITTYDOCS_SOURCE=/absolute/path/to/docs
 ```
+
+## Page actions and Markdown output
+
+Markdown/MDX pages have a **Copy page** button with a page-actions menu:
+
+- **Copy page as Markdown for LLMs** copies readable Markdown. Built-in [components](/components#markdown-exports) become headings and lists, while custom JSX and fenced syntax examples remain intact.
+- **Open in GitHub** opens the original `.md` or `.mdx` source file using a GitHub `blob` URL, not an edit URL or a guessed route filename. `site.repo` supplies repository metadata; a GitHub source provides a fallback when `site.repo` is omitted. For local docs, configure `site.repo` to enable this action.
+- **View as Markdown** opens the generated per-page Markdown in a new tab. It is available when `llms.enabled` is not `false` and the page has a Markdown/MDX source file.
+- **Open in ChatGPT** and **Open in Claude** open a prompt referencing the current page URL.
+
+The generated Markdown path follows the **source filename**, not just the route: `deploy/index.mdx` at `/deploy` produces `/llms/deploy/index.md`. Setting `llms.path` to `"raw"` changes that URL to `/raw/deploy/index.md`. View as Markdown respects the deployment base path; Open in GitHub preserves the original repository-relative source path and ref.
+
+`llms.enabled: false` disables `/llms.txt`, per-page Markdown output, the sidebar's `llms.txt` link, and **View as Markdown**. Copying a page remains available, as do configured `navFooter` links and the site version. The `llms.txt` sidebar link is supplied automatically and opens in a new tab with an arrow; do not add a duplicate to `nav` or `navFooter`.
 
 ## Writing Content
 
@@ -142,6 +287,8 @@ export default function Page() {
 
 Named exports mirror MDX frontmatter. `sideNav` is accepted as an alias for `sidebar`.
 
+Custom pages are searchable by their exported title and description, even when omitted from a custom `nav`. Their rendered JSX body is not indexed as Markdown, and they do not get Markdown heading results. Give them meaningful `title` and `description` exports.
+
 Every route must have exactly one page file. Gittydocs reports an error when multiple files resolve to the same route—for example, `index.tsx` and `index.mdx` both resolve to `/`. Move the previous home content to an explicit route only when that is your intended information architecture; Gittydocs does not automatically create an `/introduction` route.
 
 Custom pages can keep private components beside the docs in an underscore-prefixed folder. Gittydocs copies these files for bundling but excludes them from routes, navigation, search, source maps, and `llms.txt`:
@@ -177,6 +324,8 @@ index.tsx            # / (custom page; cannot coexist with index.mdx)
 subtopic/index.mdx   # /subtopic
 subtopic/topic.mdx   # /subtopic/topic
 ```
+
+For import-free authoring helpers and live demos, see [Components](/components). Use `.mdx` for `<Steps>`, `<Files>`, and `<Accordions>`; ordinary fenced code blocks work in both Markdown and MDX.
 
 ## Fully Customize
 

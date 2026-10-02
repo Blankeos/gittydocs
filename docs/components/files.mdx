@@ -1,0 +1,78 @@
+---
+title: Files
+description: Display collapsible file trees with filename icons and optional descriptions.
+---
+
+Use `Files` to contain a tree, `Folder` for a collapsible directory, and self-closing `File` elements for filenames. They are built into MDX and require no imports.
+
+## Live demo
+
+Try expanding and collapsing the folders:
+
+<Files>
+  <Folder name="docs" defaultOpen>
+    <Folder name="[images]">
+      <File name="logo.svg" description="Served at /static/logo.svg" />
+    </Folder>
+    <File name="gittydocs.jsonc" description="Site configuration" />
+    <File name="index.tsx" description="Custom landing page" />
+    <File name="introduction.mdx" description="Introduction page" />
+    <File name="theme.css" description="Theme overrides" />
+    <File name="preview" description="Helper script" icon="terminal" />
+  </Folder>
+</Files>
+
+## Syntax
+
+Paste this into a `.mdx` page to reproduce the demo:
+
+```mdx title="project-structure.mdx"
+<Files>
+  <Folder name="docs" defaultOpen>
+    <Folder name="[images]">
+      <File name="logo.svg" description="Served at /static/logo.svg" />
+    </Folder>
+    <File name="gittydocs.jsonc" description="Site configuration" />
+    <File name="index.tsx" description="Custom landing page" />
+    <File name="introduction.mdx" description="Introduction page" />
+    <File name="theme.css" description="Theme overrides" />
+    <File name="preview" description="Helper script" icon="terminal" />
+  </Folder>
+</Files>
+```
+
+Folders start closed by default. The outer folder above uses the boolean shorthand `defaultOpen`, which is equivalent to `defaultOpen={true}`. Use `defaultOpen={false}` or omit it to start a folder closed. Readers can toggle folders with the mouse or by focusing the summary and pressing Enter or Space.
+
+Folder expansion/collapse and the disclosure chevron are animated. When the reader prefers reduced motion, those animations are removed without changing the toggle behavior. See [Reduced motion](/theming#reduced-motion).
+
+## Props
+
+| Component | Prop | Type | Default / behavior |
+| --- | --- | --- | --- |
+| `Files` | children | `File` or `Folder` elements | Root tree entries. |
+| `Folder` | `name` | string | Required directory label. |
+| `Folder` | `defaultOpen` | boolean | `false`; initially expand the folder when `true`. |
+| `Folder` | children | `File` or `Folder` elements | Nested entries; folders can contain folders. |
+| `File` | `name` | string | Required filename label. |
+| `File` | `description` | string | Optional text displayed beside the filename. |
+| `File` | `icon` | string | Optional file-type override; otherwise inferred from `name`. |
+
+The tree is a visual explanation of your project, not a filesystem browser. Labels do not create routes or link to files.
+
+## Icons
+
+File icons are selected automatically from the filename. Language and format logos use bundled monochrome [Simple Icons](https://simpleicons.org), the same logo set used by Fumadocs code blocks. Generic files, folders, and utility icons use Tabler Icons. All icons inherit the surrounding text color in light and dark themes.
+
+For example, `.js` uses the square JavaScript logo, `.ts` uses TypeScript, `.jsx`/`.tsx` use the React atom, `.json`/`.jsonc` use JSON, `.md`/`.mdx` use Markdown, `.css` uses CSS, and `.toml` uses a config icon. Recognized special names include `Dockerfile`, `.env`, and `.gitignore`. Unknown filenames get a generic file icon.
+
+To override detection, use one of these file-type names:
+
+`file`, `javascript`, `typescript`, `react`, `json`, `markdown`, `css`, `html`, `yaml`, `shell`, `python`, `rust`, `go`, `config`, `image`, `docker`, `text`, `code`.
+
+Extension aliases such as `js`, `tsx`, and `mdx` are accepted too. `terminal` is an alias for `shell`, and `generic` is an alias for `file`. Names are case-insensitive; an unknown override uses the generic file icon. These are bundled identifiers, not remote image URLs or arbitrary icon-library names.
+
+The same filename detection is used for [code-block headers](/components/code-blocks). Sidebar navigation has its own [curated icon names](/navigation#icons), which are a different set.
+
+## Markdown output
+
+[Markdown exports](/components#markdown-exports) turn the live tree into nested lists, preserving folder names, filenames, and descriptions. Folder names have a trailing slash, and closed folders still include all their children. Icons and disclosure controls are presentation only and are omitted from the text export.

@@ -9,6 +9,12 @@ export const sourcePathByRoute: Record<string, string> = {
   "/deploy": "deploy/index.mdx",
   "/deploy/vercel": "deploy/vercel.mdx",
   "/ai-docs-prompt": "ai-docs-prompt.mdx",
+  "/navigation": "navigation.mdx",
   "/introduction": "introduction.mdx",
+  "/components/code-blocks": "components/code-blocks.mdx",
+  "/components/files": "components/files.mdx",
+  "/components/accordion": "components/accordion.mdx",
+  "/components": "components/index.mdx",
+  "/components/steps": "components/steps.mdx",
   "/theming": "theming.mdx"
 }

@@ -1,0 +1,76 @@
+---
+title: Code blocks
+description: Add syntax highlighting, filename headers, and copyable code with Markdown fences.
+---
+
+Code blocks use ordinary fenced Markdown. Set a language after the opening backticks for syntax highlighting; add `title` metadata when the block represents a particular file. No component import is needed.
+
+## Filename headers
+
+This is a live titled code block:
+
+```js title='config.js'
+export default {
+  name: "My project",
+  docs: "./docs",
+}
+```
+
+The filename appears in a header with an automatically selected, compact 14px file-type icon and a copy button. File-tree icons remain 18px. **Copy copies only the code**, not the filename, icon, or header.
+
+To reproduce it, write:
+
+````md
+```js title='config.js'
+export default {
+  name: "My project",
+  docs: "./docs",
+}
+```
+````
+
+Use single or double quotes for titles. Quoted titles can include spaces or a path, such as `title="src/my config.js"`. Icons come from the filename, not the language: a `js` fence titled `config.json` gets a JSON icon. Unrecognized filenames get a generic file icon. The [Files icon reference](/components/files#icons) describes the shared filename detection.
+
+The title is a display label; it does not create a file or change which code is copied.
+
+## Untitled blocks
+
+Omit `title` for the existing generic code-block presentation, with its copy control and no filename header:
+
+```js
+console.log("Hello, docs!")
+```
+
+````md
+```js
+console.log("Hello, docs!")
+```
+````
+
+Use `text` for plain text or an example that does not need language highlighting. Unknown languages fall back to plain text.
+
+## Showing MDX source
+
+Fence component examples to show their syntax rather than render them. If the example itself contains a triple-backtick fence, use four backticks for the surrounding fence:
+
+````mdx title="guide.mdx"
+<Steps>
+  <Step title="Start the preview">
+
+```bash
+gittydocs dev ./docs
+```
+
+  </Step>
+</Steps>
+````
+
+The example above is source code, not a live Steps demo. Similarly, put a custom component export inside a fence when documenting it:
+
+```tsx title="Example.tsx"
+export default function Example() {
+  return <p>This is example source, not an active component on this page.</p>
+}
+```
+
+Fenced examples are preserved as code by [Markdown exports](/components#markdown-exports), including built-in component tags, export statements, and filename metadata.

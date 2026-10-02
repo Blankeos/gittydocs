@@ -2,6 +2,11 @@ export const veliteRoutes = [
   "/",
   "/ai-docs-prompt",
   "/cli",
+  "/components",
+  "/components/accordion",
+  "/components/code-blocks",
+  "/components/files",
+  "/components/steps",
   "/configuration",
   "/deploy",
   "/deploy/cloudflare",
@@ -10,7 +15,8 @@ export const veliteRoutes = [
   "/deploy/vercel",
   "/introduction",
   "/motivation",
-  "/theming",
+  "/navigation",
+  "/theming"
 ] as const
 
-export type VeliteRoute = (typeof veliteRoutes)[number]
+export type VeliteRoute = typeof veliteRoutes[number]

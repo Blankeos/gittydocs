@@ -5,48 +5,82 @@ import type { DocsConfig, GitHubRepo, NavItem } from "@/gittydocs/lib/config-sch
 export type { DocsConfig, GitHubRepo, NavItem }
 
 export const gittydocsConfig: DocsConfig | null = {
-  "site": {
-    "name": "gittydocs",
-    "description": "Simple, fast docs from your Markdown.",
-    "logo": "/static/gittydocs_logo.png",
-    "favicon": "/static/gittydocs_logo.png",
-    "socialBanner": "/static/gittydocs_mainbanner.jpg",
-    "repo": {
-      "owner": "blankeos",
-      "name": "gittydocs",
-      "ref": "main",
-      "docsPath": "docs"
-    }
-  },
   "nav": [
     {
       "label": "Docs",
       "items": [
         {
           "label": "Introduction",
-          "path": "/introduction"
+          "path": "/introduction",
+          "icon": "book"
         },
         {
           "label": "Motivation",
-          "path": "/motivation"
+          "path": "/motivation",
+          "icon": "rocket"
         },
         {
           "label": "AI Docs Prompt",
-          "path": "/ai-docs-prompt"
+          "path": "/ai-docs-prompt",
+          "icon": "file"
         },
         {
           "label": "Configuration",
-          "path": "/configuration"
+          "path": "/configuration",
+          "icon": "settings"
+        },
+        {
+          "label": "Navigation",
+          "path": "/navigation",
+          "icon": "folder"
         },
         {
           "label": "CLI",
-          "path": "/cli"
+          "path": "/cli",
+          "icon": "terminal"
         },
         {
           "label": "Theming",
-          "path": "/theming"
+          "path": "/theming",
+          "icon": "settings"
         }
-      ]
+      ],
+      "icon": "book"
+    },
+    {
+      "label": "Components",
+      "path": "/components",
+      "items": [
+        {
+          "label": "Code blocks",
+          "path": "/components/code-blocks",
+          "icon": "code"
+        },
+        {
+          "label": "Authoring",
+          "items": [
+            {
+              "label": "Steps",
+              "path": "/components/steps",
+              "icon": "hash"
+            },
+            {
+              "label": "Files",
+              "path": "/components/files",
+              "icon": "folder"
+            },
+            {
+              "label": "Accordion",
+              "path": "/components/accordion",
+              "icon": "file"
+            }
+          ],
+          "accordion": true,
+          "icon": "book",
+          "defaultOpen": true
+        }
+      ],
+      "icon": "package"
     },
     {
       "label": "Deploy",
@@ -72,7 +106,15 @@ export const gittydocsConfig: DocsConfig | null = {
           "path": "/deploy/netlify"
         }
       ],
-      "accordion": true
+      "accordion": true,
+      "icon": "rocket"
+    }
+  ],
+  "navFooter": [
+    {
+      "label": "GitHub",
+      "path": "https://github.com/blankeos/gittydocs",
+      "icon": "github"
     }
   ],
   "links": {
@@ -81,5 +123,19 @@ export const gittydocsConfig: DocsConfig | null = {
   },
   "theme": {
     "preset": "ocean"
+  },
+  "site": {
+    "name": "gittydocs",
+    "version": "0.0.5",
+    "description": "Simple, fast docs from your Markdown.",
+    "logo": "/static/gittydocs_logo.png",
+    "favicon": "/static/gittydocs_logo.png",
+    "socialBanner": "/static/gittydocs_mainbanner.jpg",
+    "repo": {
+      "owner": "blankeos",
+      "name": "gittydocs",
+      "ref": "main",
+      "docsPath": "docs"
+    }
   }
 }

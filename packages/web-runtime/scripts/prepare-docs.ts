@@ -1,15 +1,44 @@
 import fs from "fs/promises"
-import { parse } from "jsonc-parser"
+import { type ParseError, parse, printParseErrorCode } from "jsonc-parser"
 import path from "path"
-import type { ZodIssue } from "zod"
+import type { ZodIssue, z } from "zod"
 import type { DocsConfig, NavItem } from "../src/gittydocs/lib/config-schema"
 import { docsConfigSchema } from "../src/gittydocs/lib/config-schema"
+import { toReadableMarkdown } from "../src/gittydocs/lib/markdown-export"
+import { resolveSiteVersion, type VersionSource } from "./lib/resolve-version"
 
 interface GitHubSource {
   owner: string
   repo: string
   ref: string
   docsPath: string
+}
+
+async function resolveConfigVersion(
+  config: z.output<typeof docsConfigSchema> | null,
+  source: PreparedSource
+): Promise<DocsConfig | null> {
+  const versionSource: VersionSource =
+    source.type === "github" && source.repo
+      ? { type: "github", ...source.repo, headers: buildGitHubHeaders() }
+      : { type: "local", docsDir: path.resolve(projectRoot, source.source) }
+  const manifestPaths = new Set<string>()
+  try {
+    const resolved = await resolveSiteVersion(config?.site?.version, versionSource, {
+      onManifest: (manifestPath) => manifestPaths.add(manifestPath),
+    })
+    if (!config) return null
+    const { site, ...rest } = config
+    return { ...rest, ...(site ? { site: { ...site, version: resolved.version } } : {}) }
+  } finally {
+    // Private CLI watcher metadata: never imported by the browser or emitted to public/.
+    // Write even on failure so a missing manifest can be watched and fixed in dev.
+    await fs.writeFile(
+      path.join(projectRoot, ".gittydocs-version-manifests.json"),
+      JSON.stringify(source.type === "local" ? [...manifestPaths] : []),
+      "utf-8"
+    )
+  }
 }
 
 interface PreparedSource {
@@ -85,7 +114,13 @@ async function prepareDocs() {
   await assertUniquePageRoutes()
 
   const configPath = await findConfigPath()
-  const config = configPath ? await readConfig(configPath) : null
+  const originalConfigPath = configPath
+    ? source.type === "local"
+      ? path.join(path.resolve(projectRoot, source.source), path.basename(configPath))
+      : `${source.source}/${path.basename(configPath)}`
+    : null
+  const inputConfig = configPath ? await readConfig(configPath, originalConfigPath!) : null
+  const config = await resolveConfigVersion(inputConfig, source)
 
   await writeConfigFile(config)
   await writeSourceFiles(source)
@@ -379,15 +414,26 @@ async function findConfigPath(): Promise<string | null> {
   return null
 }
 
-async function readConfig(filePath: string): Promise<DocsConfig | null> {
+async function readConfig(
+  filePath: string,
+  originalPath: string
+): Promise<z.output<typeof docsConfigSchema>> {
   const raw = await fs.readFile(filePath, "utf-8")
-  const parsed = parse(raw)
-  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null
+  const errors: ParseError[] = []
+  const parsed = parse(raw, errors, { allowTrailingComma: true })
+  if (errors.length > 0) {
+    throw new Error(
+      `Invalid gittydocs config at ${originalPath}: ${errors.map((error) => `${printParseErrorCode(error.error)} at offset ${error.offset}`).join(", ")}`
+    )
+  }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error(`Invalid gittydocs config at ${originalPath}: expected a JSON object.`)
+  }
   const { $schema: _schema, ...config } = parsed as Record<string, unknown>
   const result = docsConfigSchema.safeParse(config)
   if (!result.success) {
     const issues = formatZodIssues(result.error.issues)
-    throw new Error(`Invalid gittydocs config at ${filePath}:\n${issues}`)
+    throw new Error(`Invalid gittydocs config at ${originalPath}:\n${issues}`)
   }
   return result.data
 }
@@ -552,7 +598,7 @@ async function collectDocsPages(): Promise<LlmsPage[]> {
     const raw = await fs.readFile(filePath, "utf-8")
     const title = extractFrontmatterField(raw, "title") || defaultLabel(path.basename(relativePath))
     const description = extractFrontmatterField(raw, "description") || undefined
-    const body = stripFrontmatter(raw)
+    const body = toReadableMarkdown(stripFrontmatter(raw))
 
     pages.push({ routePath, sourcePath: relativePath, title, description, body })
   }
@@ -730,6 +776,10 @@ function renderLlmsTxt(nav: NavItem[], config: DocsConfig | null, llmsDir: strin
 
   for (const section of sections) {
     lines.push(`### ${section.label}`)
+    const sectionPath = normalizeLlmsPath(section.path)
+    if (sectionPath && sectionPath !== "/llms.txt") {
+      lines.push(renderNavLine(sectionPath, section.label))
+    }
     if (section.items) {
       lines.push(...renderNavItems(section.items))
     }
@@ -739,22 +789,18 @@ function renderLlmsTxt(nav: NavItem[], config: DocsConfig | null, llmsDir: strin
   return lines.join("\n").trimEnd() + "\n"
 }
 
-function renderNavItems(items: NavItem[]): string[] {
+function renderNavItems(items: NavItem[], depth = 0): string[] {
   const lines: string[] = []
 
   for (const item of items) {
-    if (item.items && item.items.length > 0) {
-      for (const child of item.items) {
-        const normalizedPath = normalizeLlmsPath(child.path)
-        if (!normalizedPath || normalizedPath === "/llms.txt") continue
-        lines.push(renderNavLine(normalizedPath, child.label))
-      }
-      continue
-    }
-
+    const indent = "  ".repeat(depth)
     const normalizedPath = normalizeLlmsPath(item.path)
-    if (!normalizedPath || normalizedPath === "/llms.txt") continue
-    lines.push(renderNavLine(normalizedPath, item.label))
+    if (normalizedPath && normalizedPath !== "/llms.txt") {
+      lines.push(indent + renderNavLine(normalizedPath, item.label))
+    } else if (item.items?.length) {
+      lines.push(`${indent}- ${item.label}`)
+    }
+    if (item.items?.length) lines.push(...renderNavItems(item.items, depth + 1))
   }
 
   return lines
@@ -818,7 +864,7 @@ async function writeLlmsSubpages(pages: LlmsPage[], llmsDir: string) {
 function renderLlmsPage(page: LlmsPage): string {
   const body = page.body.trim()
 
-  if (body.startsWith("#")) {
+  if (/^#(?:[ \t]|$)/.test(body)) {
     const endOfHeading = body.indexOf("\n")
     const headingLine = endOfHeading === -1 ? body : body.slice(0, endOfHeading)
     const rest = endOfHeading === -1 ? "" : body.slice(endOfHeading + 1).trimStart()

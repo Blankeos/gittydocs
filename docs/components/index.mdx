@@ -1,0 +1,65 @@
+---
+title: Components
+description: Built-in MDX components for steps, file trees, accordions, and code blocks.
+---
+
+Gittydocs includes authoring components directly in `.mdx` pages. **No imports, package installs, or ejection are needed.** Use the component names with their exact capitalization, and put Markdown content between the tags.
+
+| Component | Use it for |
+| --- | --- |
+| [Code blocks](/components/code-blocks) | Highlighted code with optional filename headers and a copy button. |
+| [Steps / Step](/components/steps) | Numbered instructions with optional step titles. |
+| [Files / Folder / File](/components/files) | Collapsible file trees with filename-based icons. |
+| [Accordions / Accordion](/components/accordion) | Expandable content, with single or multiple items open. |
+
+These JSX components belong in `.mdx` files. Ordinary code fences also work in `.md` files. Keep blank lines around Markdown paragraphs, lists, and code fences inside a component so they are parsed as Markdown.
+
+## Live example
+
+<Steps>
+  <Step title="Write an MDX page">
+
+Add your Markdown and built-in components to a `.mdx` file.
+
+  </Step>
+  <Step title="Preview it">
+
+Run your local docs preview and open the page. The components work without imports.
+
+  </Step>
+</Steps>
+
+Paste this directly into a page to reproduce the demo:
+
+```mdx title="guide.mdx"
+<Steps>
+  <Step title="Write an MDX page">
+
+Add your Markdown and built-in components to a `.mdx` file.
+
+  </Step>
+  <Step title="Preview it">
+
+Run your local docs preview and open the page. The components work without imports.
+
+  </Step>
+</Steps>
+```
+
+Use the individual component pages for complete prop tables and more interactive demos. Each demo is followed by a fenced example you can copy.
+
+## Markdown exports
+
+**Copy page**, its **Copy page as Markdown for LLMs** action, and generated per-page Markdown convert built-in components into portable text:
+
+| Built-in content | Markdown output |
+| --- | --- |
+| `Steps` / `Step` | Numbered step headings with the step body underneath. A missing title becomes “Step”. |
+| `Files` / `Folder` / `File` | Nested lists of filenames, folder names, and file descriptions. |
+| `Accordions` / `Accordion` | Headings with each accordion's full body, even if it starts closed. |
+
+This preserves the meaning of a page without requiring an MDX renderer. Custom JSX and imports are preserved rather than stripped or executed. Dynamic component titles or names that cannot be converted safely are left intact too.
+
+**Syntax examples stay examples:** components inside fenced code blocks or inline code are not converted. Fence language and `title` metadata are retained. Always put demonstration source—including custom `export` examples—in a code fence when you want readers to see it rather than run it.
+
+For output paths and **View as Markdown**, see [Page actions and Markdown output](/configuration#page-actions-and-markdown-output).

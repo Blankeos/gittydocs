@@ -1,0 +1,82 @@
+---
+title: Steps
+description: Present numbered instructions with the import-free Steps and Step components.
+---
+
+Wrap each instruction in `Step`, then place the steps inside `Steps`. Numbering is automatic and follows their order. A step's `title` is optional, and its body can contain ordinary Markdown, lists, links, or code fences.
+
+## Live demo
+
+<Steps>
+  <Step title="Create your docs">
+
+Scaffold a docs folder:
+
+```bash
+gittydocs new docs
+```
+
+  </Step>
+  <Step title="Preview locally">
+
+Start the preview from your project root:
+
+```bash
+gittydocs dev ./docs
+```
+
+  </Step>
+  <Step>
+
+Edit a page and save it. Local changes refresh automatically.
+
+  </Step>
+</Steps>
+
+## Syntax
+
+This reproduces the live demo. No imports are required:
+
+````mdx title="getting-started.mdx"
+<Steps>
+  <Step title="Create your docs">
+
+Scaffold a docs folder:
+
+```bash
+gittydocs new docs
+```
+
+  </Step>
+  <Step title="Preview locally">
+
+Start the preview from your project root:
+
+```bash
+gittydocs dev ./docs
+```
+
+  </Step>
+  <Step>
+
+Edit a page and save it. Local changes refresh automatically.
+
+  </Step>
+</Steps>
+````
+
+The last step intentionally has no title. It still gets a number, but does not render an empty title row.
+
+## Props
+
+| Component | Prop | Type | Default / behavior |
+| --- | --- | --- | --- |
+| `Steps` | children | `Step` elements | Ordered instructions; no additional props are required. |
+| `Step` | `title` | string | Optional; omit for a body-only instruction. |
+| `Step` | children | MDX content | The instruction body. |
+
+For a simple list with no rich content, a normal Markdown numbered list is still a good choice.
+
+## Markdown output
+
+[Markdown exports](/components#markdown-exports) turn live steps into numbered headings and preserve their bodies. The titled steps become headings such as `### 1. Create your docs`; the untitled one becomes `### 3. Step`. Fenced source examples remain code and are not expanded into a second set of instructions.

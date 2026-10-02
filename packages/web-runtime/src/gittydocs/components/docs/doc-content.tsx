@@ -1,17 +1,31 @@
 import { createMemo, Show } from "solid-js"
 import { Dynamic } from "solid-js/web"
 import { useMetadata } from "vike-metadata-solid"
+import { usePageContext } from "vike-solid/usePageContext"
 import { CopyPageButton } from "@/gittydocs/components/docs/copy-page-button"
 import { DocsFooter } from "@/gittydocs/components/docs/docs-footer"
+import { NavBreadcrumbs } from "@/gittydocs/components/docs/nav-breadcrumbs"
+import { PageNavigation } from "@/gittydocs/components/docs/page-navigation"
 import { TableOfContents } from "@/gittydocs/components/docs/table-of-contents"
 import { usePageLayout } from "@/gittydocs/hooks/use-page-layout"
-import { extractHeadingsFromMarkdown } from "@/gittydocs/lib/heading-utils"
+import { useTableOfContents } from "@/gittydocs/hooks/use-table-of-contents"
+import { resolvePage } from "@/gittydocs/lib/docs/page-layout"
+import { sourcePathByRoute } from "@/gittydocs/lib/docs/source-map.gen"
+import { getDocHeadings } from "@/gittydocs/lib/heading-utils"
 import { MdxContentStatic } from "@/gittydocs/lib/velite/mdx-content"
 import { MdxContext } from "@/gittydocs/lib/velite/mdx-context"
 import getTitle from "@/utils/get-title"
 
 export function DocContent() {
-  const { routePath, page, toc } = usePageLayout()
+  const layout = usePageLayout()
+  // Prerendered /page HTML is served at /page/ by static directory hosts.
+  // Resolve the same document on both sides of hydration; otherwise Solid keeps
+  // the SSR content visible, but the client takes the missing-page branch and
+  // never attaches the ToC handlers or creates its heading coordinator.
+  const routePath = createMemo(() => layout.routePath().replace(/\/+$/, "") || "/")
+  const page = createMemo(() => resolvePage(routePath()))
+  const toc = createMemo(() => page().toc)
+  const pageContext = usePageContext()
 
   useMetadata(() => {
     const current = page()
@@ -23,18 +37,24 @@ export function DocContent() {
 
   const mdxDoc = createMemo(() => page().mdx)
 
-  const hasHeadings = createMemo(() => {
-    if (!toc()) return false
-    const d = mdxDoc()
-    if (!d?.rawMarkdown) return false
-    return extractHeadingsFromMarkdown(d.rawMarkdown).length > 0
-  })
-
   const headings = createMemo(() => {
     const d = mdxDoc()
-    if (!d?.rawMarkdown) return []
-    return extractHeadingsFromMarkdown(d.rawMarkdown)
+    return d ? getDocHeadings(d) : []
   })
+  const hasHeadings = createMemo(() => toc() && headings().length > 0)
+
+  const tocController = useTableOfContents({
+    routePath,
+    headings,
+    hash: () =>
+      typeof window === "undefined" ? undefined : (pageContext.urlParsed.hashOriginal ?? undefined),
+  })
+
+  // Velite's sourcePath includes the runtime collection's "docs/" prefix.
+  // The generated map preserves the original docs-relative filename (including index/README).
+  const sourcePath = createMemo(
+    () => sourcePathByRoute[routePath()] ?? mdxDoc()?.sourcePath?.replace(/^docs\//, "")
+  )
 
   const customComponent = createMemo(() =>
     page().kind === "custom" ? page().CustomComponent : undefined
@@ -51,10 +71,14 @@ export function DocContent() {
           <>
             <Show when={hasHeadings()}>
               <div class="sticky top-14 z-20 w-full xl:hidden">
-                <TableOfContents headings={headings()} variant="mobile" />
+                <TableOfContents
+                  headings={headings()}
+                  controller={tocController}
+                  variant="mobile"
+                />
               </div>
             </Show>
-            <div class="w-full min-w-0 max-w-6xl">
+            <div class="flex w-full min-w-0 max-w-6xl flex-1 flex-col">
               <main
                 class={
                   hasHeadings()
@@ -62,13 +86,18 @@ export function DocContent() {
                     : "relative flex min-w-0 flex-1 flex-col px-4 py-6 md:px-6 lg:py-8 xl:px-8"
                 }
               >
-                <div class="mx-auto flex min-h-full w-full min-w-0 max-w-3xl flex-col overflow-x-hidden">
-                  <article class="prose prose-slate dark:prose-invert flex min-h-full min-w-0 max-w-none flex-col">
+                <div class="mx-auto flex w-full min-w-0 max-w-3xl flex-1 flex-col overflow-x-hidden">
+                  <article class="prose prose-slate dark:prose-invert flex min-w-0 max-w-none flex-1 flex-col">
                     <div class="flex-1">
+                      <NavBreadcrumbs routePath={routePath()} />
                       <Show when={d().title}>
                         <div class="mb-0 flex items-center justify-between">
                           <h1 class="scroll-m-20 font-bold text-3xl tracking-tight">{d().title}</h1>
-                          <CopyPageButton markdown={d().rawMarkdown ?? ""} />
+                          <CopyPageButton
+                            markdown={d().rawMarkdown ?? ""}
+                            sourcePath={sourcePath()}
+                            routePath={routePath()}
+                          />
                         </div>
                       </Show>
 
@@ -85,14 +114,19 @@ export function DocContent() {
                       </div>
                     </div>
 
+                    <PageNavigation routePath={routePath()} />
                     <DocsFooter sourcePath={d().sourcePath || d().slugAsParams} />
                   </article>
                 </div>
 
                 <Show when={hasHeadings()}>
                   <div class="hidden text-sm xl:block">
-                    <div class="sticky top-16 -mt-10 h-[calc(100vh-3.5rem)] overflow-y-auto pt-10">
-                      <TableOfContents headings={headings()} variant="desktop" />
+                    <div class="sticky top-16 -mt-10 max-h-[calc(100vh-3.5rem)] overflow-y-auto pt-10">
+                      <TableOfContents
+                        headings={headings()}
+                        controller={tocController}
+                        variant="desktop"
+                      />
                     </div>
                   </div>
                 </Show>
