@@ -1,6 +1,15 @@
-import { createEffect, createMemo, createSignal, For, onCleanup, Show } from "solid-js"
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  createUniqueId,
+  For,
+  onCleanup,
+  Show,
+} from "solid-js"
 import { Collapsible } from "@/components/ui/collapsible"
 import { HeadingInlineContent } from "@/gittydocs/components/docs/heading-inline-content"
+import type { TableOfContentsController } from "@/gittydocs/hooks/use-table-of-contents"
 import type { DocHeading } from "@/gittydocs/lib/heading-utils"
 import { cn } from "@/utils/cn"
 
@@ -8,63 +17,20 @@ export type Heading = DocHeading
 
 interface TableOfContentsProps {
   headings: Heading[]
+  controller: TableOfContentsController
   class?: string
   variant?: "desktop" | "mobile"
 }
 
 export function TableOfContents(props: TableOfContentsProps) {
-  const [activeSlug, setActiveSlug] = createSignal<string | null>(null)
+  const activeSlug = () => props.controller.activeSlug()
   const [mobileOpen, setMobileOpen] = createSignal(false)
+  const mobilePanelId = createUniqueId()
   let mobileRef: HTMLDivElement | undefined
 
   createEffect(() => {
-    const headings = props.headings
-    if (headings.length === 0) return
-
-    let lastActiveSlug: string | null = null
-    const visibleHeadings = new Set<string>()
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            visibleHeadings.add(entry.target.id)
-          } else {
-            visibleHeadings.delete(entry.target.id)
-          }
-        })
-
-        // If we have visible headings, use the first one
-        // Otherwise, keep the last active heading
-        if (visibleHeadings.size > 0) {
-          // Find the first visible heading in document order
-          const firstVisible = headings.find((h) => visibleHeadings.has(h.slug))
-          if (firstVisible) {
-            lastActiveSlug = firstVisible.slug
-            setActiveSlug(firstVisible.slug)
-          }
-        } else if (lastActiveSlug) {
-          // Keep the last active heading when scrolling past all headings
-          setActiveSlug(lastActiveSlug)
-        }
-      },
-      {
-        rootMargin: "-92px 0px -40%",
-        threshold: [0, 0.25, 0.5, 0.75, 1],
-      }
-    )
-
-    // Observe all heading elements
-    headings.forEach((heading) => {
-      const element = document.getElementById(heading.slug)
-      if (element) {
-        observer.observe(element)
-      }
-    })
-
-    onCleanup(() => {
-      observer.disconnect()
-    })
+    props.headings
+    setMobileOpen(false)
   })
 
   createEffect(() => {
@@ -88,19 +54,9 @@ export function TableOfContents(props: TableOfContentsProps) {
   })
 
   const handleClick = (e: MouseEvent, slug: string, closeMobile = false) => {
-    e.preventDefault()
-    const element = document.getElementById(slug)
-    if (element) {
-      const headerOffset = 92 // Account for sticky header (3.5rem) + mobile toc bar
-      const elementPosition = element.getBoundingClientRect().top
-      const offsetPosition = elementPosition + window.scrollY - headerOffset
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      })
-      window.history.pushState(null, "", `#${slug}`)
-      setActiveSlug(slug)
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return
+    if (props.controller.navigate(slug)) {
+      e.preventDefault()
       if (closeMobile) setMobileOpen(false)
     }
   }
@@ -112,7 +68,7 @@ export function TableOfContents(props: TableOfContentsProps) {
           type="button"
           class="flex h-9 w-full items-center justify-between gap-1.5 rounded-none border-x-0 border-t-0 border-b bg-background/95 px-3 text-xs backdrop-blur"
           aria-expanded={mobileOpen()}
-          aria-controls="mobile-toc-panel"
+          aria-controls={mobilePanelId}
           onClick={() => setMobileOpen((open) => !open)}
         >
           <span class="flex min-w-0 items-center gap-2 text-left">
@@ -144,7 +100,7 @@ export function TableOfContents(props: TableOfContentsProps) {
           </svg>
         </button>
         <Collapsible
-          id="mobile-toc-panel"
+          id={mobilePanelId}
           role="region"
           open={mobileOpen()}
           containerClass="absolute left-0 right-0 top-full z-40"
@@ -161,7 +117,7 @@ export function TableOfContents(props: TableOfContentsProps) {
                     )}
                   >
                     <a
-                      href={`#${heading.slug}`}
+                      href={`#${encodeURIComponent(heading.slug)}`}
                       onClick={(e) => handleClick(e, heading.slug, true)}
                       aria-current={activeSlug() === heading.slug ? "true" : undefined}
                       class={cn(
@@ -201,7 +157,7 @@ export function TableOfContents(props: TableOfContentsProps) {
                 )}
               >
                 <a
-                  href={`#${heading.slug}`}
+                  href={`#${encodeURIComponent(heading.slug)}`}
                   onClick={(e) => handleClick(e, heading.slug)}
                   aria-current={activeSlug() === heading.slug ? "true" : undefined}
                   class={cn(

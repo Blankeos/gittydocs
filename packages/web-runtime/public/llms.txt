@@ -11,9 +11,18 @@ Per-page markdown lives at /llms/... by default.
 - [Introduction](/llms/introduction.md): Turn a GitHub folder of Markdown/MDX into a fast, searchable docs site.
 - [Motivation](/llms/motivation.md): Why gittydocs exists.
 - [AI Docs Prompt](/llms/ai-docs-prompt.md): Let an LLM write your docs for you with our llms.txt.
-- [Configuration ⚙️](/llms/configuration.md): Everything you need to configure gittydocs from top-to-bottom (like a cheatsheet)
+- [Configuration ⚙️](/llms/configuration.md): A reference for site metadata, versions, navigation and footer links, and content.
+- [Navigation](/llms/navigation.md): Organize pages with nested groups, footer links, icons, and page navigation.
 - [CLI](/llms/cli.md): Scaffold, develop, build, and deploy with the gittydocs CLI.
 - [Theming](/llms/theming.md): Customize app.css, choose a preset, and add custom CSS.
+
+### Components
+- [Components](/llms/components/index.md): Built-in MDX components for steps, file trees, accordions, and code blocks.
+- [Code blocks](/llms/components/code-blocks.md): Add syntax highlighting, filename headers, and copyable code with Markdown fences.
+- Authoring
+  - [Steps](/llms/components/steps.md): Present numbered instructions with the import-free Steps and Step components.
+  - [Files](/llms/components/files.md): Display collapsible file trees with filename icons and optional descriptions.
+  - [Accordion](/llms/components/accordion.md): Keep optional details in import-free expandable sections.
 
 ### Deploy
 - [Deployment Overview](/llms/deploy/index.md): Pick a deployment path and understand the build output.

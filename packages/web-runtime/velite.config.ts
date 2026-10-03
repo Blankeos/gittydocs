@@ -7,6 +7,8 @@ import remarkGfm from "remark-gfm"
 import remarkGithubBlockquoteAlert from "remark-github-blockquote-alert"
 import remarkMath from "remark-math"
 import { defineConfig, s } from "velite"
+import { codeTitleTransformer } from "./src/gittydocs/lib/velite/code-title"
+import { getCompiledHeadings, rehypeExtractHeadings } from "./src/gittydocs/lib/velite/headings"
 
 export default defineConfig({
   root: "content",
@@ -41,9 +43,12 @@ export default defineConfig({
           rawMarkdown: s.raw(),
           rawText: s.custom().transform((data, { meta }) => meta.plain as string),
         })
-        .transform(async (data) => {
+        .transform(async (data, { meta }) => {
           return {
             ...data,
+            // Object fields parse concurrently; read compiler metadata only
+            // here, after s.mdx() has finished (not in a sibling field).
+            headings: getCompiledHeadings(meta),
             title: data.title ?? deriveTitle(data.rawMarkdown, data.slug),
             slugAsParams: data.slug.split("/").slice(1).join("/"),
           }
@@ -54,9 +59,18 @@ export default defineConfig({
     // jsxImportSource: "solid-jsx", ( Not needed )
     remarkPlugins: [remarkGfm, remarkMath, remarkGithubBlockquoteAlert],
     rehypePlugins: [
-      [rehypeShiki, { theme: "one-dark-pro" }],
+      [
+        rehypeShiki,
+        {
+          theme: "one-dark-pro",
+          defaultLanguage: "text",
+          fallbackLanguage: "text",
+          transformers: [codeTitleTransformer()],
+        },
+      ],
       rehypeKatex,
       rehypeSlug,
+      rehypeExtractHeadings,
       [
         rehypeAutolinkHeadings,
         {

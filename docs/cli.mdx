@@ -58,6 +58,9 @@ gittydocs dev ./docs
 If `./docs/.env` exists, it is loaded automatically (or use `--env`).
 
 Hot reload is automatic for local sources. Edit `.md/.mdx`, `gittydocs.jsonc`, `theme.css`, or files in `[static]` or `[images]` and the browser refreshes.
+
+When [site.version](/configuration#site-version) references a local `package.json` or `Cargo.toml`, that manifest is watched too, even outside the docs folder. Cargo workspace manifests used for inherited versions are also watched. If a refresh fails because a manifest was removed or became invalid, the error identifies the path or field to fix; the watcher stays alive and retries when you fix or recreate it. An invalid manifest at initial startup must be fixed before starting the server.
+
 For GitHub URLs, restart `gittydocs dev` to pull the latest content.
 
 ### `gittydocs build <GITTYDOCS_SOURCE>`

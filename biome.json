@@ -15,7 +15,11 @@
       "!**/*.cjs",
       "!**/*.mjs",
       "!**/src/route-tree.gen.ts",
-      "!**/src/gittydocs/lib/docs/*.gen.ts"
+      "!**/src/gittydocs/lib/docs/*.gen.ts",
+      "!**/src/velite-route.gen.ts",
+      "!**/.velite/**",
+      "!packages/web-runtime/content/**",
+      "!**/.gittydocs-version-manifests.json"
     ]
   },
   "linter": {

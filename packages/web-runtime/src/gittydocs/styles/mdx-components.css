@@ -1,0 +1,334 @@
+/* Higher-specificity, component-scoped rules intentionally beat prose defaults,
+   regardless of the order in which route stylesheets are loaded. */
+.prose nav[aria-label="Breadcrumb"] ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.prose nav[aria-label="Breadcrumb"] li {
+  margin: 0;
+  padding: 0;
+}
+
+.prose ol.mdx-steps {
+  counter-reset: mdx-step;
+  list-style-type: none;
+  margin: 1.5em 0;
+  padding: 0;
+}
+
+.prose .mdx-steps > .mdx-step {
+  position: relative;
+  counter-increment: mdx-step;
+  margin: 0;
+  padding: 0 0 1.5rem 2.75rem;
+  color: var(--foreground);
+  line-height: 1.75;
+}
+
+.prose .mdx-steps > .mdx-step::before {
+  content: counter(mdx-step);
+  position: absolute;
+  inset: 0 auto auto 0;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--muted);
+  color: var(--foreground);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.prose .mdx-steps > .mdx-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 2rem;
+  bottom: 0.25rem;
+  left: calc(0.875rem - 0.5px);
+  width: 1px;
+  background: var(--border);
+}
+
+.prose .mdx-steps > .mdx-step:last-child {
+  padding-bottom: 0;
+}
+
+.prose .mdx-step-title {
+  margin: 0 0 0.5rem;
+  min-height: 1.75rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+  overflow-wrap: anywhere;
+}
+
+.prose .mdx-accordion-trigger > span {
+  min-width: 0;
+}
+
+.prose .mdx-step-body,
+.prose .mdx-accordion-body {
+  min-width: 0;
+}
+
+.prose :is(.mdx-step-body, .mdx-accordion-body) > :first-child {
+  margin-top: 0;
+}
+
+.prose :is(.mdx-step-body, .mdx-accordion-body) > :last-child {
+  margin-bottom: 0;
+}
+
+.prose .mdx-files {
+  margin: 1.5em 0;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--muted);
+}
+
+.prose .mdx-files ul.mdx-files-list {
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0;
+}
+
+.prose .mdx-files :is(.mdx-file, .mdx-folder) {
+  margin: 0;
+  padding: 0;
+  color: var(--foreground);
+  line-height: 1.5;
+}
+
+.prose .mdx-files :is(.mdx-file, .mdx-folder-trigger) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.prose .mdx-files .mdx-file {
+  flex-wrap: wrap;
+}
+
+/* Empty slot the same size as the folder chevron, so a file icon sits exactly
+   where a sibling folder's folder icon sits at any depth. No magic left
+   padding: indentation compounds only from nested .mdx-folder-children. */
+.prose .mdx-files .mdx-file-spacer {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+}
+
+.prose .mdx-file-icon {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--muted-foreground);
+}
+
+.prose .mdx-file-name {
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  overflow-wrap: anywhere;
+}
+
+.prose .mdx-file-description {
+  color: var(--muted-foreground);
+  font-size: 0.875em;
+  overflow-wrap: anywhere;
+}
+
+/* One guide per nesting level, drawn as a positioned pseudo so its 1px width
+   never shifts layout. margin-left (1rem) centers the guide under the parent
+   chevron (row padding 0.5rem + half chevron 0.5rem); padding-left (0.5rem)
+   makes each level indent exactly 1.5rem, so a child chevron lands under its
+   parent file/folder icon at every depth. */
+.prose .mdx-files ul.mdx-files-list.mdx-folder-children {
+  position: relative;
+  margin: 0.125rem 0 0.125rem 1rem;
+  padding-left: 0.5rem;
+}
+
+.prose .mdx-files .mdx-folder-children::before {
+  content: "";
+  position: absolute;
+  top: 0.125rem;
+  bottom: 0.125rem;
+  left: 0;
+  width: 1px;
+  border-radius: 1px;
+  background: var(--border);
+  pointer-events: none;
+}
+
+.prose :is(.mdx-folder-trigger, .mdx-accordion-trigger) {
+  list-style-type: none;
+  cursor: pointer;
+}
+
+.prose :is(.mdx-folder-trigger, .mdx-accordion-trigger)::-webkit-details-marker {
+  display: none;
+}
+
+.prose :is(.mdx-folder-trigger, .mdx-accordion-trigger)::marker {
+  content: "";
+}
+
+.prose :is(.mdx-folder-trigger, .mdx-accordion-trigger):hover {
+  background: color-mix(in oklch, var(--foreground) 4%, transparent);
+}
+
+.prose :is(.mdx-folder-trigger, .mdx-accordion-trigger):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+.prose .mdx-disclosure-chevron {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  color: var(--muted-foreground);
+  transition: transform 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.prose :is(.mdx-folder-disclosure, .mdx-accordion)[open] > summary .mdx-disclosure-chevron {
+  transform: rotate(90deg);
+}
+
+/* Contain body margins without padding the animated box or changing its native
+   initial open state. The measured fallback can return to natural height at rest. */
+.prose .mdx-disclosure-content {
+  display: flow-root;
+}
+
+/* Keep all three checks in sync with disclosure-animation.ts. Chromium 131+
+   animates both directions natively, including name-group closes and reversals.
+   Scope intrinsic interpolation to the pseudo, not arbitrary MDX descendants. */
+@supports selector(::details-content) and
+  (interpolate-size: allow-keywords) and
+  (transition-behavior: allow-discrete) {
+  .prose :is(.mdx-folder-disclosure, .mdx-accordion)::details-content {
+    interpolate-size: allow-keywords;
+    height: 0;
+    overflow: clip;
+    transition:
+      height 220ms cubic-bezier(0.2, 0, 0, 1),
+      content-visibility 220ms allow-discrete;
+  }
+
+  .prose :is(.mdx-folder-disclosure, .mdx-accordion)[open]::details-content {
+    height: auto;
+  }
+}
+
+/* Safari/Firefox: hold the native content slot visible ONLY while the measured
+   wrapper animates. Never restore open on a closing exclusive-group member. */
+@supports selector(::details-content) {
+  .prose [data-mdx-disclosure-fallback][data-mdx-disclosure-animating]::details-content {
+    content-visibility: visible;
+  }
+
+  .prose [data-mdx-disclosure-fallback][data-mdx-disclosure-animating] > .mdx-disclosure-content {
+    overflow: clip;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prose .mdx-disclosure-chevron {
+    transition: none;
+  }
+
+  @supports selector(::details-content) {
+    .prose :is(.mdx-folder-disclosure, .mdx-accordion)::details-content {
+      transition: none;
+    }
+  }
+}
+
+.prose .mdx-accordions {
+  margin: 1.5em 0;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+
+.prose .mdx-accordion {
+  scroll-margin-top: 5rem;
+}
+
+.prose .mdx-accordions > .mdx-accordion + .mdx-accordion {
+  border-top: 1px solid var(--border);
+}
+
+.prose .mdx-accordion-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  color: var(--foreground);
+  font-weight: 500;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.prose .mdx-accordion-body {
+  padding: 0.25rem 1rem 1rem;
+}
+
+/* Only titled fences change the global copy layout. Untitled fences keep the
+   existing floating button and code padding from prose.css. */
+.prose .code-block[data-titled="true"] .mdx-code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.45rem 0.65rem 0.45rem 1rem;
+  border-bottom: 1px solid var(--code-block-border);
+  background: color-mix(in oklch, var(--code-block-fg) 4%, var(--code-block-bg));
+  color: var(--code-block-fg);
+}
+
+.prose .code-block[data-titled="true"] .mdx-code-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  max-width: calc(100% - 2.45rem);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.prose .code-block[data-titled="true"] .mdx-file-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: inherit;
+}
+
+.prose .code-block[data-titled="true"] .mdx-code-filename {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prose .code-block[data-titled="true"] .mdx-code-header .code-block-copy {
+  position: static;
+  flex: none;
+}
+
+.prose .code-block[data-titled="true"] pre {
+  padding-right: 1em;
+}

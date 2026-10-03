@@ -10,6 +10,44 @@
           "type": "string",
           "description": "Site title"
         },
+        "version": {
+          "description": "Version label or manifest path, relative to the original docs/config folder",
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "description": "Literal version label"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "packageJson": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Path to package.json"
+                }
+              },
+              "required": [
+                "packageJson"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "cargoToml": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Path to Cargo.toml"
+                }
+              },
+              "required": [
+                "cargoToml"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
         "description": {
           "description": "Short site description used in /llms.txt",
           "type": "string"
@@ -65,6 +103,52 @@
       "items": {
         "$ref": "#/definitions/__schema0"
       }
+    },
+    "navFooter": {
+      "description": "Ordered sidebar footer links, alongside llms.txt and above the site version",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Footer navigation label"
+          },
+          "path": {
+            "type": "string",
+            "description": "Route path or external URL"
+          },
+          "icon": {
+            "description": "Built-in navigation icon name (unknown names use file)",
+            "type": "string"
+          },
+          "newTab": {
+            "description": "Open in a new tab (default: true for external HTTP(S) URLs, false for internal routes)",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "label",
+          "path"
+        ],
+        "additionalProperties": false,
+        "description": "Footer navigation link (no groups or collapsible sections)"
+      }
+    },
+    "ui": {
+      "description": "Page navigation controls",
+      "type": "object",
+      "properties": {
+        "breadcrumbs": {
+          "description": "Show page breadcrumbs (default: true)",
+          "type": "boolean"
+        },
+        "pageNavigation": {
+          "description": "Show previous/next page links (default: true)",
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
     },
     "links": {
       "description": "External links",
@@ -150,6 +234,18 @@
         },
         "accordion": {
           "description": "Render as collapsible section",
+          "type": "boolean"
+        },
+        "icon": {
+          "description": "Built-in navigation icon name (unknown names use file)",
+          "type": "string"
+        },
+        "newTab": {
+          "description": "Open this navigation link in a new tab",
+          "type": "boolean"
+        },
+        "defaultOpen": {
+          "description": "Initially expand this collapsible section",
           "type": "boolean"
         }
       },

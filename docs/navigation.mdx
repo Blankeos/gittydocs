@@ -1,0 +1,200 @@
+---
+title: Navigation
+description: Organize pages with nested groups, footer links, icons, and page navigation.
+---
+
+Gittydocs derives navigation from your file structure by default. Set `nav` in `gittydocs.jsonc` to choose your own labels, ordering, groups, and external links. The same structure supplies breadcrumb ancestry, previous/next ordering, and search-result groups. Use `navFooter` for a separate ordered list of links in the sidebar's bottom region.
+
+## Recursive groups
+
+Every navigation item can contain `items`, so a group can contain links or more groups. Nesting is unrestricted, but **one sublevel is recommended; keep to two at most for readability**. This is an authoring recommendation, not a schema limit.
+
+This example mirrors the Components section on this site:
+
+```jsonc title="gittydocs.jsonc"
+{
+  "nav": [
+    {
+      "label": "Components",
+      "path": "/components",
+      "icon": "package",
+      "items": [
+        { "label": "Code blocks", "path": "/components/code-blocks", "icon": "code" },
+        {
+          "label": "Authoring",
+          "icon": "book",
+          "accordion": true,
+          "defaultOpen": true,
+          "items": [
+            { "label": "Steps", "path": "/components/steps", "icon": "hash" },
+            { "label": "Files", "path": "/components/files", "icon": "folder" },
+            { "label": "Accordion", "path": "/components/accordion", "icon": "file" },
+          ],
+        },
+      ],
+    },
+  ],
+  "navFooter": [
+    { "label": "GitHub", "path": "https://github.com/blankeos/gittydocs", "icon": "github" },
+  ],
+}
+```
+
+A group is always expanded unless `accordion: true` makes it collapsible. Collapsible groups start closed unless `defaultOpen: true` is set. The ancestors of the active page expand automatically on initial load and when you navigate to a descendant. Readers can still collapse them manually.
+
+A group with a `path` links to its own page. Without a `path`, its label automatically links to the first known internal page in its descendants, in navigation order. Nested groups are searched recursively; external links and missing pages are skipped. For collapsible groups, the **label navigates** and the **separate chevron button toggles** the children. In the example, Components opens `/components`, while Authoring opens Steps. A group with no available internal page remains a label, or a whole-row toggle if collapsible.
+
+Toggle buttons work with Enter or Space, have accessible names, and expose their expanded state to screen readers. A linked group's separate toggle lets keyboard and screen-reader users expand it without navigating away. Expansion/collapse and chevron changes are animated, with motion removed when the reader requests [reduced motion](/theming#reduced-motion).
+
+The label and toggle share a full-width hover highlight, so collapsible headings look like one row while keeping navigation and disclosure independently accessible. The chevron button has no background of its own, including during hover transitions; only the shared row background changes. Chevrons keep their muted color on hover and animate only their rotation when expanding or collapsing a group, at every nesting level.
+
+When the group label already links to an overview, do not repeat that same path as an Overview child. Each internal page should normally appear once in your navigation.
+
+## Item options
+
+All levels of `nav` use the same item shape. Footer links use a [separate, link-only shape](#footer-links).
+
+| Field | Type | Default / behavior |
+| --- | --- | --- |
+| `label` | string | Required label. |
+| `path` | string | Optional internal page route or external URL. |
+| `items` | array of navigation items | Optional recursive children. |
+| `accordion` | boolean | `false`; set `true` to make a group collapsible. |
+| `defaultOpen` | boolean | `false`; initial expansion for a collapsible group. Active ancestors expand regardless. |
+| `icon` | string | Optional curated icon name. |
+| `newTab` | boolean | External HTTP(S) links default to `true`; internal links default to `false`. |
+
+Use paths such as `/components/files`, not the source filename `components/files.mdx`. Navigation does not create pages; add a source file for every internal page route you link to.
+
+## Icons
+
+Add an `icon` field to any page link, section heading, subsection, or `navFooter` link in `gittydocs.jsonc`:
+
+```jsonc title="gittydocs.jsonc"
+{
+  "nav": [
+    {
+      "label": "Guide",
+      "icon": "book",
+      "items": [
+        { "label": "Getting started", "path": "/getting-started", "icon": "rocket" },
+        { "label": "Configuration", "path": "/configuration", "icon": "settings" },
+      ],
+    },
+  ],
+}
+```
+
+Icons are optional: omit `icon` for no sidebar icon. There are **11 supported names**, not a full icon-library catalog. Navigation uses bundled Lucide icons, plus the GitHub brand mark:
+
+- `file`
+- `book`
+- `code`
+- `terminal`
+- `folder`
+- `rocket`
+- `hash`
+- `link`
+- `package`
+- `github`
+- `settings`
+
+Names are case-insensitive and whitespace is trimmed. This is a curated, bundled set—not an arbitrary Lucide or Iconify identifier, import path, or image URL. An unrecognized name falls back to `file`; omit `icon` to leave the sidebar item undecorated. Configured icons are also used for page results in search and linked breadcrumb/previous-next controls.
+
+File-tree and code-header icons use a separate [filename-based vocabulary](/components/files#icons).
+
+## External links and new tabs
+
+External HTTP(S) URLs open in a new tab by default. Set `newTab: false` to keep an external destination in the current tab:
+
+```jsonc
+{
+  "label": "GitHub",
+  "path": "https://github.com/blankeos/gittydocs",
+  "icon": "github",
+  "newTab": false,
+}
+```
+
+Conversely, set `newTab: true` on an internal link to open that page in a new tab. All navigation links that open a new tab show an arrow and announce the behavior to screen readers, including internal links and the built-in `llms.txt` footer link. External URLs are not sent through the internal page router.
+
+## Footer links
+
+Set `navFooter` to add links such as GitHub or a community site without creating a Resources section in the main navigation:
+
+```jsonc title="gittydocs.jsonc"
+{
+  "navFooter": [
+    { "label": "GitHub", "path": "https://github.com/blankeos/gittydocs", "icon": "github" },
+    { "label": "Contact", "path": "/contact", "icon": "link" },
+  ],
+}
+```
+
+Each entry requires `label` and `path`; only `icon` and `newTab` are optional. This is a strict, flat list of links: `items`, `accordion`, `defaultOpen`, and other fields are rejected. Footer links use the same [icons](#icons) and safe new-tab behavior as main navigation links: external HTTP(S) URLs default to a new tab, internal routes stay in the current tab, and `newTab` overrides either default. New tabs use safe `rel="noopener noreferrer"` attributes, an arrow, and a screen-reader announcement.
+
+Links appear in array order as compact stacked rows in the **same bottom footer group as `llms.txt`**, not in the scrollable page-navigation sections. Gittydocs still adds `llms.txt` automatically when LLM output is enabled; it opens in a new tab and shows the arrow. Do not add it to `nav` or `navFooter` yourself. A configured [site version](/configuration#site-version) sits **below all footer links**, with its left edge aligned to the footer icons.
+
+Omit `navFooter` or use `[]` for no custom footer links. Disabling LLM output hides only the automatic `llms.txt` link; configured footer links and the version remain available. Gittydocs does **not** generate a GitHub footer link from `links.github` or `site.repo`: add it explicitly to `navFooter`, and remove it from `nav` if you want it only in the footer.
+
+Footer links do not supply breadcrumb ancestry, previous/next ordering, or search-result groups; those continue to come from `nav`. Internal footer destinations still need real page files, and remain searchable like other pages.
+
+## Breadcrumbs
+
+Breadcrumbs follow navigation ancestry, not guessed URL segments. On this site's Files page, the trail is **Components › Authoring › Files**:
+
+- **Components** is clickable because its `path` points to the real `/components` page.
+- **Authoring** links to Steps, its first internal page, because it has no landing-page path.
+- **Files** identifies the current page.
+
+An ancestor with its own internal path links to that known page. Pathless groups link to their first known internal descendant, just like sidebar headings. Groups with no available page, external destinations, and missing explicit page paths remain labels. A real page omitted from custom navigation falls back to its page title rather than a fabricated folder label.
+
+## Previous and next pages
+
+Previous/next controls follow depth-first navigation order: a clickable group landing comes before its children, then the next sibling. Only **known internal page routes** participate. Pathless groups, external links, `llms.txt`, and paths without a page are skipped.
+
+Routes are deduplicated, keeping their first occurrence. Query strings, fragments, and trailing slashes do not create additional page-navigation entries. A page omitted from custom navigation has no previous/next controls. Known custom pages can be destinations, but their own layouts are not wrapped in the Markdown/MDX page controls.
+
+Previous/next controls and the page footer stay together at the bottom of the viewport on short Markdown/MDX pages. On longer pages, they follow the content normally; they are not fixed overlays.
+
+Breadcrumbs and previous/next links are enabled by default on Markdown/MDX pages. Disable either independently:
+
+```jsonc title="gittydocs.jsonc"
+{
+  "ui": {
+    "breadcrumbs": false,
+    "pageNavigation": false,
+  },
+}
+```
+
+Omit these options or set them to `true` to show the controls again.
+
+## Search
+
+Open search with **Ctrl+K** (Windows/Linux) or **Cmd+K** (macOS). Results include pages and individual Markdown headings; choosing a heading opens its anchor directly. Page matches can show highlighted content snippets.
+
+Results are grouped by their navigation ancestors, including recursive groups. In the example, Code blocks belongs to **Components**, while Steps, Files, and Accordion belong to **Components › Authoring**. Page and heading results share this navigation-derived context. Empty search shows browsable pages alongside available quick actions such as theme switching and Open GitHub.
+
+Navigation is not a search allowlist: pages omitted from `nav` remain searchable. Custom `.tsx`/`.jsx` pages are searchable by title and description, but their rendered JSX is not indexed for body text or heading anchors. Private underscore-prefixed component folders are excluded.
+
+Use **↑ / ↓** to select a result, **Enter** to open it, and **Escape** to close search. The footer displays the navigation/open keyboard hints and the current page or result count.
+
+## Spacing
+
+Top-level section headings are flush. Their direct page links and subsection headings indent one step; pages and deeper descendants beneath a subsection indent two steps. Section and subsection headings have the same row height and padding as page links, with slightly smaller, muted text rather than uppercase labels. For example:
+
+```text
+Components
+  Code blocks
+  Authoring
+    Steps
+    Files
+    Accordion
+
+Deploy
+  Overview
+  GitHub Pages
+```
+
+Rows within a section have no extra gaps, including around subsection headings. Only **top-level sections** are separated by a gap. Adjust that gap with `--docs-nav-section-gap` and the per-level indentation step with `--docs-nav-indent` in your theme CSS. See [Navigation spacing](/theming#navigation-spacing) for defaults and an override example.

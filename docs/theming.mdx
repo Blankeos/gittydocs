@@ -55,6 +55,32 @@ To use a different filename or path (relative to your docs folder), point to it 
 
 If you need full control (new layout, typography, or structure changes), eject and edit `src/styles/app.css` directly.
 
+## Navigation spacing
+
+You can adjust sidebar spacing without changing the layout or ejecting. Add overrides to your custom CSS file:
+
+```css title="theme.css"
+:root {
+  --docs-nav-section-gap: 1.25rem;
+  --docs-nav-indent: 1rem;
+}
+```
+
+| Variable | Default | Controls |
+| --- | --- | --- |
+| `--docs-nav-section-gap` | `1.25rem` | Space between top-level navigation sections. |
+| `--docs-nav-indent` | `0.75rem` | Indentation step per hierarchy level beneath a top-level section. |
+
+Top-level section headings are flush. Direct pages and subsection headings indent one step; pages beneath a subsection indent two steps. Section and subsection headings share the same typography. Rows have no extra gaps within a section or around subsections. `--docs-nav-section-gap` applies **only between top-level sections**, not between individual rows.
+
+These are CSS lengths, not config fields. Omit the overrides to keep the default design. Footer links sit with the automatic `llms.txt` link as compact rows in a separate bottom group, above the version; version text aligns with the link labels rather than their icons. Configure those links with [`navFooter`](/navigation#footer-links), not a CSS setting. For group structure, icons, and collapsible sections, see [Navigation](/navigation).
+
+## Reduced motion
+
+Sidebar collapsible groups, [Files folders](/components/files), and [Accordion sections](/components/accordion) animate their expansion and collapse, including their disclosure chevrons. They respect the reader's `prefers-reduced-motion: reduce` setting by removing those animations while keeping the same open/close behavior and keyboard controls.
+
+If you add motion in custom theme CSS, honor the same preference. For example, disable your custom transitions or animations inside an `@media (prefers-reduced-motion: reduce)` rule rather than forcing motion back onto the built-in disclosures.
+
 ## Customize with tweakcn
 
 The live preview script is included out of the box, so you can just open:

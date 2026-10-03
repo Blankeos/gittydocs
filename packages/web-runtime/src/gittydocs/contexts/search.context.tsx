@@ -1,21 +1,16 @@
 "use client"
 
-import { type Docs, docs } from "@velite"
-import { type Accessor, createContext, type JSX, useContext } from "solid-js"
-import {
-  type CreateFlexSearchIndexResult,
-  createFlexSearchIndex,
-} from "@/gittydocs/hooks/use-flex-search"
+import { createContext, createMemo, type JSX, useContext } from "solid-js"
+import { useDocsContext } from "@/gittydocs/contexts/docs.context"
+import { createDocsSearch, type DocsSearchGroup } from "@/gittydocs/lib/search-utils"
 
 type SearchContextValue = {
-  searchDocs: CreateFlexSearchIndexResult<Docs>["search"]
-  docsIndexIsReady: Accessor<boolean>
+  searchDocs: (query: string) => DocsSearchGroup[]
 }
 
 const SearchContext = createContext<SearchContextValue>({
   searchDocs: () => [],
-  docsIndexIsReady: () => false,
-} as SearchContextValue)
+})
 
 export const useSearchContext = () => useContext(SearchContext)
 
@@ -24,23 +19,10 @@ type SearchContextProviderProps = {
 }
 
 export const SearchContextProvider = (props: SearchContextProviderProps) => {
-  const { search: searchDocs, indexIsReady: docsIndexIsReady } = createFlexSearchIndex(docs, {
-    indexerFn: (data) => {
-      return `${data.title} ${data.rawText}`
-    },
-    highlightableTextFn: (data) => {
-      return data.rawText
-    },
-  })
+  const docs = useDocsContext()
+  const searchIndex = createMemo(() => createDocsSearch(docs.pages, docs.navigation))
 
-  return (
-    <SearchContext.Provider
-      value={{
-        searchDocs,
-        docsIndexIsReady,
-      }}
-    >
-      {props.children}
-    </SearchContext.Provider>
-  )
+  const searchDocs = (query: string) => searchIndex()(query)
+
+  return <SearchContext.Provider value={{ searchDocs }}>{props.children}</SearchContext.Provider>
 }

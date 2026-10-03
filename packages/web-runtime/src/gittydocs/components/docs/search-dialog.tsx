@@ -1,16 +1,18 @@
-import { createMemo, createSignal, Show } from "solid-js"
+import { createEffect, createMemo, createSignal, For, Show } from "solid-js"
 import { navigate } from "vike/client/router"
 import { IconMoon, IconSun } from "@/assets/icons"
 import {
-  Command,
   CommandDialog,
-  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
+import { DocsIcon, NewTabIndicator } from "@/gittydocs/components/docs/docs-icon"
 import { useSearchContext } from "@/gittydocs/contexts/search.context"
+import { isExternalHref, opensInNewTab } from "@/gittydocs/lib/nav-utils"
+import type { DocsSearchResult } from "@/gittydocs/lib/search-utils"
+import { withBasePath } from "@/utils/base-path"
 
 interface SearchDialogProps {
   open: boolean
@@ -22,118 +24,193 @@ interface SearchDialogProps {
 
 export function SearchDialog(props: SearchDialogProps) {
   const [query, setQuery] = createSignal("")
-  const [docsResults, setDocsResults] = createSignal<ReturnType<typeof searchDocs>>([])
   const { searchDocs } = useSearchContext()
+  const groups = createMemo(() => searchDocs(query()))
+  const resultCount = createMemo(() =>
+    groups().reduce((count, group) => count + group.results.length, 0)
+  )
+  const isSearching = createMemo(() => query().trim().length > 0)
+  const hasQuickActions = createMemo(() => Boolean(props.onToggleTheme || props.githubUrl))
 
-  const noResults = createMemo(() => {
-    return docsResults().length === 0
+  createEffect(() => {
+    if (!props.open) setQuery("")
   })
 
-  const hasQuickActions = createMemo(() => {
-    return Boolean(props.onToggleTheme || props.githubUrl)
-  })
+  function closeDialog() {
+    props.onOpenChange(false)
+    setQuery("")
+  }
 
-  function handleCommandInput(value: string) {
-    setQuery(value)
-
-    if (!value) {
-      clearResults()
-    } else {
-      const _docsResults = searchDocs(value)
-      setDocsResults(_docsResults)
+  async function selectResult(result: DocsSearchResult) {
+    closeDialog()
+    const external = isExternalHref(result.href)
+    const href = external ? result.href : withBasePath(result.href)
+    if (external || (result.navItem && opensInNewTab(result.navItem))) {
+      window.open(href, "_blank", "noopener,noreferrer")
+      return
+    }
+    await navigate(href)
+    if (result.heading) {
+      // Also handle selecting an anchor on the current route. The initial hash
+      // and event let the ToC initialize its active item after route hydration.
+      requestAnimationFrame(() => {
+        const heading = document.getElementById(result.heading!.slug)
+        heading?.scrollIntoView({ block: "start" })
+        window.dispatchEvent(new Event("hashchange"))
+      })
     }
   }
 
-  function clearResults() {
-    setQuery("")
-    setDocsResults([])
-  }
-
   return (
-    <CommandDialog open={props.open} onOpenChange={props.onOpenChange}>
-      <Command shouldFilter={false}>
-        <CommandInput placeholder="Search documentation..." onValueChange={handleCommandInput} />
-        <CommandList>
-          <Show when={query().length === 0 && hasQuickActions()}>
-            <CommandGroup heading="Quick actions" class="md:hidden">
-              <Show when={props.onToggleTheme && props.themeLabel}>
-                <CommandItem
-                  onSelect={() => {
-                    props.onToggleTheme?.()
-                    props.onOpenChange(false)
-                    clearResults()
-                  }}
-                  class="gap-2"
+    <CommandDialog
+      open={props.open}
+      onOpenChange={(open) => {
+        props.onOpenChange(open)
+        if (!open) setQuery("")
+      }}
+      title="Search documentation"
+      description="Find documentation pages and headings. Use the arrow keys to move and Enter to open a result."
+      commandProps={{ shouldFilter: false, loop: true, label: "Search documentation" }}
+    >
+      <CommandInput
+        placeholder="Search documentation…"
+        aria-label="Search documentation"
+        value={query()}
+        onValueChange={setQuery}
+        onClose={closeDialog}
+      />
+      <CommandList class="px-0 py-1">
+        <Show when={!isSearching() && hasQuickActions()}>
+          <CommandGroup heading="Quick actions">
+            <Show when={props.onToggleTheme}>
+              <CommandItem
+                value="action:toggle-theme"
+                onSelect={() => {
+                  props.onToggleTheme?.()
+                  closeDialog()
+                }}
+                class="gap-2 px-3 py-1.5"
+              >
+                <span
+                  aria-hidden="true"
+                  class="flex size-7 shrink-0 items-center justify-center rounded-none border bg-background text-muted-foreground"
                 >
                   <Show
                     when={props.themeLabel?.toLowerCase().includes("dark")}
-                    fallback={<IconSun class="h-4 w-4" />}
+                    fallback={<IconSun class="size-4" />}
                   >
-                    <IconMoon class="h-4 w-4" />
+                    <IconMoon class="size-4" />
                   </Show>
-                  <span>{props.themeLabel}</span>
-                </CommandItem>
-              </Show>
-              <Show when={props.githubUrl}>
-                {(url) => (
-                  <CommandItem
-                    onSelect={() => {
-                      if (typeof window !== "undefined") {
-                        window.open(url(), "_blank", "noopener,noreferrer")
-                      }
-                      props.onOpenChange(false)
-                      clearResults()
-                    }}
-                    class="gap-2"
+                </span>
+                <span>{props.themeLabel || "Toggle theme"}</span>
+              </CommandItem>
+            </Show>
+            <Show when={props.githubUrl}>
+              {(url) => (
+                <CommandItem
+                  value="action:open-github"
+                  onSelect={() => {
+                    window.open(url(), "_blank", "noopener,noreferrer")
+                    closeDialog()
+                  }}
+                  class="gap-2 px-3 py-1.5"
+                >
+                  <span
+                    aria-hidden="true"
+                    class="flex size-7 shrink-0 items-center justify-center rounded-none border bg-background text-muted-foreground"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      class="h-4 w-4"
+                    <DocsIcon name="github" class="size-4" />
+                  </span>
+                  <span>Open GitHub</span>
+                  <span class="ml-auto inline-flex">
+                    <NewTabIndicator />
+                  </span>
+                </CommandItem>
+              )}
+            </Show>
+          </CommandGroup>
+        </Show>
+
+        <Show when={resultCount() === 0}>
+          <div role="status" class="px-3 py-6 text-center text-muted-foreground text-sm">
+            <Show when={isSearching()} fallback="No documentation pages available yet.">
+              No results for <span class="font-medium text-foreground">“{query().trim()}”</span>.
+              <p class="mt-1 text-xs">Try a page title, heading, or a shorter phrase.</p>
+            </Show>
+          </div>
+        </Show>
+
+        <For each={groups()}>
+          {(group) => (
+            <CommandGroup heading={group.label}>
+              <For each={group.results}>
+                {(result) => (
+                  <CommandItem
+                    value={result.id}
+                    onSelect={() => void selectResult(result)}
+                    class="gap-2 px-3 py-1.5 text-start"
+                  >
+                    <span
+                      aria-hidden="true"
+                      class="flex size-8 shrink-0 items-center justify-center rounded-none border bg-background text-muted-foreground"
                     >
-                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                    </svg>
-                    <span>Open GitHub</span>
+                      <Show
+                        when={result.kind === "heading"}
+                        fallback={<DocsIcon name={result.icon} class="size-4" />}
+                      >
+                        <span class="font-mono text-base">#</span>
+                      </Show>
+                    </span>
+                    <div class="min-w-0 flex-1">
+                      <div class="truncate font-medium text-sm">{result.title}</div>
+                      <div class="mt-0.5 truncate text-muted-foreground text-xs">
+                        {result.context}
+                      </div>
+                      <Show when={result.highlights.length > 0 && isSearching()}>
+                        <p class="mt-1 line-clamp-2 break-words text-muted-foreground text-xs leading-relaxed">
+                          <For each={result.highlights}>
+                            {(segment) => (
+                              <Show when={segment.matched} fallback={segment.text}>
+                                <mark class="rounded-sm bg-accent px-0.5 font-medium text-accent-foreground">
+                                  {segment.text}
+                                </mark>
+                              </Show>
+                            )}
+                          </For>
+                        </p>
+                      </Show>
+                    </div>
+                    <span class="sr-only">{result.kind === "heading" ? "Heading" : "Page"}</span>
                   </CommandItem>
                 )}
-              </Show>
+              </For>
             </CommandGroup>
-          </Show>
-
-          <Show when={noResults() && query().length > 0}>
-            <CommandEmpty>No results found.</CommandEmpty>
-          </Show>
-
-          <Show when={query().length === 0}>
-            <CommandEmpty>Type to search documentation...</CommandEmpty>
-          </Show>
-
-          <Show when={docsResults().length > 0}>
-            <CommandGroup heading="Documentation">
-              {docsResults().map((doc) => (
-                <CommandItem
-                  onSelect={() => {
-                    const path = doc.slugAsParams === "" ? "/" : `/${doc.slugAsParams}`
-                    navigate(path)
-                    props.onOpenChange(false)
-                    clearResults()
-                  }}
-                  class="flex flex-col items-start justify-start text-start"
-                >
-                  <span class="text-start">{doc.title}</span>
-                  <Show when={doc.highlights && doc.highlights.length > 0}>
-                    <div
-                      class="line-clamp-2 text-muted-foreground text-xs"
-                      innerHTML={`...${doc.highlights?.join("...")}...`}
-                    />
-                  </Show>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Show>
-        </CommandList>
-      </Command>
+          )}
+        </For>
+      </CommandList>
+      <div class="flex items-center justify-between gap-3 border-t bg-muted/30 px-3 py-2 text-muted-foreground text-xs">
+        <div aria-hidden="true" class="flex items-center gap-3">
+          <span class="flex items-center gap-1.5">
+            <kbd class="rounded border bg-background px-1 font-mono text-[10px]">↑</kbd>
+            <kbd class="rounded border bg-background px-1 font-mono text-[10px]">↓</kbd>
+            <span class="hidden sm:inline">Navigate</span>
+          </span>
+          <span class="flex items-center gap-1.5">
+            <kbd class="rounded border bg-background px-1 font-mono text-[10px]">↵</kbd>
+            Open
+          </span>
+        </div>
+        <span role="status" aria-live="polite" aria-atomic="true">
+          {resultCount()}{" "}
+          {isSearching()
+            ? resultCount() === 1
+              ? "result"
+              : "results"
+            : resultCount() === 1
+              ? "page"
+              : "pages"}
+        </span>
+      </div>
     </CommandDialog>
   )
 }

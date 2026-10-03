@@ -15,11 +15,13 @@ Write docs in Markdown. Push to GitHub. Get a beautiful docs site.
 
 - **LLMs-ready** — Automatic llms.txt generation, so AI agents can explore your docs with efficient tokens
 - **Easy & Minimal** — One `.jsonc` config file, a couple of `.mdx`, push to GitHub, deploy anywhere
-- **Partial-Text Search** — `Ctrl+K` to search (w/ flexsearch)
+- **Partial-Text Search** — `Ctrl+K` / `Cmd+K` to find pages and headings, grouped by navigation (w/ flexsearch)
 - **Table of Contents** — Auto-generated with scroll spy showing current section
 - **Copy Page** — Copy entire page as Markdown with one click
-- **Dark Mode** — Built-in toggle`
-- **GitHub Integration** — "Edit this page" links
+- **MDX Components** — Import-free [steps, file trees, accordions, and titled code blocks](/components)
+- **Navigation** — [Nested groups, icons, breadcrumbs, and previous/next links](/navigation)
+- **Dark Mode** — Built-in toggle
+- **GitHub Integration** — "Edit this page" links and "Open in GitHub" page actions
 - **Fully Customizable** — Built on Velite + Vike + Solid. Eject anytime and own your stack
 - **Static Export** — Deploy to any host
 
@@ -27,30 +29,35 @@ Write docs in Markdown. Push to GitHub. Get a beautiful docs site.
 
 To get started, all you really need is a folder with `.mdx` and `gittydocs.jsonc` files. But for convenience, you can also use the CLI to scaffold.
 
-1. Scaffold with the CLI:
+<Steps>
+<Step title="Scaffold with the CLI">
 
 ```bash
 npx gittydocs@latest new docs # Creates a "docs" folder
 npx gittydocs@latest dev docs # Live preview & hot-reload
 ```
 
-> This creates this file structure:
->
-> ```sh
-> 📁 docs
-> ├── 📁 [static]           # assets are stored here
-> │   └── logo.svg
-> ├── gittydocs.jsonc       # config
-> ├── index.tsx             # optional custom landing (/)
-> ├── introduction.mdx      # /introduction
-> ├── getting-started.mdx   # a page
-> └── theme.css             # custom styles
-> ```
+This creates this file structure:
 
-2. (Optional) Recommended: add a dev script in your repo:
+<Files>
+  <Folder name="docs" defaultOpen>
+    <Folder name="[static]" defaultOpen>
+      <File name="logo.svg" description="Static asset, served at /static/logo.svg" />
+    </Folder>
+    <File name="gittydocs.jsonc" description="Config" />
+    <File name="index.tsx" description="Optional custom landing (/)" />
+    <File name="introduction.mdx" description="/introduction" />
+    <File name="getting-started.mdx" description="A page" />
+    <File name="theme.css" description="Custom styles" />
+  </Folder>
+</Files>
 
-```json
-// package.json
+</Step>
+<Step title="Add a dev script (optional)">
+
+Recommended: add a dev script in your repo:
+
+```json title="package.json"
 {
   "scripts": {
     "dev:docs": "gittydocs dev docs"
@@ -58,9 +65,12 @@ npx gittydocs@latest dev docs # Live preview & hot-reload
 }
 ```
 
-3. Make it yours w/ the `gittydocs.jsonc`! (More in [Configuration#Options](/configuration#options))
+</Step>
+<Step title="Make it yours">
 
-```diff
+Customize `gittydocs.jsonc`! (More in [Configuration#Options](/configuration#options))
+
+```diff title="gittydocs.jsonc"
 {
   "$schema": "https://raw.githubusercontent.com/blankeos/gittydocs/main/gittydocs.schema.json",
   "site": {
@@ -72,9 +82,12 @@ npx gittydocs@latest dev docs # Live preview & hot-reload
 }
 ```
 
-4. Add some pages with `about-us.mdx` (More in [Configuration#Writing-Content](/configuration#writing-content))
+</Step>
+<Step title="Add some pages">
 
-```mdx
+Create a page like `about-us.mdx` (More in [Configuration#Writing-Content](/configuration#writing-content))
+
+```mdx title="about-us.mdx"
 ---
 title: About Us
 description: A little about the team
@@ -85,11 +98,17 @@ description: A little about the team
 Your content here.
 ```
 
-5. Push to GitHub. Pick a deployment option:
+</Step>
+<Step title="Deploy your docs">
+
+Push to GitHub. Pick a deployment option:
 
 - [GitHub Pages](/deploy/github-pages)
 - [Vercel](/deploy/vercel)
 - [Cloudflare Pages](/deploy/cloudflare)
 - [Netlify](/deploy/netlify)
+
+</Step>
+</Steps>
 
 <p class="text-lg">🎉 That's literally it! You have docs now!</p>

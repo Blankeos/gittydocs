@@ -1,10 +1,15 @@
 import { docs } from "@velite"
-import { Index } from "flexsearch"
 import { createMemo, type FlowComponent } from "solid-js"
 import type { DocsConfig, NavItem } from "@/gittydocs/lib/docs/config.gen"
 import { gittydocsConfig } from "@/gittydocs/lib/docs/config.gen"
 import { customPagesByRoute } from "@/gittydocs/lib/docs/custom-pages"
-import { type DocHeading, extractHeadingsFromMarkdown } from "@/gittydocs/lib/heading-utils"
+import { type DocHeading, getDocHeadings } from "@/gittydocs/lib/heading-utils"
+import {
+  buildNavFromPages,
+  createDocsNavigation,
+  defaultLabel,
+  normalizeMdxSourcePath,
+} from "@/gittydocs/lib/nav-utils"
 import { createStrictContext } from "@/utils/create-strict-context"
 
 export type { NavItem }
@@ -27,17 +32,11 @@ export interface DocsPage {
   rawContent: string
 }
 
-export interface SearchResult {
-  routePath: string
-  title: string
-  snippet: string
-}
-
 export type DocsContextValue = {
   pages: DocsPage[]
   config: DocsConfig | null
   nav: NavItem[]
-  search: (query: string) => SearchResult[]
+  navigation: ReturnType<typeof createDocsNavigation<DocsPage>>
 }
 
 // ===========================================================================
@@ -47,96 +46,6 @@ export type DocsContextValue = {
 const [useDocsContext, Provider] = createStrictContext<DocsContextValue>("DocsContext")
 
 export { useDocsContext }
-
-// ===========================================================================
-// Search Index
-// ===========================================================================
-
-class SearchIndex {
-  private index: Index
-  private pages: Map<string, DocsPage>
-
-  constructor() {
-    this.index = new Index({
-      tokenize: "forward",
-      cache: true,
-    })
-    this.pages = new Map()
-  }
-
-  addPage(page: DocsPage): void {
-    this.index.add(page.routePath, page.title)
-
-    if (page.description) {
-      this.index.append(page.routePath, page.description)
-    }
-
-    for (const heading of page.headings) {
-      this.index.append(page.routePath, heading.text)
-    }
-
-    const bodyText = this.stripMarkdown(page.rawContent)
-    this.index.append(page.routePath, bodyText)
-
-    this.pages.set(page.routePath, page)
-  }
-
-  search(query: string): SearchResult[] {
-    if (!query.trim()) return []
-
-    const results = this.index.search(query, 10)
-    const searchResults: SearchResult[] = []
-
-    for (const routePath of results) {
-      const path = String(routePath)
-      const page = this.pages.get(path)
-      if (!page) continue
-
-      const snippet = this.generateSnippet(page.rawContent, query)
-
-      searchResults.push({
-        routePath: path,
-        title: page.title,
-        snippet,
-      })
-    }
-
-    return searchResults
-  }
-
-  private stripMarkdown(content: string): string {
-    return content
-      .replace(/```[\s\S]*?```/g, "")
-      .replace(/`[^`]*`/g, "")
-      .replace(/^#{1,6}\s+/gm, "")
-      .replace(/(\*\*|__|\*|_)/g, "")
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-      .replace(/!\[([^\]]*)\]\([^)]+\)/g, "")
-      .replace(/<[^>]*>/g, "")
-      .replace(/\s+/g, " ")
-      .trim()
-  }
-
-  private generateSnippet(content: string, query: string): string {
-    const text = this.stripMarkdown(content)
-    const lowerText = text.toLowerCase()
-    const lowerQuery = query.toLowerCase()
-
-    const index = lowerText.indexOf(lowerQuery)
-    if (index === -1) {
-      return text.slice(0, 150) + (text.length > 150 ? "..." : "")
-    }
-
-    const start = Math.max(0, index - 60)
-    const end = Math.min(text.length, index + query.length + 90)
-
-    let snippet = text.slice(start, end)
-    if (start > 0) snippet = `...${snippet}`
-    if (end < text.length) snippet = `${snippet}...`
-
-    return snippet
-  }
-}
 
 // ===========================================================================
 // Helper Functions
@@ -153,109 +62,6 @@ function toRoutePath(slug: string): string {
   return route.startsWith("/") ? route : `/${route}`
 }
 
-function buildNavFromPages(pages: DocsPage[], configNav?: NavItem[]): NavItem[] {
-  if (configNav && configNav.length > 0) {
-    return configNav
-  }
-
-  // Build nav from file structure
-  const tree = buildFileTree(pages.map((p) => p.sourcePath))
-  return buildNavFromTree(tree, pages)
-}
-
-interface FileNode {
-  name: string
-  path: string
-  type: "file" | "directory"
-  children?: FileNode[]
-}
-
-function buildFileTree(paths: string[]): FileNode[] {
-  const root: FileNode = { name: "", path: "", type: "directory", children: [] }
-
-  for (const filePath of paths) {
-    const parts = filePath.split("/").filter(Boolean)
-    let current = root
-
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i]
-      const isFile = i === parts.length - 1
-      if (!current.children) current.children = []
-
-      let next = current.children.find((child) => child.name === part)
-      if (!next) {
-        next = {
-          name: part,
-          path: current.path ? `${current.path}/${part}` : part,
-          type: isFile ? "file" : "directory",
-          children: isFile ? undefined : [],
-        }
-        current.children.push(next)
-      }
-
-      current = next
-    }
-  }
-
-  return root.children || []
-}
-
-function buildNavFromTree(tree: FileNode[], pages: DocsPage[]): NavItem[] {
-  const nav: NavItem[] = []
-
-  const sorted = [...tree].sort((a, b) => {
-    const aIsIndex = a.name.startsWith("index.")
-    const bIsIndex = b.name.startsWith("index.")
-
-    if (aIsIndex && !bIsIndex) return -1
-    if (!aIsIndex && bIsIndex) return 1
-
-    const aNum = a.name.match(/^(\d+)-/)
-    const bNum = b.name.match(/^(\d+)-/)
-
-    if (aNum && bNum) return parseInt(aNum[1], 10) - parseInt(bNum[1], 10)
-    if (aNum) return -1
-    if (bNum) return 1
-
-    return a.name.localeCompare(b.name)
-  })
-
-  for (const node of sorted) {
-    if (node.type === "directory" && node.children) {
-      const children = buildNavFromTree(node.children, pages)
-      if (children.length > 0) {
-        nav.push({
-          label: formatLabel(node.name),
-          items: children,
-        })
-      }
-      continue
-    }
-
-    if (node.type === "file") {
-      const routePath = toRoutePath(node.path.replace(/\.(md|mdx|tsx|jsx)$/i, ""))
-      const page = pages.find((p) => p.routePath === routePath)
-      const label = page?.title || defaultLabel(node.name)
-      nav.push({ label, path: routePath })
-    }
-  }
-
-  return nav
-}
-
-function defaultLabel(name: string): string {
-  if (name.startsWith("index.")) return "Overview"
-  return formatLabel(name.replace(/\.(md|mdx|tsx|jsx)$/i, ""))
-}
-
-function formatLabel(name: string): string {
-  const cleanName = name.replace(/^\d+-/, "")
-  return cleanName
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ")
-}
-
 // ===========================================================================
 // Provider
 // ===========================================================================
@@ -265,11 +71,11 @@ export const DocsContextProvider: FlowComponent = (props) => {
   const pages = createMemo<DocsPage[]>(() => {
     const mdxPages = docs.map((doc) => {
       const routePath = toRoutePath(doc.slugAsParams)
-      const headings = extractHeadingsFromMarkdown(doc.rawMarkdown || "")
+      const headings = getDocHeadings(doc)
 
       return {
         routePath,
-        sourcePath: doc.sourcePath || doc.slugAsParams,
+        sourcePath: doc.sourcePath ? normalizeMdxSourcePath(doc.sourcePath) : doc.slugAsParams,
         title: doc.title || "Untitled",
         description: doc.description,
         date: doc.date,
@@ -300,19 +106,9 @@ export const DocsContextProvider: FlowComponent = (props) => {
     return buildNavFromPages(pages(), gittydocsConfig?.nav)
   })
 
-  // Initialize search index
-  const searchIndex = createMemo(() => {
-    const index = new SearchIndex()
-    for (const page of pages()) {
-      index.addPage(page)
-    }
-    return index
-  })
-
-  // Search function
-  const search = (query: string): SearchResult[] => {
-    return searchIndex().search(query)
-  }
+  const navigation = createMemo(() =>
+    createDocsNavigation(pages(), nav(), import.meta.env.BASE_URL)
+  )
 
   return (
     <Provider
@@ -324,7 +120,9 @@ export const DocsContextProvider: FlowComponent = (props) => {
         get nav() {
           return nav()
         },
-        search,
+        get navigation() {
+          return navigation()
+        },
       }}
     >
       {props.children}
