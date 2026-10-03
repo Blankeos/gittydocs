@@ -11,7 +11,7 @@ import {
 import { DocsIcon, NewTabIndicator } from "@/gittydocs/components/docs/docs-icon"
 import { useSearchContext } from "@/gittydocs/contexts/search.context"
 import { isExternalHref, opensInNewTab } from "@/gittydocs/lib/nav-utils"
-import { type DocsSearchResult, groupSearchResults } from "@/gittydocs/lib/search-utils"
+import type { DocsSearchResult } from "@/gittydocs/lib/search-utils"
 import { withBasePath } from "@/utils/base-path"
 
 interface SearchDialogProps {
@@ -24,9 +24,11 @@ interface SearchDialogProps {
 
 export function SearchDialog(props: SearchDialogProps) {
   const [query, setQuery] = createSignal("")
-  const { searchDocs, docsIndexIsReady } = useSearchContext()
-  const results = createMemo(() => searchDocs(query()))
-  const groups = createMemo(() => groupSearchResults(results()))
+  const { searchDocs } = useSearchContext()
+  const groups = createMemo(() => searchDocs(query()))
+  const resultCount = createMemo(() =>
+    groups().reduce((count, group) => count + group.results.length, 0)
+  )
   const isSearching = createMemo(() => query().trim().length > 0)
   const hasQuickActions = createMemo(() => Boolean(props.onToggleTheme || props.githubUrl))
 
@@ -77,7 +79,7 @@ export function SearchDialog(props: SearchDialogProps) {
         onValueChange={setQuery}
         onClose={closeDialog}
       />
-      <CommandList class="px-0 py-1" aria-busy={!docsIndexIsReady()}>
+      <CommandList class="px-0 py-1">
         <Show when={!isSearching() && hasQuickActions()}>
           <CommandGroup heading="Quick actions">
             <Show when={props.onToggleTheme}>
@@ -129,7 +131,7 @@ export function SearchDialog(props: SearchDialogProps) {
           </CommandGroup>
         </Show>
 
-        <Show when={results().length === 0}>
+        <Show when={resultCount() === 0}>
           <div role="status" class="px-3 py-6 text-center text-muted-foreground text-sm">
             <Show when={isSearching()} fallback="No documentation pages available yet.">
               No results for <span class="font-medium text-foreground">“{query().trim()}”</span>.
@@ -199,12 +201,12 @@ export function SearchDialog(props: SearchDialogProps) {
           </span>
         </div>
         <span role="status" aria-live="polite" aria-atomic="true">
-          {results().length}{" "}
+          {resultCount()}{" "}
           {isSearching()
-            ? results().length === 1
+            ? resultCount() === 1
               ? "result"
               : "results"
-            : results().length === 1
+            : resultCount() === 1
               ? "page"
               : "pages"}
         </span>

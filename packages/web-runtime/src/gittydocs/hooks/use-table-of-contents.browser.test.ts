@@ -57,28 +57,57 @@ const docs = [
     headings: [{ slug: "other-heading", text: "Other heading", level: 2 }],
   },
   { slug: "empty", slugAsParams: "empty", title: "Empty", content: "empty", headings: [] },
+  {
+    slug: "hidden",
+    slugAsParams: "hidden",
+    title: "Hidden",
+    content: "hidden",
+    sidebar: false,
+    toc: false,
+    headings: [{ slug: "hidden-heading", text: "Hidden heading", level: 2 }],
+  },
 ]
 
 const fixture = `
-import { onMount } from "solid-js"
+import { onMount, Show } from "solid-js"
 import { createStore } from "solid-js/store"
 import { PageContextProvider } from "vike-solid/usePageContext"
 import { DocContent } from ${JSON.stringify(path.join(runtimeRoot, "src/gittydocs/components/docs/doc-content.tsx"))}
+import { usePageLayout } from ${JSON.stringify(path.join(runtimeRoot, "src/gittydocs/hooks/use-page-layout.ts"))}
+import { findMdxDoc, normalizeRoutePath, resolvePage } from ${JSON.stringify(path.join(runtimeRoot, "src/gittydocs/lib/docs/page-layout.ts"))}
 
-export function Fixture() {
+// Like the header/layout, this consumer must not depend on DocContent's resolution.
+function LayoutConsumer() {
+  const { routePath, page, sidebar, toc } = usePageLayout()
+  onMount(() => {
+    window.fixtureLayout = () => ({ routePath: routePath(), kind: page().kind,
+      title: page().title, sidebar: sidebar(), toc: toc() })
+  })
+  return <aside data-layout-route={routePath()}>
+    <Show when={sidebar()}><span data-sidebar-control>Sidebar</span></Show>
+    <Show when={toc()}><span data-toc-control>ToC</span></Show>
+  </aside>
+}
+
+export function Fixture(props) {
   // Like a static directory server: canonical SSR path, trailing slash in browser.
   const [pageContext, setPageContext] = createStore({ urlParsed: {
-    pathname: typeof window === "undefined" ? "/configuration" : window.location.pathname,
+    pathname: typeof window === "undefined" ? props.pathname : window.location.pathname,
     hashOriginal: typeof window === "undefined" ? undefined : window.location.hash,
   } })
   onMount(() => {
+    window.fixtureResolve = pathname => {
+      const page = resolvePage(pathname)
+      return { routePath: normalizeRoutePath(pathname), kind: page.kind,
+        sidebar: page.sidebar, toc: page.toc, mdxSlug: findMdxDoc(pathname)?.slugAsParams ?? null }
+    }
     window.fixtureNavigate = (pathname, hash = "") => {
       history.pushState(history.state, "", pathname + hash)
       window.scrollTo({ top: 0, behavior: "instant" })
       setPageContext("urlParsed", { pathname, hashOriginal: hash })
     }
   })
-  return <PageContextProvider pageContext={pageContext}><DocContent /></PageContextProvider>
+  return <PageContextProvider pageContext={pageContext}><LayoutConsumer /><DocContent /></PageContextProvider>
 }
 `
 
@@ -87,7 +116,10 @@ export function Fixture() {
 const stubs: Record<string, string> = {
   "@velite": `export const docs = ${JSON.stringify(docs)}`,
   "vike-metadata-solid": "export const useMetadata = () => {}",
-  "@/gittydocs/lib/docs/custom-pages": "export const getCustomPage = () => undefined",
+  "@/gittydocs/lib/docs/custom-pages": `
+    const custom = { Component: () => null, sidebar: false, toc: false }
+    export const getCustomPage = route => route === "/custom" ? custom : undefined
+  `,
   "@/gittydocs/lib/docs/source-map.gen": "export const sourcePathByRoute = {}",
   "@/gittydocs/components/docs/copy-page-button": "export const CopyPageButton = () => null",
   "@/gittydocs/components/docs/docs-footer": "export const DocsFooter = () => null",
@@ -120,9 +152,9 @@ describe.skipIf(!browser)("hydrated ToC hook lifecycle", () => {
     )
     await writeFile(
       path.join(directory, "server.tsx"),
-      'import { renderToString, generateHydrationScript } from "solid-js/web"; import { Fixture } from "./fixture"; export const render = () => generateHydrationScript() + \'<div id="app">\' + renderToString(() => <Fixture />) + \'</div>\';'
+      'import { renderToString, generateHydrationScript } from "solid-js/web"; import { Fixture } from "./fixture"; export const render = pathname => generateHydrationScript() + \'<div id="app">\' + renderToString(() => <Fixture pathname={pathname} />) + \'</div>\';'
     )
-    let html: string
+    const htmlByRoute: Record<string, string> = {}
     server = await createServer({
       configFile: false,
       root: runtimeRoot,
@@ -133,9 +165,10 @@ describe.skipIf(!browser)("hydrated ToC hook lifecycle", () => {
           enforce: "pre",
           configureServer(server) {
             server.middlewares.use((request, response, next) => {
-              if (request.url?.startsWith("/configuration/")) {
+              const pathname = request.url?.split("?")[0] ?? ""
+              if (htmlByRoute[pathname]) {
                 response.setHeader("Content-Type", "text/html")
-                response.end(html)
+                response.end(htmlByRoute[pathname])
               } else next()
             })
           },
@@ -174,7 +207,10 @@ describe.skipIf(!browser)("hydrated ToC hook lifecycle", () => {
           <ul class="mdx-files-list mdx-folder-children"><li class="mdx-file"><span class="mdx-file-name" id="tree-child">logo.svg</span></li></ul>
         </details></li><li class="mdx-file"><span class="mdx-file-name" id="tree-sibling">gittydocs.jsonc</span></li></ul>
       </details></li></ul></div></article>`
-    html = `<!doctype html><html><head><style>${componentCss}</style></head><body>${render()}${fileTree}<script type="module" src="/@fs/${path.join(directory, "client.tsx")}"></script></body></html>`
+    for (const route of ["/configuration", "/hidden"]) {
+      htmlByRoute[`${route}/`] =
+        `<!doctype html><html><head><style>${componentCss}</style></head><body>${render(route)}${fileTree}<script type="module" src="/@fs/${path.join(directory, "client.tsx")}"></script></body></html>`
+    }
     await server.listen()
     const address = server.httpServer!.address()
     if (!address || typeof address === "string") throw new Error("Missing fixture server port")
@@ -190,6 +226,13 @@ describe.skipIf(!browser)("hydrated ToC hook lifecycle", () => {
   })
 
   test("static trailing-slash hydration attaches both ToCs and immediately pins a click", async () => {
+    expect(await evaluate("window.fixtureLayout()")).toEqual({
+      routePath: "/configuration",
+      kind: "mdx",
+      title: "Configuration",
+      sidebar: true,
+      toc: true,
+    })
     const state = await evaluate(`(() => {
       const link = document.querySelector('main a[href="#fully-customize"]')
       const event = new MouseEvent("click", { bubbles: true, cancelable: true })
@@ -266,5 +309,77 @@ describe.skipIf(!browser)("hydrated ToC hook lifecycle", () => {
     expect(state.prevented).toBe(true)
     expect(state.active).toEqual(["Fully Customize", "Fully Customize"])
     expect((await command("errors")).errors).toEqual([])
+  })
+
+  test("false metadata survives trailing-slash hydration for every layout consumer", async () => {
+    await command("open", new URL("/hidden/", url).href)
+    const readState = `(() => ({
+      ...window.fixtureLayout(),
+      renderedRoute: document.querySelector('[data-layout-route]').getAttribute('data-layout-route'),
+      sidebarControls: document.querySelectorAll('[data-sidebar-control]').length,
+      tocControls: document.querySelectorAll('[data-toc-control]').length,
+      tocLinks: document.querySelectorAll('a[href="#hidden-heading"]').length,
+      heading: !!document.getElementById('hidden-heading'),
+      title: document.querySelector('h1')?.textContent,
+    }))()`
+    const hidden = {
+      routePath: "/hidden",
+      renderedRoute: "/hidden",
+      kind: "mdx",
+      title: "Hidden",
+      sidebar: false,
+      toc: false,
+      sidebarControls: 0,
+      tocControls: 0,
+      tocLinks: 0,
+      heading: true,
+    }
+    expect(await evaluate(readState)).toEqual(hidden)
+    await evaluate('window.fixtureNavigate("/configuration/")')
+    expect(await evaluate("window.fixtureLayout()")).toEqual({
+      routePath: "/configuration",
+      kind: "mdx",
+      title: "Configuration",
+      sidebar: true,
+      toc: true,
+    })
+    await evaluate('window.fixtureNavigate("/hidden///")')
+    expect(await evaluate(readState)).toEqual(hidden)
+    expect((await command("errors")).errors).toEqual([])
+  })
+
+  test("page resolution canonicalizes root, missing, MDX and custom routes centrally", async () => {
+    for (const pathname of ["", "/", "///"]) {
+      expect(await evaluate(`window.fixtureResolve(${JSON.stringify(pathname)})`)).toEqual({
+        routePath: "/",
+        kind: "missing",
+        sidebar: true,
+        toc: true,
+        mdxSlug: null,
+      })
+    }
+    for (const pathname of ["hidden", "/hidden", "/hidden/", "hidden///"]) {
+      expect(await evaluate(`window.fixtureResolve(${JSON.stringify(pathname)})`)).toEqual({
+        routePath: "/hidden",
+        kind: "mdx",
+        sidebar: false,
+        toc: false,
+        mdxSlug: "hidden",
+      })
+    }
+    expect(await evaluate('window.fixtureResolve("/custom///")')).toEqual({
+      routePath: "/custom",
+      kind: "custom",
+      sidebar: false,
+      toc: false,
+      mdxSlug: null,
+    })
+    expect(await evaluate('window.fixtureResolve("/missing///")')).toEqual({
+      routePath: "/missing",
+      kind: "missing",
+      sidebar: true,
+      toc: true,
+      mdxSlug: null,
+    })
   })
 })

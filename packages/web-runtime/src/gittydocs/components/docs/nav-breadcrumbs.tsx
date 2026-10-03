@@ -6,12 +6,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { type NavItem, useDocsContext } from "@/gittydocs/contexts/docs.context"
-import {
-  findNavTrail,
-  normalizeNavPath,
-  opensInNewTab,
-  resolveNavPagePath,
-} from "@/gittydocs/lib/nav-utils"
+import { opensInNewTab } from "@/gittydocs/lib/nav-utils"
 import { withBasePath } from "@/utils/base-path"
 import { DocsIcon, NewTabIndicator } from "./docs-icon"
 
@@ -22,24 +17,16 @@ export interface NavBreadcrumbsProps {
 /** Navigation ancestry, not guessed labels or links from URL segments. */
 export function NavBreadcrumbs(props: NavBreadcrumbsProps) {
   const docs = useDocsContext()
-  const route = () => normalizeNavPath(props.routePath, import.meta.env.BASE_URL)
-  const pagesByRoute = createMemo(
-    () =>
-      new Map(
-        docs.pages.map((page) => [normalizeNavPath(page.routePath, import.meta.env.BASE_URL), page])
-      )
-  )
+  const current = createMemo(() => docs.navigation.resolve(props.routePath))
   const trail = createMemo(() => {
-    const ancestors = findNavTrail(docs.nav, props.routePath, import.meta.env.BASE_URL)
+    const ancestors = current().trail
     if (ancestors.length > 0) return ancestors
     // A real page omitted from custom nav still has a title; never display a
     // route segment as a fabricated breadcrumb label.
-    const page = pagesByRoute().get(route())
+    const page = current().page
     return page ? [{ label: page.title, path: page.routePath } satisfies NavItem] : []
   })
-  const validPath = (item: NavItem) => {
-    return resolveNavPagePath(item, [...pagesByRoute().keys()], import.meta.env.BASE_URL)
-  }
+  const validPath = (item: NavItem) => docs.navigation.destination(item)
 
   return (
     <Show when={docs.config?.ui?.breadcrumbs !== false && trail().length > 0}>

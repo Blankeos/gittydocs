@@ -1,11 +1,15 @@
 import { docs } from "@velite"
-import { Index } from "flexsearch"
 import { createMemo, type FlowComponent } from "solid-js"
 import type { DocsConfig, NavItem } from "@/gittydocs/lib/docs/config.gen"
 import { gittydocsConfig } from "@/gittydocs/lib/docs/config.gen"
 import { customPagesByRoute } from "@/gittydocs/lib/docs/custom-pages"
-import { type DocHeading, getDocHeadings, headingText } from "@/gittydocs/lib/heading-utils"
-import { buildNavFromPages, defaultLabel, normalizeMdxSourcePath } from "@/gittydocs/lib/nav-utils"
+import { type DocHeading, getDocHeadings } from "@/gittydocs/lib/heading-utils"
+import {
+  buildNavFromPages,
+  createDocsNavigation,
+  defaultLabel,
+  normalizeMdxSourcePath,
+} from "@/gittydocs/lib/nav-utils"
 import { createStrictContext } from "@/utils/create-strict-context"
 
 export type { NavItem }
@@ -28,17 +32,11 @@ export interface DocsPage {
   rawContent: string
 }
 
-export interface SearchResult {
-  routePath: string
-  title: string
-  snippet: string
-}
-
 export type DocsContextValue = {
   pages: DocsPage[]
   config: DocsConfig | null
   nav: NavItem[]
-  search: (query: string) => SearchResult[]
+  navigation: ReturnType<typeof createDocsNavigation<DocsPage>>
 }
 
 // ===========================================================================
@@ -48,96 +46,6 @@ export type DocsContextValue = {
 const [useDocsContext, Provider] = createStrictContext<DocsContextValue>("DocsContext")
 
 export { useDocsContext }
-
-// ===========================================================================
-// Search Index
-// ===========================================================================
-
-class SearchIndex {
-  private index: Index
-  private pages: Map<string, DocsPage>
-
-  constructor() {
-    this.index = new Index({
-      tokenize: "forward",
-      cache: true,
-    })
-    this.pages = new Map()
-  }
-
-  addPage(page: DocsPage): void {
-    this.index.add(page.routePath, page.title)
-
-    if (page.description) {
-      this.index.append(page.routePath, page.description)
-    }
-
-    for (const heading of page.headings) {
-      this.index.append(page.routePath, heading.plainText ?? headingText(heading.text))
-    }
-
-    const bodyText = this.stripMarkdown(page.rawContent)
-    this.index.append(page.routePath, bodyText)
-
-    this.pages.set(page.routePath, page)
-  }
-
-  search(query: string): SearchResult[] {
-    if (!query.trim()) return []
-
-    const results = this.index.search(query, 10)
-    const searchResults: SearchResult[] = []
-
-    for (const routePath of results) {
-      const path = String(routePath)
-      const page = this.pages.get(path)
-      if (!page) continue
-
-      const snippet = this.generateSnippet(page.rawContent, query)
-
-      searchResults.push({
-        routePath: path,
-        title: page.title,
-        snippet,
-      })
-    }
-
-    return searchResults
-  }
-
-  private stripMarkdown(content: string): string {
-    return content
-      .replace(/```[\s\S]*?```/g, "")
-      .replace(/`[^`]*`/g, "")
-      .replace(/^#{1,6}\s+/gm, "")
-      .replace(/(\*\*|__|\*|_)/g, "")
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-      .replace(/!\[([^\]]*)\]\([^)]+\)/g, "")
-      .replace(/<[^>]*>/g, "")
-      .replace(/\s+/g, " ")
-      .trim()
-  }
-
-  private generateSnippet(content: string, query: string): string {
-    const text = this.stripMarkdown(content)
-    const lowerText = text.toLowerCase()
-    const lowerQuery = query.toLowerCase()
-
-    const index = lowerText.indexOf(lowerQuery)
-    if (index === -1) {
-      return text.slice(0, 150) + (text.length > 150 ? "..." : "")
-    }
-
-    const start = Math.max(0, index - 60)
-    const end = Math.min(text.length, index + query.length + 90)
-
-    let snippet = text.slice(start, end)
-    if (start > 0) snippet = `...${snippet}`
-    if (end < text.length) snippet = `${snippet}...`
-
-    return snippet
-  }
-}
 
 // ===========================================================================
 // Helper Functions
@@ -198,19 +106,9 @@ export const DocsContextProvider: FlowComponent = (props) => {
     return buildNavFromPages(pages(), gittydocsConfig?.nav)
   })
 
-  // Initialize search index
-  const searchIndex = createMemo(() => {
-    const index = new SearchIndex()
-    for (const page of pages()) {
-      index.addPage(page)
-    }
-    return index
-  })
-
-  // Search function
-  const search = (query: string): SearchResult[] => {
-    return searchIndex().search(query)
-  }
+  const navigation = createMemo(() =>
+    createDocsNavigation(pages(), nav(), import.meta.env.BASE_URL)
+  )
 
   return (
     <Provider
@@ -222,7 +120,9 @@ export const DocsContextProvider: FlowComponent = (props) => {
         get nav() {
           return nav()
         },
-        search,
+        get navigation() {
+          return navigation()
+        },
       }}
     >
       {props.children}

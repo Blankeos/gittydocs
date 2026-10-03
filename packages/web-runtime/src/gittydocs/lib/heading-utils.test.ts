@@ -17,7 +17,7 @@ import {
   parseHeadingInlineContent,
   slugifyHeadingText,
 } from "./heading-utils"
-import { createDocsSearch, createSearchEntries } from "./search-utils"
+import { createDocsSearch } from "./search-utils"
 import { getCompiledHeadings } from "./velite/headings"
 
 function compilerHeadingIds(markdown: string): string[] {
@@ -316,22 +316,20 @@ describe("compiler heading metadata", () => {
     ])
     expect(first.headings).toHaveLength(2)
     expect(second.headings.map((heading) => heading.slug)).toEqual(["other-code"])
-    const entries = createSearchEntries(
-      [
-        {
-          routePath: "/math",
-          sourcePath: "math.mdx",
-          title: "Math",
-          content: first.content,
-          rawContent: first.rawMarkdown,
-          headings: getDocHeadings(first),
-        },
-      ],
-      []
-    )
-    expect(entries[1].title).toBe("中文 x^2")
-    expect(entries[1].href).toBe(`/math#${encodeURIComponent(first.headings[0].slug)}`)
-    expect(createDocsSearch(entries)("x^2")[0].kind).toBe("heading")
+    const search = createDocsSearch([
+      {
+        routePath: "/math",
+        sourcePath: "math.mdx",
+        title: "Math",
+        content: first.content,
+        rawContent: first.rawMarkdown,
+        headings: getDocHeadings(first),
+      },
+    ])
+    const results = search("x^2").flatMap((group) => group.results)
+    expect(results[0].title).toBe("中文 x^2")
+    expect(results[0].href).toBe(`/math#${encodeURIComponent(first.headings[0].slug)}`)
+    expect(results[0].kind).toBe("heading")
   })
 
   test("recompiling a path cannot reuse the prior file's heading metadata", async () => {

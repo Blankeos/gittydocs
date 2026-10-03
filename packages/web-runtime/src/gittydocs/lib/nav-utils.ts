@@ -166,30 +166,6 @@ export function opensInNewTab(item: NavItem): boolean {
   return item.newTab ?? (item.path ? isExternalHref(item.path) : false)
 }
 
-/** Pathless groups navigate to their first real internal descendant page. */
-export function resolveNavPagePath(
-  item: NavItem,
-  pageRoutes: readonly string[],
-  basePath = "/"
-): string | undefined {
-  const known = new Set(pageRoutes.map((route) => normalizeNavPath(route, basePath)))
-  const visit = (entry: NavItem): string | undefined => {
-    if (entry.path) {
-      const path = entry.path.trim()
-      const route = normalizeNavPath(path, basePath)
-      if (isSafeNavHref(path) && isInternalHref(path) && route !== "/llms.txt" && known.has(route))
-        return path
-      return undefined
-    }
-    for (const child of entry.items ?? []) {
-      const path = visit(child)
-      if (path) return path
-    }
-    return undefined
-  }
-  return visit(item)
-}
-
 /**
  * Normalize document routes for comparison, without interpreting external URLs
  * as routes. The optional deployment base is stripped at a segment boundary.
@@ -212,45 +188,88 @@ export function normalizeNavPath(path: string, basePath = "/"): string {
   return normalized
 }
 
-/**
- * Return the first exact internal route match with all of its ancestors.
- * Items retain their original identity; labels are never used as branch keys.
- * Callers may supply a deployment base when matching a browser pathname.
- */
-export function findNavTrail(nav: NavItem[], path: string, basePath = "/"): NavItem[] {
-  if (!isInternalHref(path) || !isSafeNavHref(path)) return []
-  const route = normalizeNavPath(path, basePath)
-
-  const visit = (items: NavItem[]): NavItem[] => {
-    for (const item of items) {
-      if (
-        item.path &&
-        isInternalHref(item.path) &&
-        isSafeNavHref(item.path) &&
-        normalizeNavPath(item.path, basePath) === route
-      ) {
-        return [item]
-      }
-      if (item.items) {
-        const trail = visit(item.items)
-        if (trail.length > 0) return [item, ...trail]
-      }
-    }
-    return []
-  }
-
-  return visit(nav)
+export interface NavigationDestination {
+  item: NavItem
+  routePath: string
 }
 
-/** Pre-order traversal, including pathless groups and clickable group landings. */
-export function flattenNav(nav: NavItem[]): NavItem[] {
-  const flattened: NavItem[] = []
-  const visit = (items: NavItem[]) => {
-    for (const item of items) {
-      flattened.push(item)
-      if (item.items) visit(item.items)
+/** One route policy shared by sidebar, breadcrumbs, page navigation, and search. */
+export function createDocsNavigation<Page extends { routePath: string; title: string }>(
+  pages: readonly Page[],
+  nav: readonly NavItem[],
+  basePath = "/"
+) {
+  const routeKey = (href: string): string | undefined =>
+    isSafeNavHref(href) && isInternalHref(href) ? normalizeNavPath(href, basePath) : undefined
+  const pagesByRoute = new Map<string, Page>()
+  for (const page of pages) {
+    const route = routeKey(page.routePath)
+    if (route && !pagesByRoute.has(route)) pagesByRoute.set(route, page)
+  }
+  const filter = (entries: readonly NavItem[]): NavItem[] =>
+    entries.flatMap((item) => {
+      // Validate before trimming so raw control characters cannot become safe.
+      if (item.path && (!isSafeNavHref(item.path) || routeKey(item.path) === "/llms.txt")) return []
+      if (!item.items) return [item]
+      const children = filter(item.items)
+      if (!children.length && !item.path) return []
+      return children.length === item.items.length &&
+        children.every((child, i) => child === item.items![i])
+        ? [item]
+        : [{ ...item, items: children }]
+    })
+  const items = filter(nav)
+  const trails = new Map<string, NavItem[]>()
+  const ordered: NavigationDestination[] = []
+  const orderByRoute = new Map<string, number>()
+  const visit = (entries: NavItem[], ancestors: NavItem[]) => {
+    for (const item of entries) {
+      const trail = [...ancestors, item]
+      const route = item.path ? routeKey(item.path) : undefined
+      if (route && !trails.has(route)) {
+        trails.set(route, trail)
+        if (pagesByRoute.has(route)) {
+          orderByRoute.set(route, ordered.length)
+          ordered.push({ item, routePath: route })
+        }
+      }
+      if (item.items) visit(item.items, trail)
     }
   }
-  visit(nav)
-  return flattened
+  visit(items, [])
+
+  /** Explicit missing/external landings never silently redirect to a child. */
+  const destination = (item: NavItem): string | undefined => {
+    if (item.path) {
+      const route = routeKey(item.path)
+      return route && route !== "/llms.txt" && pagesByRoute.has(route)
+        ? item.path.trim()
+        : undefined
+    }
+    for (const child of item.items ?? []) {
+      const href = destination(child)
+      if (href) return href
+    }
+    return undefined
+  }
+
+  return {
+    items,
+    destination,
+    resolve(path: string) {
+      const route = routeKey(path)
+      const routePath = route ?? path
+      const trail = route ? (trails.get(route) ?? []) : []
+      const order = route ? orderByRoute.get(route) : undefined
+      return {
+        routePath,
+        page: route ? pagesByRoute.get(route) : undefined,
+        item: trail[trail.length - 1],
+        trail,
+        order,
+        previous: order !== undefined && order > 0 ? ordered[order - 1] : undefined,
+        next: order !== undefined ? ordered[order + 1] : undefined,
+      }
+    },
+  }
 }

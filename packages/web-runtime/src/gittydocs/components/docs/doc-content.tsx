@@ -9,7 +9,6 @@ import { PageNavigation } from "@/gittydocs/components/docs/page-navigation"
 import { TableOfContents } from "@/gittydocs/components/docs/table-of-contents"
 import { usePageLayout } from "@/gittydocs/hooks/use-page-layout"
 import { useTableOfContents } from "@/gittydocs/hooks/use-table-of-contents"
-import { resolvePage } from "@/gittydocs/lib/docs/page-layout"
 import { sourcePathByRoute } from "@/gittydocs/lib/docs/source-map.gen"
 import { getDocHeadings } from "@/gittydocs/lib/heading-utils"
 import { MdxContentStatic } from "@/gittydocs/lib/velite/mdx-content"
@@ -17,14 +16,7 @@ import { MdxContext } from "@/gittydocs/lib/velite/mdx-context"
 import getTitle from "@/utils/get-title"
 
 export function DocContent() {
-  const layout = usePageLayout()
-  // Prerendered /page HTML is served at /page/ by static directory hosts.
-  // Resolve the same document on both sides of hydration; otherwise Solid keeps
-  // the SSR content visible, but the client takes the missing-page branch and
-  // never attaches the ToC handlers or creates its heading coordinator.
-  const routePath = createMemo(() => layout.routePath().replace(/\/+$/, "") || "/")
-  const page = createMemo(() => resolvePage(routePath()))
-  const toc = createMemo(() => page().toc)
+  const { routePath, page, toc } = usePageLayout()
   const pageContext = usePageContext()
 
   useMetadata(() => {

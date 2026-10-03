@@ -5,14 +5,13 @@ import { usePageContext } from "vike-solid/usePageContext"
 import { Accordion, AccordionItem } from "@/components/ui/accordion"
 import { type NavItem, useDocsContext } from "@/gittydocs/contexts/docs.context"
 import {
-  findNavTrail,
+  createDocsNavigation,
   formatVersionLabel,
   isExternalHref,
   isInternalHref,
   isSafeNavHref,
   normalizeNavPath,
   opensInNewTab,
-  resolveNavPagePath,
 } from "@/gittydocs/lib/nav-utils"
 import { withBasePath } from "@/utils/base-path"
 import { cn } from "@/utils/cn"
@@ -31,14 +30,13 @@ interface NavBranch {
 export function DocsNav(props: DocsNavProps = {}) {
   const docs = useDocsContext()
   const pageContext = usePageContext()
-  const pathname = () =>
-    normalizeNavPath(pageContext.urlParsed?.pathname || "/", import.meta.env.BASE_URL)
-  const navItems = createMemo(() => filterNavItems(docs.nav))
-  const footerItems = createMemo(() => filterNavItems(docs.config?.navFooter ?? []))
-  const branches = createMemo(() => buildBranches(navItems()))
-  const activeTrail = createMemo(() =>
-    findNavTrail(navItems(), pageContext.urlParsed?.pathname || "/", import.meta.env.BASE_URL)
+  const current = createMemo(() => docs.navigation.resolve(pageContext.urlParsed?.pathname || "/"))
+  const pathname = () => current().routePath
+  const footerItems = createMemo(
+    () => createDocsNavigation([], docs.config?.navFooter ?? [], import.meta.env.BASE_URL).items
   )
+  const branches = createMemo(() => buildBranches(docs.navigation.items))
+  const activeTrail = () => current().trail
   const llmsEnabled = () => docs.config?.llms?.enabled !== false
   const version = () => docs.config?.site?.version
 
@@ -142,18 +140,12 @@ function NavSection(props: NavSectionProps) {
   const item = () => props.branch.item
   const headingItem = createMemo(() => {
     if (item().path) return item()
-    const path = resolveNavPagePath(
-      item(),
-      docs.pages.map((page) => page.routePath),
-      import.meta.env.BASE_URL
-    )
+    const path = docs.navigation.destination(item())
     return path ? { ...item(), path } : item()
   })
   const isGroup = () => props.branch.children.length > 0
   const isActive = () =>
-    !!item().path &&
-    isInternalHref(item().path!) &&
-    normalizeNavPath(item().path!, import.meta.env.BASE_URL) === props.pathname
+    !!item().path && docs.navigation.resolve(item().path!).routePath === props.pathname
   const isOpen = () => props.openBranches[props.branch.id] === true
   const indent = () => `calc(.75rem + ${props.indentDepth} * var(--docs-nav-indent, .75rem))`
   // Match item row geometry; only text size and muted color distinguish groups.
@@ -293,7 +285,7 @@ function NavLink(props: {
   const href = () => (internal() ? withBasePath(path()) : path())
 
   return (
-    <Show when={isSafeNavHref(path())}>
+    <Show when={!props.item.path || isSafeNavHref(props.item.path)}>
       <a
         href={href()}
         target={newTab() ? "_blank" : undefined}
@@ -360,21 +352,4 @@ function NavChevron(props: { open: boolean }) {
       <path d="m6 9 6 6 6-6" />
     </svg>
   )
-}
-
-function filterNavItems(items: NavItem[]): NavItem[] {
-  return items.flatMap((item) => {
-    if (item.path && !isSafeNavHref(item.path)) return []
-    if (
-      item.path &&
-      isInternalHref(item.path) &&
-      normalizeNavPath(item.path, import.meta.env.BASE_URL) === "/llms.txt"
-    ) {
-      return []
-    }
-    if (!item.items) return [item]
-    const children = filterNavItems(item.items)
-    if (children.length === 0 && !item.path) return []
-    return [{ ...item, items: children }]
-  })
 }

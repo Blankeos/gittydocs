@@ -2,46 +2,41 @@ import { Index } from "flexsearch"
 import type { DocsPage } from "../contexts/docs.context"
 import type { NavItem } from "./docs/config.gen"
 import { type DocHeading, headingText, markdownToSearchText } from "./heading-utils"
-import { findNavTrail, flattenNav, isInternalHref, isSafeNavHref } from "./nav-utils"
+import { createDocsNavigation } from "./nav-utils"
 import {
   createSearchSnippet,
   highlightSearchText,
   type SearchHighlightSegment,
 } from "./search-highlights"
 
-export interface DocsSearchEntry {
+export interface DocsSearchResult {
   id: string
   kind: "page" | "heading"
   title: string
   pageTitle: string
   routePath: string
   href: string
-  groupId: string
-  groupLabel: string
   context: string
   icon?: string
   navItem?: NavItem
   heading?: DocHeading
+  snippet: string
+  highlights: SearchHighlightSegment[]
+}
+
+interface DocsSearchEntry extends Omit<DocsSearchResult, "snippet" | "highlights"> {
+  groupId: string
+  groupLabel: string
   description: string
   body: string
   indexText: string
   order: number
 }
 
-export interface DocsSearchResult extends DocsSearchEntry {
-  snippet: string
-  highlights: SearchHighlightSegment[]
-}
-
 export interface DocsSearchGroup {
   id: string
   label: string
   results: DocsSearchResult[]
-}
-
-function routeKey(path: string): string {
-  const route = path.split(/[?#]/)[0]
-  return `/${route.split("/").filter(Boolean).join("/")}`
 }
 
 function formatRouteLabel(part: string): string {
@@ -52,44 +47,27 @@ function formatRouteLabel(part: string): string {
 }
 
 /** Navigation metadata is display-only; a page absent from nav is still searchable. */
-export function createSearchEntries(pages: DocsPage[], nav: NavItem[]): DocsSearchEntry[] {
-  const navOrder = new Map<string, number>()
-  const flattenedNav = flattenNav(nav)
-  const navItemIds = new Map(flattenedNav.map((item, index) => [item, index]))
-  flattenedNav.forEach((item, index) => {
-    if (
-      item.path &&
-      isInternalHref(item.path) &&
-      isSafeNavHref(item.path) &&
-      !navOrder.has(routeKey(item.path))
-    ) {
-      navOrder.set(routeKey(item.path), index)
-    }
-  })
+function createSearchEntries(
+  pages: DocsPage[],
+  navigation: ReturnType<typeof createDocsNavigation<DocsPage>>
+): DocsSearchEntry[] {
   const sortedPages = pages
-    .map((page, index) => ({ page, index }))
-    .sort((a, b) => {
-      return (
-        (navOrder.get(routeKey(a.page.routePath)) ?? flattenedNav.length + a.index) -
-        (navOrder.get(routeKey(b.page.routePath)) ?? flattenedNav.length + b.index)
-      )
-    })
+    .map((page, index) => ({ page, index, resolved: navigation.resolve(page.routePath) }))
+    .sort(
+      (a, b) =>
+        (a.resolved.order ?? pages.length + a.index) - (b.resolved.order ?? pages.length + b.index)
+    )
   const entries: DocsSearchEntry[] = []
   const seenRoutes = new Set<string>()
+  // Branch identity, not labels or flattened positions, determines grouping.
+  // Seed the display key with a known route so unrelated nav insertions don't renumber it.
+  const groupIds = new Map<NavItem, string>()
 
-  for (const { page } of sortedPages) {
-    const routePath = routeKey(page.routePath)
+  for (const { page, resolved } of sortedPages) {
+    if (!resolved.page) continue
+    const { routePath, trail, item: matchedLeaf } = resolved
     if (seenRoutes.has(routePath)) continue
     seenRoutes.add(routePath)
-    const trail = findNavTrail(nav, routePath)
-    const leaf = trail[trail.length - 1]
-    const matchedLeaf =
-      leaf?.path &&
-      isInternalHref(leaf.path) &&
-      isSafeNavHref(leaf.path) &&
-      routeKey(leaf.path) === routePath
-        ? leaf
-        : undefined
     const isGroupLanding = !!matchedLeaf?.items?.length
     const parents = matchedLeaf && !isGroupLanding ? trail.slice(0, -1) : trail
     const labels = parents.map((item) => item.label).filter(Boolean)
@@ -99,9 +77,9 @@ export function createSearchEntries(pages: DocsPage[], nav: NavItem[]): DocsSear
     const groupLabel = labels.join(" › ") || "Documentation"
     const headingLabels =
       isGroupLanding && labels[labels.length - 1] === page.title ? labels : [...labels, page.title]
-    const groupId = parents.length
-      ? `nav:${parents.map((item) => navItemIds.get(item)).join("/")}`
-      : JSON.stringify(labels)
+    const parent = parents[parents.length - 1]
+    if (parent && !groupIds.has(parent)) groupIds.set(parent, `nav:${routePath}`)
+    const groupId = parent ? groupIds.get(parent)! : JSON.stringify(labels)
     const description = markdownToSearchText(page.description ?? "")
     const body = markdownToSearchText(page.rawContent)
     const icon = (matchedLeaf as (NavItem & { icon?: string }) | undefined)?.icon
@@ -146,7 +124,9 @@ export function createSearchEntries(pages: DocsPage[], nav: NavItem[]): DocsSear
   return entries
 }
 
-export function groupSearchResults(results: DocsSearchResult[]): DocsSearchGroup[] {
+function groupSearchResults(
+  results: Array<DocsSearchResult & { groupId: string; groupLabel: string }>
+): DocsSearchGroup[] {
   const groups = new Map<string, DocsSearchGroup>()
   for (const result of results) {
     let group = groups.get(result.groupId)
@@ -154,7 +134,8 @@ export function groupSearchResults(results: DocsSearchResult[]): DocsSearchGroup
       group = { id: result.groupId, label: result.groupLabel, results: [] }
       groups.set(result.groupId, group)
     }
-    group.results.push(result)
+    const { groupId: _groupId, groupLabel: _groupLabel, ...display } = result
+    group.results.push(display)
   }
   return [...groups.values()]
 }
@@ -170,23 +151,35 @@ function titleScore(title: string, query: string): number {
   return 0
 }
 
-/** Pure FlexSearch wrapper, shared by the context and targeted unit tests. */
-export function createDocsSearch(entries: DocsSearchEntry[], limit = 24) {
+/** Synchronous, page-aware search: indexing and ranking are private to this module. */
+export function createDocsSearch(
+  pages: DocsPage[],
+  navigation = createDocsNavigation(pages, []),
+  limit = 24
+) {
+  const entries = createSearchEntries(pages, navigation)
   const index = new Index({ tokenize: "full", cache: true })
   entries.forEach((entry, position) => {
     index.add(position, entry.indexText)
   })
 
-  const resultFor = (entry: DocsSearchEntry, query: string): DocsSearchResult => {
+  const resultFor = (entry: DocsSearchEntry, query: string) => {
     const snippetText =
       query && highlightSearchText(entry.body, query).some((part) => part.matched)
         ? entry.body
         : entry.description || entry.body
     const snippet = entry.kind === "page" ? createSearchSnippet(snippetText, query) : ""
-    return { ...entry, snippet, highlights: snippet ? highlightSearchText(snippet, query) : [] }
+    const {
+      description: _description,
+      body: _body,
+      indexText: _indexText,
+      order: _order,
+      ...display
+    } = entry
+    return { ...display, snippet, highlights: snippet ? highlightSearchText(snippet, query) : [] }
   }
 
-  return (input: string): DocsSearchResult[] => {
+  return (input: string): DocsSearchGroup[] => {
     const query = input.trim().slice(0, 200)
     if (!query) {
       // Round-robin browse makes small/deep sections useful even with a large nav.
@@ -198,7 +191,7 @@ export function createDocsSearch(entries: DocsSearchEntry[], limit = 24) {
           group.push(entry)
           groups.set(entry.groupId, group)
         })
-      const selected: DocsSearchResult[] = []
+      const selected: ReturnType<typeof resultFor>[] = []
       for (let row = 0; selected.length < limit; row++) {
         let added = false
         for (const group of groups.values()) {
@@ -210,7 +203,7 @@ export function createDocsSearch(entries: DocsSearchEntry[], limit = 24) {
         }
         if (!added) break
       }
-      return selected
+      return groupSearchResults(selected)
     }
 
     // Request enough candidates for title ranking, rather than accepting the
@@ -237,7 +230,7 @@ export function createDocsSearch(entries: DocsSearchEntry[], limit = 24) {
       ranked.filter(({ entry }) => entry.kind === "heading").map(({ entry }) => entry.routePath)
     )
 
-    const results: DocsSearchResult[] = []
+    const results: ReturnType<typeof resultFor>[] = []
     const headingCounts = new Map<string, number>()
     for (const { entry } of ranked) {
       if (
@@ -255,6 +248,6 @@ export function createDocsSearch(entries: DocsSearchEntry[], limit = 24) {
       results.push(resultFor(entry, query))
       if (results.length >= limit) break
     }
-    return results
+    return groupSearchResults(results)
   }
 }

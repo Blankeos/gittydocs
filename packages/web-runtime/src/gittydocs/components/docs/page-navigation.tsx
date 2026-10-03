@@ -1,11 +1,6 @@
 import { createMemo, Show } from "solid-js"
-import { type NavItem, useDocsContext } from "@/gittydocs/contexts/docs.context"
-import {
-  flattenNav,
-  isInternalHref,
-  normalizeNavPath,
-  opensInNewTab,
-} from "@/gittydocs/lib/nav-utils"
+import { useDocsContext } from "@/gittydocs/contexts/docs.context"
+import { type NavigationDestination, opensInNewTab } from "@/gittydocs/lib/nav-utils"
 import { withBasePath } from "@/utils/base-path"
 import { DocsIcon, NewTabIndicator } from "./docs-icon"
 
@@ -13,36 +8,12 @@ export interface PageNavigationProps {
   routePath: string
 }
 
-interface NavigationPage {
-  item: NavItem
-  routePath: string
-}
-
 /** Previous/next actual docs pages, in depth-first navigation order. */
 export function PageNavigation(props: PageNavigationProps) {
   const docs = useDocsContext()
-  const pages = createMemo(() => {
-    const knownRoutes = new Set(
-      docs.pages.map((page) => normalizeNavPath(page.routePath, import.meta.env.BASE_URL))
-    )
-    const seen = new Set<string>()
-    const ordered: NavigationPage[] = []
-
-    for (const item of flattenNav(docs.nav)) {
-      if (!item.path || !isInternalHref(item.path)) continue
-      const routePath = normalizeNavPath(item.path, import.meta.env.BASE_URL)
-      if (routePath === "/llms.txt" || seen.has(routePath) || !knownRoutes.has(routePath)) continue
-      seen.add(routePath)
-      ordered.push({ item, routePath })
-    }
-    return ordered
-  })
-  const index = () => {
-    const route = normalizeNavPath(props.routePath, import.meta.env.BASE_URL)
-    return pages().findIndex((page) => page.routePath === route)
-  }
-  const previous = () => (index() > 0 ? pages()[index() - 1] : undefined)
-  const next = () => (index() >= 0 ? pages()[index() + 1] : undefined)
+  const current = createMemo(() => docs.navigation.resolve(props.routePath))
+  const previous = () => current().previous
+  const next = () => current().next
 
   return (
     <Show when={docs.config?.ui?.pageNavigation !== false && (previous() || next())}>
@@ -59,7 +30,10 @@ export function PageNavigation(props: PageNavigationProps) {
   )
 }
 
-function PageNavigationLink(props: { page: NavigationPage; direction: "previous" | "next" }) {
+function PageNavigationLink(props: {
+  page: NavigationDestination
+  direction: "previous" | "next"
+}) {
   const newTab = () => opensInNewTab(props.page.item)
   const isNext = () => props.direction === "next"
 

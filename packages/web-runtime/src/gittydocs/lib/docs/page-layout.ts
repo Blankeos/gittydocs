@@ -15,9 +15,12 @@ export type ResolvedPage = PageLayoutMeta & {
   mdx?: (typeof docs)[number]
 }
 
-function normalizeRoutePath(routePath: string): string {
-  if (!routePath || routePath === "/") return "/"
-  return routePath.startsWith("/") ? routePath : `/${routePath}`
+export function normalizeRoutePath(routePath: string): string {
+  // Static directory hosts serve /page at /page/. Resolve the same page for
+  // every caller, including SSR and hydration, while preserving the root route.
+  const normalized = routePath.replace(/\/+$/, "")
+  if (!normalized) return "/"
+  return normalized.startsWith("/") ? normalized : `/${normalized}`
 }
 
 export function findMdxDoc(routePath: string) {

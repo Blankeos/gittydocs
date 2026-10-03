@@ -2,8 +2,7 @@ import { describe, expect, test } from "bun:test"
 import type { NavItem } from "./config-schema"
 import {
   buildNavFromPages,
-  findNavTrail,
-  flattenNav,
+  createDocsNavigation,
   formatVersionLabel,
   isExternalHref,
   isInternalHref,
@@ -11,74 +10,65 @@ import {
   normalizeMdxSourcePath,
   normalizeNavPath,
   opensInNewTab,
-  resolveNavPagePath,
 } from "./nav-utils"
 
-describe("implicit section landing pages", () => {
-  const pages = ["/intro", "/nested/start", "/other"]
-  test("links to the first known internal descendant in navigation order", () => {
-    expect(
-      resolveNavPagePath(
-        {
-          label: "Docs",
-          items: [
-            { label: "External", path: "https://example.com" },
-            { label: "Missing", path: "/missing" },
-            { label: "Intro", path: "/intro" },
-            { label: "Other", path: "/other" },
-          ],
-        },
-        pages
-      )
-    ).toBe("/intro")
+describe("navigation destinations", () => {
+  const pages = ["/intro", "/nested/start", "/other"].map((routePath) => ({
+    routePath,
+    title: routePath,
+  }))
+
+  test("finds the first known internal descendant through pathless groups", () => {
+    const group: NavItem = {
+      label: "Docs",
+      items: [
+        { label: "External", path: "https://example.com" },
+        { label: "Missing", path: "/missing" },
+        { label: "Empty", items: [] },
+        { label: "Nested", items: [{ label: "Start", path: "/nested/start" }] },
+        { label: "Intro", path: "/intro" },
+      ],
+    }
+    const navigation = createDocsNavigation(pages, [group])
+    expect(navigation.destination(navigation.items[0])).toBe("/nested/start")
+    expect(navigation.resolve("/nested/start").trail.map((item) => item.label)).toEqual([
+      "Docs",
+      "Nested",
+      "Start",
+    ])
   })
-  test("recurses through nested groups", () => {
-    expect(
-      resolveNavPagePath(
-        {
-          label: "Docs",
-          items: [
-            { label: "Empty", items: [] },
-            { label: "Nested", items: [{ label: "Start", path: "/nested/start" }] },
-          ],
-        },
-        pages
-      )
-    ).toBe("/nested/start")
+
+  test("explicit invalid landings never redirect to a valid child", () => {
+    for (const path of [
+      "/missing",
+      "https://example.com",
+      "#intro",
+      "?q=intro",
+      "javascript:alert(1)",
+      "/intro\n",
+      "/intro%250a",
+      "/llms.txt",
+    ]) {
+      const group = { label: "Docs", path, items: [{ label: "Intro", path: "/intro" }] }
+      expect(createDocsNavigation(pages, [group]).destination(group)).toBeUndefined()
+    }
+    const group = { label: "Docs", path: "/other", items: [{ label: "Intro", path: "/intro" }] }
+    expect(createDocsNavigation(pages, [group]).destination(group)).toBe("/other")
   })
-  test("honors explicit paths rather than redirecting broken or external landings", () => {
-    expect(
-      resolveNavPagePath(
-        { label: "Docs", path: "/other", items: [{ label: "Intro", path: "/intro" }] },
-        pages
-      )
-    ).toBe("/other")
-    expect(
-      resolveNavPagePath(
-        { label: "Docs", path: "/missing", items: [{ label: "Intro", path: "/intro" }] },
-        pages
-      )
-    ).toBeUndefined()
-    expect(
-      resolveNavPagePath(
-        { label: "Docs", items: [{ label: "Unsafe", path: "javascript:alert(1)" }] },
-        pages
-      )
-    ).toBeUndefined()
-  })
-  test("supports base paths and keeps fragments without inferring llms landings", () => {
-    expect(
-      resolveNavPagePath(
-        { label: "Docs", items: [{ label: "Intro", path: "/base/intro/#usage" }] },
-        pages,
-        "/base/"
-      )
-    ).toBe("/base/intro/#usage")
-    expect(
-      resolveNavPagePath({ label: "Docs", items: [{ label: "LLMs", path: "/llms.txt" }] }, [
-        "/llms.txt",
-      ])
-    ).toBeUndefined()
+
+  test("trims ordinary whitespace while retaining base paths, queries and fragments in hrefs", () => {
+    const group = {
+      label: "Docs",
+      items: [{ label: "Intro", path: " /base/intro/?mode=all#usage " }],
+    }
+    const navigation = createDocsNavigation(pages, [group], "/base/")
+    expect(navigation.destination(group)).toBe("/base/intro/?mode=all#usage")
+    expect(navigation.resolve(" /base/intro///?mode=all#usage ")).toMatchObject({
+      routePath: "/intro",
+      page: pages[0],
+      item: group.items[0],
+      order: 0,
+    })
   })
 })
 
@@ -121,11 +111,13 @@ describe("automatic navigation", () => {
       },
     ])
     expect(customPage.sourcePath).toBe("docs/custom.tsx")
+    const navigation = createDocsNavigation(pages, automaticNav)
     for (const page of pages) {
-      const trail = findNavTrail(automaticNav, page.routePath)
-      expect(trail[trail.length - 1]).toEqual({ label: page.title, path: page.routePath })
+      const resolved = navigation.resolve(page.routePath)
+      expect(resolved.page).toBe(page)
+      expect(resolved.item).toEqual({ label: page.title, path: page.routePath })
+      expect(resolved.order).toBeDefined()
     }
-    expect(flattenNav(automaticNav).filter((item) => item.path)).toHaveLength(pages.length)
   })
 
   test("uses the page route rather than guessing a route from the filename", () => {
@@ -172,73 +164,148 @@ const nav: NavItem[] = [
   { label: "GitHub", path: "https://github.com/example/docs" },
 ]
 
-describe("findNavTrail", () => {
-  test("returns the exact nested ancestry even when labels repeat", () => {
-    const trail = findNavTrail(nav, "/api/reference/overview/")
-    expect(trail.map((item) => item.label)).toEqual(["Guides", "Reference", "Overview"])
-    expect(trail[0]).toBe(nav[1])
-    expect(trail[1]).toBe(nav[1].items![0])
-    expect(trail[2]).toBe(nav[1].items![0].items![0])
+describe("navigation resolution", () => {
+  const pages = [
+    "/guides",
+    "/guides/overview",
+    "/guides/reference/overview",
+    "/api/reference/overview",
+    "/hidden",
+  ].map((routePath) => ({ routePath, title: routePath }))
+
+  test("returns exact ancestry and original identities even with repeated labels", () => {
+    const navigation = createDocsNavigation(pages, nav)
+    const resolved = navigation.resolve("api/reference/overview///?mode=all#examples")
+    expect(resolved.routePath).toBe("/api/reference/overview")
+    expect(resolved.page).toBe(pages[3])
+    expect(resolved.trail.map((item) => item.label)).toEqual(["Guides", "Reference", "Overview"])
+    expect(resolved.trail[0]).toBe(nav[1])
+    expect(resolved.trail[1]).toBe(nav[1].items![0])
+    expect(resolved.item).toBe(nav[1].items![0].items![0])
+    expect(navigation.resolve("/guides/").trail).toEqual([nav[0]])
+    expect(navigation.items[0]).toBe(nav[0])
   })
 
-  test("matches a group landing without adding its children", () => {
-    expect(findNavTrail(nav, "/guides/")).toEqual([nav[0]])
+  test("orders known pages depth-first with landing pages before children", () => {
+    const navigation = createDocsNavigation(pages, nav)
+    for (const [order, page] of pages.slice(0, 4).entries()) {
+      const resolved = navigation.resolve(page.routePath)
+      expect(resolved.order).toBe(order)
+      expect(resolved.previous?.routePath).toBe(pages[order - 1]?.routePath)
+      expect(resolved.next?.routePath).toBe(order < 3 ? pages[order + 1].routePath : undefined)
+    }
+    expect(navigation.resolve("/guides").next?.item).toBe(nav[0].items![0])
   })
 
-  test("normalizes routes, trailing slashes, query strings and fragments", () => {
-    expect(findNavTrail(nav, "guides/reference/overview///?mode=all#examples")).toEqual([
-      nav[0],
-      nav[0].items![1],
-      nav[0].items![1].items![0],
-    ])
+  test("known pages absent from nav remain resolvable without fabricated ancestry or adjacency", () => {
+    for (const configured of [nav, []]) {
+      const resolved = createDocsNavigation(pages, configured).resolve("/hidden")
+      expect(resolved.page).toBe(pages[4])
+      expect(resolved.trail).toEqual([])
+      expect(resolved.item).toBeUndefined()
+      expect(resolved.order).toBeUndefined()
+      expect(resolved.previous).toBeUndefined()
+      expect(resolved.next).toBeUndefined()
+    }
   })
 
-  test("strips a deployment base from both current and configured routes", () => {
-    expect(findNavTrail(nav, "/docs/api/reference/overview/", "/docs/")[0]).toBe(nav[1])
-    const basedNav = [{ label: "Introduction", path: "/docs/introduction/" }]
-    expect(findNavTrail(basedNav, "/introduction", "/docs/")).toEqual(basedNav)
-    expect(findNavTrail(nav, "/docs", "/docs/")).toEqual([])
-  })
-
-  test("does not use prefix, label, or external URL matches", () => {
-    expect(findNavTrail(nav, "/guides/missing")).toEqual([])
-    expect(findNavTrail(nav, "/unknown")).toEqual([])
-    expect(findNavTrail(nav, "https://github.com/example/docs")).toEqual([])
-    expect(findNavTrail(nav, "#overview")).toEqual([])
-    expect(findNavTrail(nav, "")).toEqual([])
-  })
-
-  test("uses the first exact duplicate route in nav order", () => {
-    const duplicates = [
-      { label: "First", path: "/same" },
-      { label: "Second", path: "/same/" },
+  test("normalizes BASE_URL page and nav routes only at segment boundaries", () => {
+    const basedPages = [
+      { routePath: " /docs/introduction/ ", title: "Intro" },
+      { routePath: "/docs-guide", title: "Other" },
     ]
-    expect(findNavTrail(duplicates, "/same")).toEqual([duplicates[0]])
+    const basedNav = [
+      { label: "Intro", path: " /introduction/ " },
+      { label: "Other", path: "/docs-guide" },
+    ]
+    const navigation = createDocsNavigation(basedPages, basedNav, "/docs/")
+    for (const path of ["/introduction", " /docs/introduction/?q=1#intro "]) {
+      expect(navigation.resolve(path)).toMatchObject({
+        routePath: "/introduction",
+        page: basedPages[0],
+        item: basedNav[0],
+      })
+    }
+    expect(navigation.resolve("/docs-guide").page).toBe(basedPages[1])
+    expect(navigation.resolve("/docs").page).toBeUndefined()
   })
-})
 
-describe("flattenNav", () => {
-  test("preserves pre-order, group landings, pathless groups and original identity", () => {
-    const flattened = flattenNav(nav)
-    expect(flattened.map((item) => item.path)).toEqual([
-      "/guides",
-      "/guides/overview",
-      undefined,
-      "/guides/reference/overview/",
-      undefined,
-      undefined,
-      "/api/reference/overview",
+  test("deduplicates normalized nav and page routes using their first occurrence", () => {
+    const duplicatePages = [
+      { routePath: "/same", title: "First page" },
+      { routePath: "/same/", title: "Duplicate page" },
+      { routePath: "/next", title: "Next" },
+    ]
+    const duplicates = [
+      { label: "First", path: " /same/?q=1#intro " },
+      { label: "Second", path: "/same/" },
+      { label: "Next", path: "/next" },
+    ]
+    const navigation = createDocsNavigation(duplicatePages, duplicates)
+    expect(navigation.resolve("/same")).toMatchObject({
+      page: duplicatePages[0],
+      item: duplicates[0],
+      trail: [duplicates[0]],
+      order: 0,
+      next: { item: duplicates[2], routePath: "/next" },
+    })
+    expect(navigation.resolve("/next").previous?.item).toBe(duplicates[0])
+    expect(navigation.resolve("/next").order).toBe(1)
+  })
+
+  test("filters unsafe children and llms nav without mutating the input", () => {
+    const child = { label: "Intro", path: "/intro" }
+    const group = {
+      label: "Docs",
+      items: [
+        child,
+        { label: "Unsafe", path: "/intro%250a" },
+        { label: "LLMs", path: "/llms.txt" },
+      ],
+    }
+    const navigation = createDocsNavigation(
+      [
+        { routePath: "/intro", title: "Intro" },
+        { routePath: "/llms.txt", title: "LLMs" },
+      ],
+      [group, { label: "Empty", items: [] }]
+    )
+    expect(navigation.items).toEqual([{ label: "Docs", items: [child] }])
+    expect(navigation.items[0]).not.toBe(group)
+    expect(navigation.items[0].items![0]).toBe(child)
+    expect(group.items).toHaveLength(3)
+    expect(navigation.resolve("/intro").trail[0]).toBe(navigation.items[0])
+    expect(navigation.resolve("/llms.txt").order).toBeUndefined()
+  })
+
+  test("rejects unsafe and non-route identities, while missing routes do not gain adjacency", () => {
+    const navigation = createDocsNavigation(pages, [...nav, { label: "Missing", path: "/missing" }])
+    for (const path of [
       "https://github.com/example/docs",
-    ])
-    expect(flattened[0]).toBe(nav[0])
-    expect(flattened[6]).toBe(nav[1].items![0].items![0])
-    expect(nav[0].items).toHaveLength(2)
-  })
-
-  test("handles empty nav and empty child arrays", () => {
-    expect(flattenNav([])).toEqual([])
-    const emptyGroup = { label: "Empty", items: [] }
-    expect(flattenNav([emptyGroup])).toEqual([emptyGroup])
+      "//example.com",
+      "mailto:a@b.com",
+      "#overview",
+      "?q=docs",
+      "",
+      "\n/guides",
+      "/guides%0a",
+      "javascript%3Aalert(1)",
+    ]) {
+      const resolved = navigation.resolve(path)
+      expect(resolved.page).toBeUndefined()
+      expect(resolved.trail).toEqual([])
+      expect(resolved.order).toBeUndefined()
+      expect(resolved.previous).toBeUndefined()
+      expect(resolved.next).toBeUndefined()
+    }
+    expect(navigation.resolve("/missing")).toMatchObject({
+      trail: [{ label: "Missing", path: "/missing" }],
+      page: undefined,
+      order: undefined,
+      previous: undefined,
+      next: undefined,
+    })
+    expect(navigation.resolve("/guides/missing").trail).toEqual([])
   })
 })
 
