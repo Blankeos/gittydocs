@@ -47,8 +47,8 @@ jobs:
           version="$(node -e '
             const fs = require("node:fs");
             const status = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
-            const pkg = require("./package.json");
-            process.stdout.write(status.releases[0]?.newVersion ?? pkg.version);
+            const cli = require("./packages/cli/package.json");
+            process.stdout.write(String(status.releases[0]?.newVersion ?? cli.version ?? "0.0.0"));
           ' "$status_file")"
           rm -f "$status_file"
           echo "title=release: v$version" >> "$GITHUB_OUTPUT"
