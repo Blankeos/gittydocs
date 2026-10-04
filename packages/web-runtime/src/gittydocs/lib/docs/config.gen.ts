@@ -146,7 +146,7 @@ export const gittydocsConfig: DocsConfig | null = {
   },
   "site": {
     "name": "gittydocs",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "Simple, fast docs from your Markdown.",
     "logo": "/static/gittydocs_logo.png",
     "favicon": "/static/gittydocs_logo.png",
