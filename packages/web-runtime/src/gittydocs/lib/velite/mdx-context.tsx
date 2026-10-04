@@ -2,11 +2,33 @@ import { createSignal, type FlowProps, type JSX, onCleanup, onMount } from "soli
 import { MDXProvider } from "solid-jsx"
 import { toast } from "solid-sonner"
 
-import { Accordion, Accordions, File, Files, Folder, Step, Steps } from "../../components/mdx"
+import {
+  Accordion,
+  Accordions,
+  File,
+  Files,
+  Folder,
+  Step,
+  Steps,
+  Tab,
+  Tabs,
+  TypeTable,
+} from "../../components/mdx"
 import { CodeBlock } from "../../components/mdx/code-block"
 import "../../styles/mdx-components.css"
 
-export { Accordion, Accordions, File, Files, Folder, Step, Steps } from "../../components/mdx"
+export {
+  Accordion,
+  Accordions,
+  File,
+  Files,
+  Folder,
+  Step,
+  Steps,
+  Tab,
+  Tabs,
+  TypeTable,
+} from "../../components/mdx"
 
 type HeadingProps = JSX.IntrinsicElements["h1"] & { level?: number }
 
@@ -136,6 +158,9 @@ export const mdxComponents: Record<string, (properties: never) => JSX.Element> =
   File,
   Accordions,
   Accordion,
+  Tabs,
+  Tab,
+  TypeTable,
   h1: (props: any) => <HeadingLink level={1} {...props} />,
   h2: (props: any) => <HeadingLink level={2} {...props} />,
   h3: (props: any) => <HeadingLink level={3} {...props} />,

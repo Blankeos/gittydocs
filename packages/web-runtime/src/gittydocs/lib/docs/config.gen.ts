@@ -57,6 +57,11 @@ export const gittydocsConfig: DocsConfig | null = {
           "icon": "code"
         },
         {
+          "label": "Callouts",
+          "path": "/components/callouts",
+          "icon": "file"
+        },
+        {
           "label": "Authoring",
           "items": [
             {
@@ -72,6 +77,21 @@ export const gittydocsConfig: DocsConfig | null = {
             {
               "label": "Accordion",
               "path": "/components/accordion",
+              "icon": "file"
+            },
+            {
+              "label": "Tabs",
+              "path": "/components/tabs",
+              "icon": "file"
+            },
+            {
+              "label": "Type Table",
+              "path": "/components/type-table",
+              "icon": "file"
+            },
+            {
+              "label": "Auto Type Table",
+              "path": "/components/auto-type-table",
               "icon": "file"
             }
           ],

@@ -94,6 +94,12 @@ gittydocs recache
 This removes the current version's cached runtime. The next `gittydocs dev/build` recreates it.
 Use `--all` to clear every cached version.
 
+Clearing the cache reloads the runtime bundled with the CLI you are running; it does not download unreleased features. If new component pages report missing components, check that your CLI includes those components, then restart after clearing its cache.
+
+### Preview changes in the Gittydocs repository
+
+When developing Gittydocs itself, run `bun run dev:docs` (or `bun run dev:web`) from the repository root. Both preview `docs/` using `packages/web-runtime` directly, so runtime edits are visible without refreshing a CLI cache. The `gittydocs dev docs` CLI command still uses its versioned cached runtime.
+
 ## Requirements
 
 `gittydocs dev` and `gittydocs build` require `bun`.

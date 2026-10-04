@@ -152,3 +152,25 @@ describe("prepare-docs integration (isolated runtime)", () => {
     ).toContain(path.join(root, "original/package.json"))
   })
 })
+
+test("public exports resolve AutoTypeTable from prepared external docs without executing source", async () => {
+  const example = '```mdx\n<AutoTypeTable path="./missing.ts" name="Missing" />\n```'
+  const { runtimeDir, run } = await fixture(
+    {},
+    {
+      "original/docs/options.mdx": `---\ntitle: Options\n---\n\n<AutoTypeTable path="./_components/options.ts" name="Options" />\n\n<Tabs items={["one", "two"]}><Tab value="one">First.</Tab><Tab value="two">Second.</Tab></Tabs>\n\n<TypeTable type={{ manual: { type: 'string', required: true } }} />\n\n${example}`,
+      "original/docs/_components/options.ts":
+        'throw new Error("Never execute");\nexport interface Options { /** A name. @default demo */ name: string; enabled?: boolean }',
+    }
+  )
+  const result = run()
+  expect(result.stderr).toBe("")
+  expect(result.code).toBe(0)
+  const markdown = await fs.readFile(path.join(runtimeDir, "public/llms/options.md"), "utf8")
+  expect(markdown).toContain("| name | string | Yes |")
+  expect(markdown).toContain("| enabled |")
+  expect(markdown).toContain("| manual | string | Yes |")
+  expect(markdown).toContain("### one")
+  expect(markdown).toContain("### two")
+  expect(markdown).toContain(example)
+})

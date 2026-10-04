@@ -182,7 +182,8 @@
             "sage",
             "ember",
             "ocean",
-            "sand"
+            "sand",
+            "mono"
           ]
         },
         "cssFile": {

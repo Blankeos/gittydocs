@@ -1,0 +1,203 @@
+---
+title: Tabs
+description: Show related alternatives with synchronized, keyboard-accessible tabs.
+---
+
+Use `Tabs` and `Tab` to show alternatives such as package-manager commands. Both components are built into `.mdx` pages—no imports are required. Each `Tab` has a `value` matching one of the strings in `items`.
+
+## Install demo
+
+Choose a package manager, then try the second demo below. Both groups use `groupId="package-manager"`, so selecting a tab updates the other group too.
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]} defaultIndex={0} groupId="package-manager" persist label="Install">
+  <Tab value="npm">
+
+```sh
+npm install gittydocs
+```
+
+  </Tab>
+  <Tab value="pnpm">
+
+```sh
+pnpm add gittydocs
+```
+
+  </Tab>
+  <Tab value="yarn">
+
+```sh
+yarn add gittydocs
+```
+
+  </Tab>
+  <Tab value="bun">
+
+```sh
+bun add gittydocs
+```
+
+  </Tab>
+</Tabs>
+
+````mdx title="install.mdx"
+<Tabs items={["npm", "pnpm", "yarn", "bun"]} defaultIndex={0} groupId="package-manager" persist label="Install">
+  <Tab value="npm">
+
+```sh
+npm install gittydocs
+```
+
+  </Tab>
+  <Tab value="pnpm">
+
+```sh
+pnpm add gittydocs
+```
+
+  </Tab>
+  <Tab value="yarn">
+
+```sh
+yarn add gittydocs
+```
+
+  </Tab>
+  <Tab value="bun">
+
+```sh
+bun add gittydocs
+```
+
+  </Tab>
+</Tabs>
+````
+
+## Synchronized demo
+
+<Tabs items={["npm", "pnpm", "yarn", "bun"]} defaultIndex={0} groupId="package-manager" persist label="Preview">
+  <Tab value="npm">
+
+```sh
+npx gittydocs dev ./docs
+```
+
+  </Tab>
+  <Tab value="pnpm">
+
+```sh
+pnpm exec gittydocs dev ./docs
+```
+
+  </Tab>
+  <Tab value="yarn">
+
+```sh
+yarn gittydocs dev ./docs
+```
+
+  </Tab>
+  <Tab value="bun">
+
+```sh
+bunx gittydocs dev ./docs
+```
+
+  </Tab>
+</Tabs>
+
+````mdx title="preview.mdx"
+<Tabs items={["npm", "pnpm", "yarn", "bun"]} defaultIndex={0} groupId="package-manager" persist label="Preview">
+  <Tab value="npm">
+
+```sh
+npx gittydocs dev ./docs
+```
+
+  </Tab>
+  <Tab value="pnpm">
+
+```sh
+pnpm exec gittydocs dev ./docs
+```
+
+  </Tab>
+  <Tab value="yarn">
+
+```sh
+yarn gittydocs dev ./docs
+```
+
+  </Tab>
+  <Tab value="bun">
+
+```sh
+bunx gittydocs dev ./docs
+```
+
+  </Tab>
+</Tabs>
+````
+
+## Selection and storage
+
+Without a `groupId`, each group is independent and starts at `defaultIndex`. With a `groupId`, selections synchronize between matching groups and are saved in `sessionStorage` by default. Add `persist` to use `localStorage` and remember the preference across browser sessions. Use the same `persist` setting on groups that share an ID.
+
+A saved value takes precedence over `defaultIndex` only when it appears in that group's `items`. If browser storage is unavailable, tabs still work with their default selection and in-page synchronization. `persist` has no effect without a `groupId`.
+
+Keep `items` unique and provide one matching `Tab` per item. Leave blank lines around Markdown inside the panels. Panels do not require a context provider or an additional wrapper.
+
+## Keyboard controls
+
+Tab into the selected tab. **Left Arrow** and **Right Arrow** select and focus the previous or next tab, wrapping at either end. **Home** selects the first tab; **End** selects the last. Tab again to move into the selected panel. Tabs expose tablist, tab, and tabpanel roles with linked labels.
+
+## Props
+
+<TypeTable
+  caption="Tabs props"
+  type={{
+    items: {
+      type: "string[]",
+      description: "Required ordered tab labels and values.",
+      required: true,
+    },
+    defaultIndex: {
+      type: "number",
+      description: "Zero-based initial selection before restoring a saved value.",
+      default: "0",
+    },
+    groupId: {
+      type: "string",
+      description: "Optional shared synchronization and storage identifier.",
+    },
+    persist: {
+      type: "boolean",
+      description: "Grouped tabs use session storage, or local storage when true.",
+      default: "false",
+    },
+    label: {
+      type: "string",
+      description: "Accessible name for the tablist.",
+      default: '"Content tabs"',
+    },
+    children: {
+      type: "Tab elements",
+      description: "The panels corresponding to items.",
+    },
+  }}
+/>
+
+<TypeTable
+  caption="Tab props"
+  type={{
+    value: {
+      type: "string",
+      description: "Required matching entry in the parent group's items.",
+      required: true,
+    },
+    children: {
+      type: "MDX content",
+      description: "The panel body, including paragraphs, lists, and code fences.",
+    },
+  }}
+/>

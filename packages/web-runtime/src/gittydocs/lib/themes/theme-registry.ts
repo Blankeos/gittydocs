@@ -29,6 +29,11 @@ export const themeRegistry = [
     label: "Sand",
     description: "Sunlit neutrals with gentle warmth.",
   },
+  {
+    id: "mono",
+    label: "Mono",
+    description: "Crisp black and white with subtle gray borders.",
+  },
 ] as const
 
 export type ThemePreset = (typeof themeRegistry)[number]["id"]

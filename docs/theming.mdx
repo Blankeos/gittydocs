@@ -9,12 +9,13 @@ gittydocs themes are pure CSS. The default look lives in `app.css`, and themes a
 
 These presets are bundled and ready to use:
 
-- `default` ⚪
-- `slate` 🪨
-- `sage` 🌿
-- `ember` 🔥
-- `ocean` 🌊
-- `sand` 🏖️
+- `default` ⚪ — neutral surfaces with soft blue accents.
+- `slate` 🪨 — cool blue-gray with crisp accents.
+- `sage` 🌿 — soft botanical greens and calm surfaces.
+- `ember` 🔥 — warm amber tones with a grounded feel.
+- `ocean` 🌊 — a teal-forward palette with deep blues.
+- `sand` 🏖️ — sunlit neutrals with gentle warmth.
+- `mono` — crisp black and white with subtle gray borders.
 
 Select one in `gittydocs.jsonc`:
 
@@ -28,6 +29,20 @@ Select one in `gittydocs.jsonc`:
 ```
 
 Presets work with the existing light/dark toggle. The color palette is driven by CSS variables; the toggle just switches the `light`/`dark` class.
+
+### Monochrome neutral theme
+
+Set `theme.preset` to `mono` for white surfaces in light mode and black surfaces in dark mode. Primary actions, links, and sidebar accents stay monochrome, with subtle gray borders and dark code blocks in both modes. Semantic alerts keep distinct blue, green, amber, and red colors for readability.
+
+```jsonc
+{
+  "theme": {
+    "preset": "mono",
+  },
+}
+```
+
+The preset uses the same CSS tokens and custom CSS override workflow as the other bundled themes.
 
 ## Custom CSS file
 
@@ -66,10 +81,13 @@ You can adjust sidebar spacing without changing the layout or ejecting. Add over
 }
 ```
 
-| Variable | Default | Controls |
-| --- | --- | --- |
-| `--docs-nav-section-gap` | `1.25rem` | Space between top-level navigation sections. |
-| `--docs-nav-indent` | `0.75rem` | Indentation step per hierarchy level beneath a top-level section. |
+<TypeTable
+  caption="Navigation spacing variables"
+  type={{
+    "--docs-nav-section-gap": { type: "CSS length", description: "Space between top-level navigation sections.", default: "1.25rem" },
+    "--docs-nav-indent": { type: "CSS length", description: "Indentation step per hierarchy level beneath a top-level section.", default: "0.75rem" },
+  }}
+/>
 
 Top-level section headings are flush. Direct pages and subsection headings indent one step; pages beneath a subsection indent two steps. Section and subsection headings share the same typography. Rows have no extra gaps within a section or around subsections. `--docs-nav-section-gap` applies **only between top-level sections**, not between individual rows.
 
@@ -77,7 +95,7 @@ These are CSS lengths, not config fields. Omit the overrides to keep the default
 
 ## Reduced motion
 
-Sidebar collapsible groups, [Files folders](/components/files), and [Accordion sections](/components/accordion) animate their expansion and collapse, including their disclosure chevrons. They respect the reader's `prefers-reduced-motion: reduce` setting by removing those animations while keeping the same open/close behavior and keyboard controls.
+Sidebar collapsible groups, [Files folders](/components/files), [Accordion sections](/components/accordion), and [Type Table rows](/components/type-table) animate their expansion and collapse, including their disclosure chevrons. They respect the reader's `prefers-reduced-motion: reduce` setting by removing those animations while keeping the same open/close behavior and keyboard controls.
 
 If you add motion in custom theme CSS, honor the same preference. For example, disable your custom transitions or animations inside an `@media (prefers-reduced-motion: reduce)` rule rather than forcing motion back onto the built-in disclosures.
 

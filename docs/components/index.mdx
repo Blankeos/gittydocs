@@ -1,6 +1,6 @@
 ---
 title: Components
-description: Built-in MDX components for steps, file trees, accordions, and code blocks.
+description: Built-in tabs, API tables, steps, file trees, accordions, code blocks, and Markdown callouts.
 ---
 
 Gittydocs includes authoring components directly in `.mdx` pages. **No imports, package installs, or ejection are needed.** Use the component names with their exact capitalization, and put Markdown content between the tags.
@@ -11,8 +11,12 @@ Gittydocs includes authoring components directly in `.mdx` pages. **No imports, 
 | [Steps / Step](/components/steps) | Numbered instructions with optional step titles. |
 | [Files / Folder / File](/components/files) | Collapsible file trees with filename-based icons. |
 | [Accordions / Accordion](/components/accordion) | Expandable content, with single or multiple items open. |
+| [Tabs / Tab](/components/tabs) | Keyboard-accessible alternatives with synchronized selections. |
+| [Type Table](/components/type-table) | An API reference from a manually authored property map. |
+| [Auto Type Table](/components/auto-type-table) | An API reference generated from TypeScript at build time. |
+| [Callouts](/components/callouts) | GitHub-style notes, tips, important details, warnings, and cautions. |
 
-These JSX components belong in `.mdx` files. Ordinary code fences also work in `.md` files. Keep blank lines around Markdown paragraphs, lists, and code fences inside a component so they are parsed as Markdown.
+These JSX components belong in `.mdx` files. Ordinary code fences and Markdown callouts also work in `.md` files. Keep blank lines around Markdown paragraphs, lists, and code fences inside a component so they are parsed as Markdown.
 
 ## Live example
 
@@ -57,6 +61,10 @@ Use the individual component pages for complete prop tables and more interactive
 | `Steps` / `Step` | Numbered step headings with the step body underneath. A missing title becomes “Step”. |
 | `Files` / `Folder` / `File` | Nested lists of filenames, folder names, and file descriptions. |
 | `Accordions` / `Accordion` | Headings with each accordion's full body, even if it starts closed. |
+| `Tabs` / `Tab` | A heading for each literal tab value and every panel's full content, regardless of browser selection. |
+| `TypeTable` | Safe literal property maps become Markdown tables. Dynamic expressions and JSX descriptions are preserved rather than executed. |
+| `AutoTypeTable` | A generated Markdown property table with types, defaults, descriptions, and required/deprecated information. |
+| Markdown callouts | Original blockquotes and their `[!NOTE]`, `[!TIP]`, `[!IMPORTANT]`, `[!WARNING]`, or `[!CAUTION]` markers. |
 
 This preserves the meaning of a page without requiring an MDX renderer. Custom JSX and imports are preserved rather than stripped or executed. Dynamic component titles or names that cannot be converted safely are left intact too.
 

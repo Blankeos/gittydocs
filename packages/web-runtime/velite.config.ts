@@ -7,8 +7,11 @@ import remarkGfm from "remark-gfm"
 import remarkGithubBlockquoteAlert from "remark-github-blockquote-alert"
 import remarkMath from "remark-math"
 import { defineConfig, s } from "velite"
+import { toReadableMarkdown } from "./src/gittydocs/lib/markdown-export"
+import { remarkAutoTypeTable } from "./src/gittydocs/lib/velite/auto-type-table"
 import { codeTitleTransformer } from "./src/gittydocs/lib/velite/code-title"
 import { getCompiledHeadings, rehypeExtractHeadings } from "./src/gittydocs/lib/velite/headings"
+import { resolveAutoTypeTablesInMarkdown } from "./src/gittydocs/lib/velite/markdown-export"
 
 export default defineConfig({
   root: "content",
@@ -40,7 +43,17 @@ export default defineConfig({
           }),
           content: s.mdx(),
           excerpt: s.excerpt({ length: Infinity }),
-          rawMarkdown: s.raw(),
+          rawMarkdown: s
+            .raw()
+            .transform(async (raw, { meta }) =>
+              toReadableMarkdown(
+                await resolveAutoTypeTablesInMarkdown(
+                  raw,
+                  meta.path,
+                  path.join(meta.config.root, "docs")
+                )
+              )
+            ),
           rawText: s.custom().transform((data, { meta }) => meta.plain as string),
         })
         .transform(async (data, { meta }) => {
@@ -57,7 +70,7 @@ export default defineConfig({
   },
   mdx: {
     // jsxImportSource: "solid-jsx", ( Not needed )
-    remarkPlugins: [remarkGfm, remarkMath, remarkGithubBlockquoteAlert],
+    remarkPlugins: [remarkGfm, remarkMath, remarkGithubBlockquoteAlert, remarkAutoTypeTable],
     rehypePlugins: [
       [
         rehypeShiki,

@@ -1,0 +1,83 @@
+---
+title: Auto Type Table
+description: Generate an API table from a TypeScript interface or type alias at build time.
+---
+
+`AutoTypeTable` reads a TypeScript declaration at build time and renders the built-in `TypeTable`. It requires no imports in MDX, and does not ship TypeScript or your source file to the browser.
+
+Both components share the same compact, expandable property rows. Open a row to see its description and default; mouse and keyboard toggles animate like accordions, with reduced motion respected.
+
+## Live demo
+
+<AutoTypeTable path="../_components/type-table-example.ts" name="ExampleOptions" />
+
+## Syntax
+
+Paths are relative to the **MDX page**, not the project root. For a page at `docs/index.mdx`, use:
+
+```mdx
+<AutoTypeTable path="./_components/type-table-example.ts" name="ExampleOptions" />
+```
+
+For this page, at `docs/components/auto-type-table.mdx`, the same file is `../_components/type-table-example.ts`.
+
+## Type source
+
+Store TypeScript helpers in a private `_components` directory (or another underscore-prefixed directory) inside your docs. The documentation preparation step copies `.ts` and `.tsx` files from private directories without turning them into pages.
+
+```ts title="docs/_components/type-table-example.ts"
+interface BaseOptions {
+  /** A label shown to readers. */
+  label: string
+}
+
+export interface ExampleOptions extends BaseOptions {
+  /**
+   * The visual treatment of the component.
+   * @default "quiet"
+   */
+  variant?: "quiet" | "strong"
+  /**
+   * Whether readers can interact with the component.
+   * @default true
+   */
+  interactive?: boolean
+  /**
+   * Legacy caption text. Use label instead.
+   * @deprecated
+   */
+  caption?: string
+}
+```
+
+The generator includes inherited properties, renders union property types, and marks properties without `?` as required. JSDoc prose becomes the description; `@default` (or `@defaultValue`) supplies the displayed default; `@deprecated` marks a property as deprecated. Default values are documentation text, not executed JavaScript.
+
+## Props
+
+<TypeTable
+  caption="AutoTypeTable props"
+  type={{
+    path: {
+      type: "Quoted string",
+      description: "Required relative .ts or .tsx source path inside the docs content root.",
+      required: true,
+    },
+    name: {
+      type: "Quoted string",
+      description: "Required top-level interface or type alias name in that file.",
+      required: true,
+    },
+  }}
+/>
+
+## Generation restrictions
+
+- Use a self-closing tag with quoted `path` and `name` strings. Expressions, spread attributes, extra props, and children are rejected.
+- The named declaration must describe an object. Primitive aliases, top-level unions, and generic declarations are not supported. Use a concrete alias for a generic type.
+- Relative imports must resolve to files inside the prepared docs tree. Imports from application source, external packages, aliases configured in an application `tsconfig`, and symlinks outside docs are not supported. TypeScript's standard library types remain available.
+- Source code is checked with strict TypeScript settings. Missing files or types, invalid TypeScript, and unresolved imports fail the documentation build with an `AutoTypeTable` diagnostic.
+- No source code is evaluated. Keep documentation-facing types self-contained, with dependencies in private docs directories.
+
+Optional properties include `undefined` in their displayed type because generation uses strict TypeScript checking. Changes to type files are picked up on the next documentation compilation; no persistent compiler cache is used.
+
+For manually authored rows or types that cannot be resolved within docs, use `TypeTable` instead.

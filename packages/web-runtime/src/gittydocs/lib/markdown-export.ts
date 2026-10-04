@@ -1,11 +1,24 @@
 import { fromMarkdown } from "mdast-util-from-markdown"
 
-const builtIns = new Set(["Steps", "Step", "Files", "Folder", "File", "Accordions", "Accordion"])
+const builtIns = new Set([
+  "Steps",
+  "Step",
+  "Files",
+  "Folder",
+  "File",
+  "Accordions",
+  "Accordion",
+  "Tabs",
+  "Tab",
+  "TypeTable",
+  "AutoTypeTable",
+])
 
 type MarkdownNode = string | ComponentNode
 interface ComponentNode {
   name: string
   attributes: Record<string, string | undefined>
+  expressions: Record<string, string>
   children: MarkdownNode[]
   raw: string
 }
@@ -14,6 +27,7 @@ interface Tag {
   closing: boolean
   selfClosing: boolean
   attributes: Record<string, string | undefined>
+  expressions: Record<string, string>
   end: number
 }
 
@@ -22,7 +36,10 @@ interface Tag {
  * Browser-safe: no filesystem, DOM, eval, or Node/Bun dependencies. Unknown JSX,
  * imports, dynamic labels, and code examples are deliberately left intact.
  */
-export function toReadableMarkdown(raw: string): string {
+export function toReadableMarkdown(
+  raw: string,
+  replacement?: (raw: string, name: string) => string | undefined
+): string {
   const { text, restore } = protectCode(raw)
   let cursor = 0
   const parseNodes = (closingName?: string): { nodes: MarkdownNode[]; closed: boolean } => {
@@ -54,6 +71,7 @@ export function toReadableMarkdown(raw: string): string {
         nodes.push({
           name: tag.name,
           attributes: tag.attributes,
+          expressions: tag.expressions,
           children: children.nodes,
           raw: text.slice(start, cursor),
         })
@@ -61,10 +79,11 @@ export function toReadableMarkdown(raw: string): string {
     }
     return { nodes, closed: !closingName }
   }
-  return restore(renderNodes(parseNodes().nodes, { folderDepth: 0, headingDepth: 3 }))
+  return restore(renderNodes(parseNodes().nodes, { folderDepth: 0, headingDepth: 3, replacement }))
 }
 
 interface RenderContext {
+  replacement?: (raw: string, name: string) => string | undefined
   folderDepth: number
   headingDepth: number
   steps?: { next: number }
@@ -78,6 +97,21 @@ function renderNodes(nodes: MarkdownNode[], context: RenderContext): string {
 
 function renderComponent(node: ComponentNode, context: RenderContext): string {
   const { name, attributes, children } = node
+  const replaced = context.replacement?.(node.raw, name)
+  if (replaced !== undefined) return replaced
+  if (name === "AutoTypeTable") return node.raw
+  if (name === "TypeTable") {
+    const table = parseLiteralObject(node.expressions.type ?? "")
+    return table ? block(typeTableToMarkdown(table) ?? node.raw) : node.raw
+  }
+  if (name === "Tabs") return block(renderNodes(children, context).trim())
+  if (name === "Tab") {
+    if (!attributes.value) return node.raw
+    const heading = `${"#".repeat(Math.min(context.headingDepth, 6))} ${escapeLabel(attributes.value)}`
+    return block(
+      `${heading}\n\n${renderNodes(children, { ...context, headingDepth: context.headingDepth + 1 }).trim()}`
+    )
+  }
   const labelKey = name === "Folder" || name === "File" ? "name" : "title"
   // Do not erase dynamic titles/names that cannot be evaluated outside the MDX page.
   if (Object.keys(attributes).includes(labelKey) && attributes[labelKey] === undefined)
@@ -134,6 +168,7 @@ function readTag(text: string, start: number): Tag | undefined {
   if (!match) return undefined
   let cursor = start + match[0].length
   const attributes: Record<string, string | undefined> = {}
+  const expressions: Record<string, string> = {}
   while (cursor < text.length) {
     if (/\s/.test(text[cursor])) {
       cursor++
@@ -146,6 +181,7 @@ function readTag(text: string, start: number): Tag | undefined {
         closing: Boolean(match[1]),
         selfClosing,
         attributes,
+        expressions,
         end: cursor + (selfClosing ? 2 : 1),
       }
     }
@@ -171,7 +207,8 @@ function readTag(text: string, start: number): Tag | undefined {
     } else if (quote === "{") {
       const end = expressionEnd(text, cursor)
       if (end === -1) return undefined
-      attributes[attr[0]] = expressionLiteral(text.slice(cursor + 1, end - 1).trim())
+      expressions[attr[0]] = text.slice(cursor + 1, end - 1).trim()
+      attributes[attr[0]] = expressionLiteral(expressions[attr[0]])
       cursor = end
     } else {
       return undefined
@@ -377,4 +414,108 @@ function protectCode(raw: string): { text: string; restore: (text: string) => st
         (_, index: string) => examples[Number(index)]
       ),
   }
+}
+
+/** A deliberately small data grammar: no calls, getters, spreads or computed keys. */
+function parseLiteralObject(source: string): Record<string, unknown> | undefined {
+  let cursor = 0
+  const whitespace = () => {
+    while (cursor < source.length) {
+      const match = /^(?:\s+|\/\/[^\n]*(?:\n|$)|\/\*[\s\S]*?\*\/)/.exec(source.slice(cursor))
+      if (!match) break
+      cursor += match[0].length
+    }
+  }
+  const string = (): string => {
+    const start = cursor
+    const end = quotedEnd(source, cursor)
+    if (end < 0) throw new Error("Unterminated string")
+    cursor = end
+    const value = expressionLiteral(source.slice(start, end))
+    if (value === undefined) throw new Error("Dynamic string")
+    return value
+  }
+  const value = (depth: number): unknown => {
+    if (depth > 50) throw new Error("Object nesting limit")
+    whitespace()
+    if (source[cursor] === '"' || source[cursor] === "'" || source[cursor] === "`") return string()
+    if (source[cursor] === "{") {
+      cursor++
+      const result: Record<string, unknown> = Object.create(null)
+      whitespace()
+      while (source[cursor] !== "}") {
+        whitespace()
+        let key: string
+        if (source[cursor] === '"' || source[cursor] === "'") key = string()
+        else {
+          const token = /^[A-Za-z_$][\w$]*/.exec(source.slice(cursor))
+          if (!token) throw new Error("Invalid key")
+          key = token[0]
+          cursor += key.length
+        }
+        whitespace()
+        if (source[cursor++] !== ":") throw new Error("Expected colon")
+        if (Object.prototype.hasOwnProperty.call(result, key)) throw new Error("Duplicate key")
+        result[key] = value(depth + 1)
+        whitespace()
+        if (source[cursor] === "}") break
+        if (source[cursor++] !== ",") throw new Error("Expected comma")
+        whitespace()
+      }
+      cursor++
+      return result
+    }
+    const token = /^(?:true\b|false\b|null\b|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?)/.exec(
+      source.slice(cursor)
+    )
+    if (!token) throw new Error("Not a literal")
+    cursor += token[0].length
+    return JSON.parse(token[0])
+  }
+  try {
+    const result = value(0)
+    whitespace()
+    if (cursor !== source.length || !result || typeof result !== "object") return undefined
+    return result as Record<string, unknown>
+  } catch {
+    return undefined
+  }
+}
+
+function typeTableToMarkdown(table: Record<string, unknown>): string | undefined {
+  const cell = (value: string) =>
+    value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\|/g, "&#124;")
+      .replace(/\r?\n/g, "<br />")
+  const rows: string[] = []
+  for (const [name, value] of Object.entries(table)) {
+    if (!value || typeof value !== "object") return undefined
+    const property = value as Record<string, unknown>
+    if (typeof property.type !== "string") return undefined
+    for (const field of ["required", "deprecated"]) {
+      if (property[field] !== undefined && typeof property[field] !== "boolean") return undefined
+    }
+    if (property.description !== undefined && typeof property.description !== "string")
+      return undefined
+    if (
+      property.default !== undefined &&
+      property.default !== null &&
+      !["string", "boolean", "number"].includes(typeof property.default)
+    )
+      return undefined
+    const description = [property.deprecated ? "Deprecated." : "", property.description ?? ""]
+      .filter(Boolean)
+      .join(" ")
+    rows.push(
+      `| ${cell(name)} | ${cell(property.type)} | ${property.required ? "Yes" : "No"} | ${cell(property.default === undefined ? "—" : String(property.default))} | ${cell(description)} |`
+    )
+  }
+  return [
+    "| Property | Type | Required | Default | Description |",
+    "| --- | --- | --- | --- | --- |",
+    ...rows,
+  ].join("\n")
 }

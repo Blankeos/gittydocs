@@ -10,7 +10,7 @@
     "changeset": "changeset",
     "ci": "bun run check && bun run build",
     "dev:web": "bun run --filter @gittydocs/web-runtime dev",
-    "dev:docs": "gittydocs dev docs",
+    "dev:docs": "bun run dev:web",
     "gen:schemajson": "bun run --filter @gittydocs/web-runtime generate:config-schema",
     "build:docs": "gittydocs build docs",
     "check": "bun run --filter '*' check",

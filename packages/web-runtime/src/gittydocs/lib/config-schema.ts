@@ -21,7 +21,7 @@ export type NavItem = {
   defaultOpen?: boolean
 }
 
-const themePresets = ["default", "slate", "sage", "ember", "ocean", "sand"] as const
+const themePresets = ["default", "slate", "sage", "ember", "ocean", "sand", "mono"] as const
 
 export const navItemSchema: z.ZodType<NavItem, NavItem> = z.lazy(() =>
   z

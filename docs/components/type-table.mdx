@@ -1,0 +1,118 @@
+---
+title: Type Table
+description: Write an API reference from a manual map of properties and types.
+---
+
+`TypeTable` renders a manually authored property map, following the Fumadocs-style `type` API. It is built into `.mdx` pages—no imports are required. Use it when you want to document an API without reading a TypeScript source file; use [Auto Type Table](/components/auto-type-table) for build-time generation from an interface or type alias.
+
+## Live demo
+
+The map keys become property names. Type and default values are display strings, not executable code. Descriptions can include JSX for links, emphasis, and inline code.
+
+<TypeTable
+  caption="Button props"
+  type={{
+    label: {
+      type: "string",
+      description: <>Text shown inside the button.</>,
+      required: true,
+    },
+    variant: {
+      type: '"quiet" | "strong"',
+      description: <>Choose the visual treatment. See <a href="/theming">Theming</a>.</>,
+      default: '"quiet"',
+    },
+    disabled: {
+      type: "boolean",
+      description: <>Prevent interaction without hiding the button.</>,
+      default: "false",
+    },
+    text: {
+      type: "string",
+      description: <>Use <code>label</code> instead.</>,
+      deprecated: true,
+    },
+  }}
+/>
+
+```mdx title="button.mdx"
+<TypeTable
+  caption="Button props"
+  type={{
+    label: {
+      type: "string",
+      description: <>Text shown inside the button.</>,
+      required: true,
+    },
+    variant: {
+      type: '"quiet" | "strong"',
+      description: <>Choose the visual treatment. See <a href="/theming">Theming</a>.</>,
+      default: '"quiet"',
+    },
+    disabled: {
+      type: "boolean",
+      description: <>Prevent interaction without hiding the button.</>,
+      default: "false",
+    },
+    text: {
+      type: "string",
+      description: <>Use <code>label</code> instead.</>,
+      deprecated: true,
+    },
+  }}
+/>
+```
+
+## Props
+
+<TypeTable
+  caption="TypeTable props"
+  type={{
+    type: {
+      type: "Record<string, TypeTableProperty>",
+      description: "Required map of property names to row definitions.",
+      required: true,
+    },
+    caption: {
+      type: "string",
+      description: "Optional visible reference caption and accessible region name. Without it, the region is named “Type reference”.",
+    },
+  }}
+/>
+
+### Row definition
+
+Each value in the `type` map supports these fields:
+
+<TypeTable
+  caption="TypeTableProperty fields"
+  type={{
+    type: {
+      type: "string",
+      description: "Required displayed type; write unions, generics, and other notation as strings.",
+      required: true,
+    },
+    description: {
+      type: "string | JSX.Element",
+      description: "Optional description; plain strings and JSX content are supported.",
+    },
+    default: {
+      type: "string",
+      description: "Optional displayed default. When omitted, the Default line is hidden.",
+    },
+    required: {
+      type: "boolean",
+      description: "Show a “Required” badge when true.",
+      default: "false",
+    },
+    deprecated: {
+      type: "boolean",
+      description: "Show a “Deprecated” badge when true.",
+      default: "false",
+    },
+  }}
+/>
+
+The compact summary shows the **Prop** and **Type**. Expand a row to read its description and default. Row definitions do not infer whether a property is optional or deprecated: set the badges explicitly. A `default` documents a value; it does not change the behavior of the API you are describing.
+
+Rows use native disclosures: focus a summary and press **Enter** or **Space** to toggle it. Expansion and collapse use the same animation as accordions and respect reduced motion. On narrow screens, the type wraps beneath the property name rather than forcing horizontal scrolling. The rounded container has a muted background and subtle border; closely spaced rows blend into it when collapsed and show a border only when open.

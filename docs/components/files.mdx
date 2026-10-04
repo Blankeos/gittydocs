@@ -47,15 +47,54 @@ Folder expansion/collapse and the disclosure chevron are animated. When the read
 
 ## Props
 
-| Component | Prop | Type | Default / behavior |
-| --- | --- | --- | --- |
-| `Files` | children | `File` or `Folder` elements | Root tree entries. |
-| `Folder` | `name` | string | Required directory label. |
-| `Folder` | `defaultOpen` | boolean | `false`; initially expand the folder when `true`. |
-| `Folder` | children | `File` or `Folder` elements | Nested entries; folders can contain folders. |
-| `File` | `name` | string | Required filename label. |
-| `File` | `description` | string | Optional text displayed beside the filename. |
-| `File` | `icon` | string | Optional file-type override; otherwise inferred from `name`. |
+<TypeTable
+  caption="Files props"
+  type={{
+    children: {
+      type: "File or Folder elements",
+      description: "Root tree entries.",
+    },
+  }}
+/>
+
+<TypeTable
+  caption="Folder props"
+  type={{
+    name: {
+      type: "string",
+      description: "Required directory label.",
+      required: true,
+    },
+    defaultOpen: {
+      type: "boolean",
+      description: "Initially expand the folder when true.",
+      default: "false",
+    },
+    children: {
+      type: "File or Folder elements",
+      description: "Nested entries; folders can contain folders.",
+    },
+  }}
+/>
+
+<TypeTable
+  caption="File props"
+  type={{
+    name: {
+      type: "string",
+      description: "Required filename label.",
+      required: true,
+    },
+    description: {
+      type: "string",
+      description: "Optional text displayed beside the filename.",
+    },
+    icon: {
+      type: "string",
+      description: "Optional file-type override; otherwise inferred from name.",
+    },
+  }}
+/>
 
 The tree is a visual explanation of your project, not a filesystem browser. Labels do not create routes or link to files.
 

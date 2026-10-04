@@ -60,30 +60,33 @@ All top-level sections are optional. If you provide `site`, its `name` is requir
 
 ## Options
 
-| Field | Type | Description / default |
-| --- | --- | --- |
-| `$schema` | string | JSON Schema URL for editor autocomplete and validation. |
-| `site.name` | string | Site title; required when `site` is present. |
-| `site.version` | string or object | Optional version label or manifest reference; see [Site version](#site-version). |
-| `site.description` | string | Short site description used in `/llms.txt`. |
-| `site.logo` | string | Logo image URL or public path. |
-| `site.favicon` | string | Favicon URL or public path. |
-| `site.socialBanner` | string | Social preview image (Open Graph/Twitter) URL or path. |
-| `site.repo.owner` | string | GitHub username or org; required when `site.repo` is present. |
-| `site.repo.name` | string | Repository name; required when `site.repo` is present. |
-| `site.repo.ref` | string | Branch or tag; default: `main`. |
-| `site.repo.docsPath` | string | Repository-relative docs folder; default: `docs`. Use `""` for the repository root. |
-| `nav` | array of navigation items | Recursive custom navigation; omitted or empty uses the file structure. See [Navigation](/navigation). |
-| `navFooter` | array of footer links | Optional ordered, link-only sidebar footer entries alongside automatic `llms.txt`, above the version. Omitted or empty adds no custom links. See [Footer navigation](#footer-navigation). |
-| `ui.breadcrumbs` | boolean | Show breadcrumbs on Markdown/MDX pages; default: `true`. Set `false` to hide. |
-| `ui.pageNavigation` | boolean | Show previous/next page links on Markdown/MDX pages; default: `true`. Set `false` to hide. |
-| `links.github` | string | URL to repository or org for GitHub actions; does not automatically add a sidebar footer link. |
-| `links.issues` | string | URL to issues page. |
-| `links.discord` | string | URL to Discord server. |
-| `theme.preset` | string | `default`, `slate`, `sage`, `ember`, `ocean`, or `sand`; default: `default`. |
-| `theme.cssFile` | string | CSS file relative to your docs folder; default: `theme.css`. |
-| `llms.enabled` | boolean | Generate `/llms.txt` and per-page Markdown; default: `true`. |
-| `llms.path` | string | Output folder for per-page Markdown; default: `llms`. Does not change `/llms.txt`. |
+<TypeTable
+  caption="Configuration options"
+  type={{
+    "$schema": { type: "string", description: "JSON Schema URL for editor autocomplete and validation." },
+    "site.name": { type: "string", description: "Site title; required when site is present.", required: true },
+    "site.version": { type: "string or object", description: <>{"Optional version label or manifest reference; see "}<a href="#site-version">Site version</a>{"."}</> },
+    "site.description": { type: "string", description: "Short site description used in /llms.txt." },
+    "site.logo": { type: "string", description: "Logo image URL or public path." },
+    "site.favicon": { type: "string", description: "Favicon URL or public path." },
+    "site.socialBanner": { type: "string", description: "Social preview image (Open Graph/Twitter) URL or path." },
+    "site.repo.owner": { type: "string", description: "GitHub username or org; required when site.repo is present.", required: true },
+    "site.repo.name": { type: "string", description: "Repository name; required when site.repo is present.", required: true },
+    "site.repo.ref": { type: "string", description: "Branch or tag; default: main.", default: "\"main\"" },
+    "site.repo.docsPath": { type: "string", description: "Repository-relative docs folder; default: docs. Use \"\" for the repository root.", default: "\"docs\"" },
+    "nav": { type: "array of navigation items", description: <>{"Recursive custom navigation; omitted or empty uses the file structure. See "}<a href="/navigation">Navigation</a>{"."}</> },
+    "navFooter": { type: "array of footer links", description: <>{"Optional ordered, link-only sidebar footer entries alongside automatic "}<code>llms.txt</code>{", above the version. Omitted or empty adds no custom links. See "}<a href="#footer-navigation">Footer navigation</a>{"."}</> },
+    "ui.breadcrumbs": { type: "boolean", description: "Show breadcrumbs on Markdown/MDX pages; default: true. Set false to hide.", default: "true" },
+    "ui.pageNavigation": { type: "boolean", description: "Show previous/next page links on Markdown/MDX pages; default: true. Set false to hide.", default: "true" },
+    "links.github": { type: "string", description: "URL to repository or org for GitHub actions; does not automatically add a sidebar footer link." },
+    "links.issues": { type: "string", description: "URL to issues page." },
+    "links.discord": { type: "string", description: "URL to Discord server." },
+    "theme.preset": { type: "string", description: "default, slate, sage, ember, ocean, sand, or mono; default: default.", default: "\"default\"" },
+    "theme.cssFile": { type: "string", description: "CSS file relative to your docs folder; default: theme.css.", default: "\"theme.css\"" },
+    "llms.enabled": { type: "boolean", description: "Generate /llms.txt and per-page Markdown; default: true.", default: "true" },
+    "llms.path": { type: "string", description: "Output folder for per-page Markdown; default: llms. Does not change /llms.txt.", default: "\"llms\"" },
+  }}
+/>
 
 `site.logo`, `site.favicon`, and `site.socialBanner` can be full URLs or paths to files in `public/`. Relative paths are resolved with the base URL.
 
@@ -91,15 +94,18 @@ All top-level sections are optional. If you provide `site`, its `name` is requir
 
 Every item in `nav`, including nested `items`, accepts the same fields:
 
-| Field | Type | Description / default |
-| --- | --- | --- |
-| `label` | string | Required display label. |
-| `path` | string | Optional internal route or external URL. A group with a path has a clickable label. |
-| `items` | array of navigation items | Optional children; nesting is recursive and unrestricted. |
-| `accordion` | boolean | Make a group collapsible; default: `false`. |
-| `defaultOpen` | boolean | Initially expand a collapsible group; default: `false`. Active ancestors expand automatically. |
-| `icon` | string | Optional curated icon name; see [supported icons](/navigation#icons). Not an arbitrary icon library name or image URL. |
-| `newTab` | boolean | Default: `true` for external HTTP(S) links, `false` for internal routes. Override either behavior explicitly. |
+<TypeTable
+  caption="Navigation item options"
+  type={{
+    "label": { type: "string", description: "Required display label.", required: true },
+    "path": { type: "string", description: "Optional internal route or external URL. A group with a path has a clickable label." },
+    "items": { type: "array of navigation items", description: "Optional children; nesting is recursive and unrestricted." },
+    "accordion": { type: "boolean", description: "Make a group collapsible; default: false.", default: "false" },
+    "defaultOpen": { type: "boolean", description: "Initially expand a collapsible group; default: false. Active ancestors expand automatically.", default: "false" },
+    "icon": { type: "string", description: <>{"Optional curated icon name; see "}<a href="/navigation#icons">supported icons</a>{". Not an arbitrary icon library name or image URL."}</> },
+    "newTab": { type: "boolean", description: "Default: true for external HTTP(S) links, false for internal routes. Override either behavior explicitly.", default: "true for external HTTP(S), false for internal routes" },
+  }}
+/>
 
 See [Navigation](/navigation) for nested groups, breadcrumbs, search, and previous/next ordering.
 
@@ -107,12 +113,15 @@ See [Navigation](/navigation) for nested groups, breadcrumbs, search, and previo
 
 Use `navFooter` to place utility links in the sidebar's bottom group rather than a main-nav Resources section. Entries render as compact rows in the order you configure, alongside the automatic `llms.txt` link and **above the site version**. The version text aligns with the left edge of the footer icons.
 
-| Field | Type | Description / default |
-| --- | --- | --- |
-| `label` | string | Required display label. |
-| `path` | string | Required internal route or external URL. |
-| `icon` | string | Optional [curated navigation icon](/navigation#icons). |
-| `newTab` | boolean | Default: `true` for external HTTP(S) links, `false` for internal routes. Override either behavior explicitly. |
+<TypeTable
+  caption="Footer navigation"
+  type={{
+    "label": { type: "string", description: "Required display label.", required: true },
+    "path": { type: "string", description: "Required internal route or external URL.", required: true },
+    "icon": { type: "string", description: <>{"Optional "}<a href="/navigation#icons">curated navigation icon</a>{"."}</> },
+    "newTab": { type: "boolean", description: "Default: true for external HTTP(S) links, false for internal routes. Override either behavior explicitly.", default: "true for external HTTP(S), false for internal routes" },
+  }}
+/>
 
 The footer schema is strict and link-only: `items`, `accordion`, `defaultOpen`, and unknown fields are rejected. `nav` remains recursive and unchanged. In TypeScript, the configuration shape is:
 
@@ -257,12 +266,15 @@ toc: true
 Content here.
 ```
 
-| Field         | Type    | Description                                      |
-| ------------- | ------- | ------------------------------------------------ |
-| `title`       | string  | Page title                                       |
-| `description` | string  | Description for SEO                              |
-| `sidebar`     | boolean | Show the left docs sidenav (default: `true`)     |
-| `toc`         | boolean | Show the on-page table of contents (default: `true`) |
+<TypeTable
+  caption="Page frontmatter"
+  type={{
+    "title": { type: "string", description: "Page title" },
+    "description": { type: "string", description: "Description for SEO" },
+    "sidebar": { type: "boolean", description: "Show the left docs sidenav (default: true)", default: "true" },
+    "toc": { type: "boolean", description: "Show the on-page table of contents (default: true)", default: "true" },
+  }}
+/>
 
 ### Custom pages (`.tsx`)
 

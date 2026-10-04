@@ -69,11 +69,29 @@ The last step intentionally has no title. It still gets a number, but does not r
 
 ## Props
 
-| Component | Prop | Type | Default / behavior |
-| --- | --- | --- | --- |
-| `Steps` | children | `Step` elements | Ordered instructions; no additional props are required. |
-| `Step` | `title` | string | Optional; omit for a body-only instruction. |
-| `Step` | children | MDX content | The instruction body. |
+<TypeTable
+  caption="Steps props"
+  type={{
+    children: {
+      type: "Step elements",
+      description: "Ordered instructions; no additional props are required.",
+    },
+  }}
+/>
+
+<TypeTable
+  caption="Step props"
+  type={{
+    title: {
+      type: "string",
+      description: "Optional; omit for a body-only instruction.",
+    },
+    children: {
+      type: "MDX content",
+      description: "The instruction body.",
+    },
+  }}
+/>
 
 For a simple list with no rich content, a normal Markdown numbered list is still a good choice.
 

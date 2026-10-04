@@ -35,7 +35,7 @@ export function renderBrowserHarness(name: string) {
     async evaluate(code: string) {
       return (await command("eval", code)).result
     },
-    async start(fixture: string, stubs: Record<string, string>) {
+    async start(fixture: string, stubs: Record<string, string>, options: { ssr?: boolean } = {}) {
       directory = await mkdtemp(path.join(tmpdir(), `${name}-`))
       await symlink(path.join(runtimeRoot, "node_modules"), path.join(directory, "node_modules"))
       const stubPaths = new Map<string, string>()
@@ -45,6 +45,14 @@ export function renderBrowserHarness(name: string) {
         await writeFile(file, source)
       }
       await writeFile(path.join(directory, "fixture.tsx"), fixture)
+      if (options.ssr) {
+        await writeFile(
+          path.join(directory, "server.tsx"),
+          `import { renderToString } from "solid-js/web"
+          import { Fixture } from "./fixture"
+          export function render() { return renderToString(() => <Fixture />) }`
+        )
+      }
       await writeFile(
         path.join(directory, "client.tsx"),
         `
@@ -57,6 +65,7 @@ export function renderBrowserHarness(name: string) {
         window.fixtureReady = true
       `
       )
+      let ssrHtml = ""
       server = await createServer({
         configFile: false,
         root: runtimeRoot,
@@ -73,19 +82,28 @@ export function renderBrowserHarness(name: string) {
             configureServer(vite) {
               vite.middlewares.use((request, response, next) => {
                 if (request.url === "/render-test") {
-                  response.setHeader("Content-Type", "text/html")
+                  response.setHeader("Content-Type", "text/html; charset=utf-8")
                   response.end(
-                    `<!doctype html><html><body><div id="app"></div><script type="module" src="/@fs/${directory}/client.tsx"></script></body></html>`
+                    options.ssr
+                      ? `<!doctype html><html><head>${[
+                          "src/styles/app.css",
+                          "src/gittydocs/styles/prose.css",
+                          "src/gittydocs/styles/mdx-components.css",
+                        ]
+                          .map((file) => `<link rel="stylesheet" href="/${file}?direct">`)
+                          .join("")}</head><body><div id="app">${ssrHtml}</div></body></html>`
+                      : `<!doctype html><html><body><div id="app"></div><script type="module" src="/@fs/${directory}/client.tsx"></script></body></html>`
                   )
                 } else next()
               })
             },
           },
-          solid({ hot: false }),
+          solid({ hot: false, ssr: options.ssr ?? false }),
           solidSvg(),
           tailwindcss(),
         ],
         resolve: { alias: { "@": path.join(runtimeRoot, "src") } },
+        ssr: { resolve: { conditions: ["node"], externalConditions: ["node"] } },
         server: { host: "127.0.0.1", port: 0, fs: { allow: [runtimeRoot, directory] } },
         optimizeDeps: {
           noDiscovery: true,
@@ -93,10 +111,16 @@ export function renderBrowserHarness(name: string) {
         },
       })
       await server.listen()
+      if (options.ssr) {
+        const fixtureModule = await server.ssrLoadModule(path.join(directory, "server.tsx"))
+        ssrHtml = fixtureModule.render()
+      }
       const address = server.httpServer!.address()
       if (!address || typeof address === "string") throw new Error("Missing fixture port")
       await command("set", "viewport", "1200", "1000")
       await command("open", `http://127.0.0.1:${address.port}/render-test`)
+      // This document contains no scripts: mounting/hydration must never repair SSR visibility.
+      if (options.ssr) return
       for (let attempt = 0; attempt < 60; attempt++) {
         if (await this.evaluate("window.fixtureReady === true")) return
         const errors = (await command("errors")).errors

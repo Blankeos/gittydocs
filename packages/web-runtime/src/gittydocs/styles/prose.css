@@ -296,97 +296,68 @@
   color: var(--foreground);
 }
 
-/* GitHub-style markdown callouts */
-.markdown-alert {
+/* GitHub-style markdown callouts: a semantic rail, not a tinted card. */
+.prose .markdown-alert {
   margin: 1.5em 0;
-  padding: 1em;
-  border-radius: 0.5rem;
-  border: 1px solid var(--border);
-  background-color: var(--muted);
+  padding: 0.5em 1em;
+  border: 0;
+  border-left: 4px solid var(--markdown-alert-color);
+  border-radius: 0;
+  background: transparent;
+  color: var(--foreground);
+  font-style: normal;
 }
 
-.markdown-alert > *:first-child {
-  margin-top: 0;
-}
-
-.markdown-alert > *:last-child {
-  margin-bottom: 0;
-}
-
-.markdown-alert p {
+.prose .markdown-alert p {
   margin: 0.5em 0;
 }
 
-.markdown-alert p:first-child {
+.prose .markdown-alert > *:first-child {
   margin-top: 0;
-  font-weight: 600;
+}
+
+.prose .markdown-alert > *:last-child {
+  margin-bottom: 0;
+}
+
+.prose .markdown-alert li {
+  color: var(--foreground);
+}
+
+/* Target the title class, not the first paragraph, and outrank prose rules. */
+.prose .markdown-alert .markdown-alert-title {
   display: flex;
   align-items: center;
-  gap: 0.35em;
+  gap: 0.5em;
+  padding-left: 0;
+  margin-left: 0;
+  font-weight: 600;
+  color: var(--markdown-alert-color);
 }
 
-/* Remove left padding from plugin-generated title */
-.markdown-alert-title {
-  padding-left: 0 !important;
-  margin-left: 0 !important;
-}
-
-/* Style SVG icons in callouts */
-.markdown-alert-title svg {
+.prose .markdown-alert-title svg {
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
   fill: currentColor;
 }
 
-/* Note callout */
-.markdown-alert-note {
-  border-color: var(--info);
-  background-color: color-mix(in oklch, var(--info) 10%, transparent);
-  color: var(--info);
+.prose .markdown-alert-note {
+  --markdown-alert-color: var(--info);
 }
 
-.markdown-alert-note p:first-child {
-  color: var(--info);
+.prose .markdown-alert-tip {
+  --markdown-alert-color: var(--success);
 }
 
-/* Tip callout */
-.markdown-alert-tip {
-  border-color: var(--success);
-  background-color: color-mix(in oklch, var(--success) 10%, transparent);
-  color: var(--success);
+.prose .markdown-alert-important {
+  --markdown-alert-color: var(--important, light-dark(#8250df, #a371f7));
 }
 
-.markdown-alert-tip p:first-child {
-  color: var(--success);
+.prose .markdown-alert-warning {
+  --markdown-alert-color: var(--warning);
 }
 
-/* Important callout */
-.markdown-alert-important {
-  border-color: var(--primary);
-  background-color: color-mix(in oklch, var(--primary) 10%, transparent);
-  color: var(--primary);
-}
-
-.markdown-alert-important p:first-child {
-  color: var(--primary);
-}
-
-/* Warning callout */
-.markdown-alert-warning {
-  border-color: var(--warning);
-  background-color: color-mix(in oklch, var(--warning) 20%, transparent);
-  color: var(--warning-foreground);
-}
-
-.markdown-alert-warning p:first-child {
-  color: var(--warning-foreground);
-}
-
-/* Caution callout */
-.markdown-alert-caution {
-  border-color: var(--error);
-  background-color: color-mix(in oklch, var(--error) 10%, transparent);
-  color: var(--error);
-}
-
-.markdown-alert-caution p:first-child {
-  color: var(--error);
+.prose .markdown-alert-caution {
+  --markdown-alert-color: var(--error);
 }

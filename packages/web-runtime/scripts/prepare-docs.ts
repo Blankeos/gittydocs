@@ -5,6 +5,7 @@ import type { ZodIssue, z } from "zod"
 import type { DocsConfig, NavItem } from "../src/gittydocs/lib/config-schema"
 import { docsConfigSchema } from "../src/gittydocs/lib/config-schema"
 import { toReadableMarkdown } from "../src/gittydocs/lib/markdown-export"
+import { resolveAutoTypeTablesInMarkdown } from "../src/gittydocs/lib/velite/markdown-export"
 import { resolveSiteVersion, type VersionSource } from "./lib/resolve-version"
 
 interface GitHubSource {
@@ -598,7 +599,9 @@ async function collectDocsPages(): Promise<LlmsPage[]> {
     const raw = await fs.readFile(filePath, "utf-8")
     const title = extractFrontmatterField(raw, "title") || defaultLabel(path.basename(relativePath))
     const description = extractFrontmatterField(raw, "description") || undefined
-    const body = toReadableMarkdown(stripFrontmatter(raw))
+    const body = toReadableMarkdown(
+      await resolveAutoTypeTablesInMarkdown(stripFrontmatter(raw), filePath, docsRoot)
+    )
 
     pages.push({ routePath, sourcePath: relativePath, title, description, body })
   }

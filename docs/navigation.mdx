@@ -54,15 +54,18 @@ When the group label already links to an overview, do not repeat that same path 
 
 All levels of `nav` use the same item shape. Footer links use a [separate, link-only shape](#footer-links).
 
-| Field | Type | Default / behavior |
-| --- | --- | --- |
-| `label` | string | Required label. |
-| `path` | string | Optional internal page route or external URL. |
-| `items` | array of navigation items | Optional recursive children. |
-| `accordion` | boolean | `false`; set `true` to make a group collapsible. |
-| `defaultOpen` | boolean | `false`; initial expansion for a collapsible group. Active ancestors expand regardless. |
-| `icon` | string | Optional curated icon name. |
-| `newTab` | boolean | External HTTP(S) links default to `true`; internal links default to `false`. |
+<TypeTable
+  caption="Navigation item options"
+  type={{
+    "label": { type: "string", description: "Required label.", required: true },
+    "path": { type: "string", description: "Optional internal page route or external URL." },
+    "items": { type: "array of navigation items", description: "Optional recursive children." },
+    "accordion": { type: "boolean", description: "false; set true to make a group collapsible.", default: "false" },
+    "defaultOpen": { type: "boolean", description: "false; initial expansion for a collapsible group. Active ancestors expand regardless.", default: "false" },
+    "icon": { type: "string", description: "Optional curated icon name." },
+    "newTab": { type: "boolean", description: "External HTTP(S) links default to true; internal links default to false.", default: "true for external HTTP(S), false for internal routes" },
+  }}
+/>
 
 Use paths such as `/components/files`, not the source filename `components/files.mdx`. Navigation does not create pages; add a source file for every internal page route you link to.
 
@@ -121,6 +124,31 @@ Conversely, set `newTab: true` on an internal link to open that page in a new ta
 ## Footer links
 
 Set `navFooter` to add links such as GitHub or a community site without creating a Resources section in the main navigation:
+
+<TypeTable
+  caption="Footer navigation"
+  type={{
+    label: {
+      type: "string",
+      description: "Display label for the footer link.",
+      required: true,
+    },
+    path: {
+      type: "string",
+      description: "Internal route or external URL.",
+      required: true,
+    },
+    icon: {
+      type: "string",
+      description: <>Optional <a href="#icons">curated navigation icon</a>.</>,
+    },
+    newTab: {
+      type: "boolean",
+      description: "Override the default new-tab behavior for either internal or external links.",
+      default: "true for external HTTP(S), false for internal routes",
+    },
+  }}
+/>
 
 ```jsonc title="gittydocs.jsonc"
 {

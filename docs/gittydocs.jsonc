@@ -11,11 +11,11 @@
       "owner": "blankeos",
       "name": "gittydocs",
       "ref": "main",
-      "docsPath": "docs",
-    },
+      "docsPath": "docs"
+    }
   },
   "theme": {
-    "preset": "ocean",
+    "preset": "ocean"
   },
   "nav": [
     {
@@ -28,8 +28,8 @@
         { "label": "Configuration", "path": "/configuration", "icon": "settings" },
         { "label": "Navigation", "path": "/navigation", "icon": "folder" },
         { "label": "CLI", "path": "/cli", "icon": "terminal" },
-        { "label": "Theming", "path": "/theming", "icon": "settings" },
-      ],
+        { "label": "Theming", "path": "/theming", "icon": "settings" }
+      ]
     },
     {
       "label": "Components",
@@ -37,6 +37,7 @@
       "icon": "package",
       "items": [
         { "label": "Code blocks", "path": "/components/code-blocks", "icon": "code" },
+        { "label": "Callouts", "path": "/components/callouts", "icon": "file" },
         {
           "label": "Authoring",
           "icon": "book",
@@ -46,9 +47,12 @@
             { "label": "Steps", "path": "/components/steps", "icon": "hash" },
             { "label": "Files", "path": "/components/files", "icon": "folder" },
             { "label": "Accordion", "path": "/components/accordion", "icon": "file" },
-          ],
-        },
-      ],
+            { "label": "Tabs", "path": "/components/tabs", "icon": "file" },
+            { "label": "Type Table", "path": "/components/type-table", "icon": "file" },
+            { "label": "Auto Type Table", "path": "/components/auto-type-table", "icon": "file" }
+          ]
+        }
+      ]
     },
     {
       "label": "Deploy",
@@ -59,15 +63,15 @@
         { "label": "GitHub Pages", "path": "/deploy/github-pages" },
         { "label": "Vercel", "path": "/deploy/vercel" },
         { "label": "Cloudflare Pages", "path": "/deploy/cloudflare" },
-        { "label": "Netlify", "path": "/deploy/netlify" },
-      ],
-    },
+        { "label": "Netlify", "path": "/deploy/netlify" }
+      ]
+    }
   ],
   "navFooter": [
-    { "label": "GitHub", "path": "https://github.com/blankeos/gittydocs", "icon": "github" },
+    { "label": "GitHub", "path": "https://github.com/blankeos/gittydocs", "icon": "github" }
   ],
   "links": {
     "github": "https://github.com/blankeos/gittydocs",
-    "issues": "https://github.com/blankeos/gittydocs/issues",
-  },
+    "issues": "https://github.com/blankeos/gittydocs/issues"
+  }
 }

@@ -6,6 +6,7 @@
 @import "../gittydocs/styles/themes/ember.css";
 @import "../gittydocs/styles/themes/ocean.css";
 @import "../gittydocs/styles/themes/sand.css";
+@import "../gittydocs/styles/themes/mono.css";
 
 /* HTML Defaults */
 body {

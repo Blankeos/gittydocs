@@ -151,3 +151,48 @@ describe("toReadableMarkdown", () => {
       expect(toReadableMarkdown(raw)).toBe(raw)
   })
 })
+
+describe("portable tabs and tables", () => {
+  test("exports every tab panel with its value heading", () => {
+    const code = "```sh\nbun install\n```"
+    const raw = `<Tabs items={["npm", "bun"]}><Tab value="npm">npm install</Tab><Tab value={'bun'}>\n${code}\n</Tab></Tabs>`
+    const result = toReadableMarkdown(raw)
+    expect(result).toContain("### npm\n\nnpm install")
+    expect(result).toContain("### bun")
+    expect(result).toContain(code)
+    expect(result).not.toContain("<Tabs")
+    const dynamic = "<Tab value={getLabel()}>Do not execute.</Tab>"
+    expect(toReadableMarkdown(dynamic)).toBe(dynamic)
+  })
+  test("renders safe literal property maps, including defaults and flags", () => {
+    const raw = `<TypeTable type={{ 'first-name': {type: 'string | null', required: true, default: 'a', description: 'First name', deprecated: true}, active: {type: 'boolean', default: false}, count: {type: 'number', default: 0}, }} />`
+    const result = toReadableMarkdown(raw)
+    expect(result).toContain(
+      "| first-name | string &#124; null | Yes | a | Deprecated. First name |"
+    )
+    expect(result).toContain("| active | boolean | No | false |")
+    expect(result).toContain("| count | number | No | 0 |")
+  })
+  test("preserves unsafe maps, JSX descriptions and examples without executing", () => {
+    for (const expression of [
+      "getTable()",
+      "{a: {type: 'string', description: <strong>Hi</strong>}}",
+      "{...table}",
+      "{a: {type: (globalThis.executed = true)}}",
+      "{get a() { return 'x' }}",
+    ]) {
+      const raw = `<TypeTable type={${expression}} />`
+      expect(toReadableMarkdown(raw)).toBe(raw)
+    }
+    const example =
+      '```mdx\n<TypeTable type={{a: {type: "string"}}} />\n<Tabs><Tab value="x">Hi</Tab></Tabs>\n```'
+    expect(toReadableMarkdown(example)).toBe(example)
+  })
+  test("supports a synchronous build-resolved replacement without Node imports", () => {
+    expect(
+      toReadableMarkdown('<AutoTypeTable path="./types.ts" name="Options" />', (_, name) =>
+        name === "AutoTypeTable" ? "Resolved table" : undefined
+      )
+    ).toBe("Resolved table")
+  })
+})

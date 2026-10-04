@@ -71,14 +71,44 @@ Build your docs and deploy the static output to your preferred [host](/deploy).
 
 ## Props
 
-| Component | Prop | Type | Default / behavior |
-| --- | --- | --- | --- |
-| `Accordions` | `type` | `"single"` or `"multiple"` | `"single"`; use `"multiple"` to allow several open items. |
-| `Accordions` | children | `Accordion` elements | The grouped sections. |
-| `Accordion` | `title` | string | Required trigger label. |
-| `Accordion` | `id` | string | Optional stable HTML ID; generated if omitted. Use a unique ID per page. |
-| `Accordion` | `defaultOpen` | boolean | `false`; set `true` to start open. |
-| `Accordion` | children | MDX content | The expandable body. |
+<TypeTable
+  caption="Accordions props"
+  type={{
+    type: {
+      type: '"single" | "multiple"',
+      description: 'Use "multiple" to allow several open items.',
+      default: '"single"',
+    },
+    children: {
+      type: "Accordion elements",
+      description: "The grouped sections.",
+    },
+  }}
+/>
+
+<TypeTable
+  caption="Accordion props"
+  type={{
+    title: {
+      type: "string",
+      description: "Required trigger label.",
+      required: true,
+    },
+    id: {
+      type: "string",
+      description: "Optional stable HTML ID; generated if omitted. Use a unique ID per page.",
+    },
+    defaultOpen: {
+      type: "boolean",
+      description: "Set true to start open.",
+      default: "false",
+    },
+    children: {
+      type: "MDX content",
+      description: "The expandable body.",
+    },
+  }}
+/>
 
 In a single-open group, if several children request `defaultOpen`, only the first stays open. A standalone `Accordion` also works without an `Accordions` wrapper when you do not need group behavior.
 

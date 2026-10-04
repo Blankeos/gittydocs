@@ -1,0 +1,102 @@
+---
+title: Callouts
+description: Highlight notes, tips, important details, warnings, and cautions with GitHub-style alerts.
+---
+
+Callouts use GitHub's Markdown blockquote syntax. They work in both `.md` and `.mdx` pages, without imports or JSX components. Start a quote with an uppercase marker on its own line, then put the content on the following quoted lines.
+
+## Note
+
+Use a note for useful context that readers can keep in mind.
+
+> [!NOTE]
+> Gittydocs reads your Markdown files directly. You do not need to move them into a framework-specific format.
+
+```md title="note.md"
+> [!NOTE]
+> Gittydocs reads your Markdown files directly. You do not need to move them into a framework-specific format.
+```
+
+## Tip
+
+Use a tip for an optional shortcut or a helpful recommendation.
+
+> [!TIP]
+> Run `gittydocs dev ./docs` while editing to preview changes locally.
+
+```md title="tip.md"
+> [!TIP]
+> Run `gittydocs dev ./docs` while editing to preview changes locally.
+```
+
+## Important
+
+Use an important callout for information readers need to complete the task successfully.
+
+> [!IMPORTANT]
+> Keep `gittydocs.jsonc` in your docs directory so the CLI can load the site's configuration.
+
+```md title="important.md"
+> [!IMPORTANT]
+> Keep `gittydocs.jsonc` in your docs directory so the CLI can load the site's configuration.
+```
+
+## Warning
+
+Use a warning for a risk that deserves attention before proceeding.
+
+> [!WARNING]
+> Review the output directory before deploying. Only publish files you intend to make public.
+
+```md title="warning.md"
+> [!WARNING]
+> Review the output directory before deploying. Only publish files you intend to make public.
+```
+
+## Caution
+
+Use a caution for an action that can cause damage or loss.
+
+> [!CAUTION]
+> Back up your content before deleting your docs directory. Removing it deletes the source pages too.
+
+```md title="caution.md"
+> [!CAUTION]
+> Back up your content before deleting your docs directory. Removing it deletes the source pages too.
+```
+
+## Rich content
+
+Quote every line, including blank lines between paragraphs. Markdown formatting, links, lists, and code work inside the callout.
+
+> [!TIP]
+> Before publishing, check the [deployment guide](/deploy).
+>
+> - Run **`gittydocs build ./docs`**.
+> - Preview your output and test navigation.
+>
+> Keep a copy of your source files in version control.
+
+```md title="publish.md"
+> [!TIP]
+> Before publishing, check the [deployment guide](/deploy).
+>
+> - Run **`gittydocs build ./docs`**.
+> - Preview your output and test navigation.
+>
+> Keep a copy of your source files in version control.
+```
+
+## Syntax reference
+
+| Marker | Title | Use it for |
+| --- | --- | --- |
+| `[!NOTE]` | Note | Helpful context. |
+| `[!TIP]` | Tip | Recommendations and shortcuts. |
+| `[!IMPORTANT]` | Important | Essential information for a successful task. |
+| `[!WARNING]` | Warning | Risks to consider before proceeding. |
+| `[!CAUTION]` | Caution | Actions that could cause damage or loss. |
+
+The renderer supplies the title and icon. Callouts have a semantic-colored left border and title, with ordinary foreground-colored body text; they do not add a tinted box. Important callouts use purple, independently of the theme's primary color.
+
+An ordinary `>` blockquote without a marker remains a blockquote. Markers inside fenced code blocks stay literal examples rather than becoming alerts. [Markdown exports](/components#markdown-exports) retain the original quote and marker syntax.
