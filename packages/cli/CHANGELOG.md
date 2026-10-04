@@ -1,5 +1,39 @@
 # gittydocs
 
+## 0.0.7
+
+### Patch Changes
+
+- [`1370f39`](https://github.com/Blankeos/gittydocs/commit/1370f39e9510b8a3416ea46c012f7837834659fd) Thanks [@Blankeos](https://github.com/Blankeos)! - feat: explore props and options in neat rows
+
+  You can now browse docs with the new type tables.
+  Open any row to see defaults, notes, and links.
+
+- [`1370f39`](https://github.com/Blankeos/gittydocs/commit/1370f39e9510b8a3416ea46c012f7837834659fd) Thanks [@Blankeos](https://github.com/Blankeos)! - feat: make key notes pop with GitHub callouts
+
+  You get all five callouts with crisp icons and colors.
+  Use the same Markdown you already know from GitHub.
+
+- [`1370f39`](https://github.com/Blankeos/gittydocs/commit/1370f39e9510b8a3416ea46c012f7837834659fd) Thanks [@Blankeos](https://github.com/Blankeos)! - fix: skip empty defaults in type tables
+
+  You only see Default when a value is set.
+  Less clutter, clearer props.
+
+- [`1370f39`](https://github.com/Blankeos/gittydocs/commit/1370f39e9510b8a3416ea46c012f7837834659fd) Thanks [@Blankeos](https://github.com/Blankeos)! - feat: ship crisp black and white docs
+
+  Give your docs a crisp black and white look.
+  Keep text and alerts clear in light and dark mode.
+
+- [`1370f39`](https://github.com/Blankeos/gittydocs/commit/1370f39e9510b8a3416ea46c012f7837834659fd) Thanks [@Blankeos](https://github.com/Blankeos)! - feat: pick your package manager in slick tabs
+
+  You can switch between npm, pnpm, yarn, and bun.
+  Your pick stays in sync, with no wall of tabs on reload.
+
+- [`1370f39`](https://github.com/Blankeos/gittydocs/commit/1370f39e9510b8a3416ea46c012f7837834659fd) Thanks [@Blankeos](https://github.com/Blankeos)! - feat: turn your types into neat docs tables
+
+  You can write prop tables or make them from TypeScript.
+  Open neat, smooth rows to see defaults and notes with no imports.
+
 ## 0.0.6
 
 ### Patch Changes
