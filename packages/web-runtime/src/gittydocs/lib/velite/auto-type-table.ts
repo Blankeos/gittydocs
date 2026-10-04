@@ -35,12 +35,12 @@ export interface AutoTypeTableOptions {
   contentRoot?: string
 }
 
-type MdxNode = {
+export type AutoTypeTableNode = {
   type: string
   name?: string | null
   attributes?: { type: string; name?: string; value?: unknown }[]
-  children?: MdxNode[]
-  position?: unknown
+  children?: AutoTypeTableNode[]
+  position?: { start: { offset?: number }; end: { offset?: number } }
 }
 
 function within(root: string, file: string) {
@@ -195,68 +195,85 @@ function expression(value: unknown): object {
   return { type: "Literal", value }
 }
 
+/** Resolve authored nodes once; output adapters do not inspect each other's markup. */
+export async function resolveAutoTypeTableNodes(
+  tree: AutoTypeTableNode,
+  file: { path?: string },
+  options: AutoTypeTableOptions = {}
+): Promise<{ node: AutoTypeTableNode; table: AutoTypeTableData }[]> {
+  const resolved: { node: AutoTypeTableNode; table: AutoTypeTableData }[] = []
+  const visit = async (node: AutoTypeTableNode): Promise<void> => {
+    if (
+      (node.type === "mdxJsxFlowElement" || node.type === "mdxJsxTextElement") &&
+      node.name === "AutoTypeTable"
+    ) {
+      try {
+        if (!file.path) throw new Error("The compiler must supply vfile.path")
+        const props = readAutoTypeTableProps(node)
+        const table = await resolveAutoTypeTable({
+          mdxPath: file.path,
+          ...props,
+          contentRoot: options.contentRoot,
+        })
+        resolved.push({ node, table })
+      } catch (error) {
+        throw new Error(
+          `[AutoTypeTable] ${file.path ?? "unknown MDX file"}: ${error instanceof Error ? error.message : String(error)}`,
+          { cause: error }
+        )
+      }
+    }
+    for (const child of node.children ?? []) await visit(child)
+  }
+  await visit(tree)
+  return resolved
+}
+
+function readAutoTypeTableProps(node: AutoTypeTableNode): { path: string; name: string } {
+  if (node.children?.length)
+    throw new Error("AutoTypeTable must be self-closing and cannot contain children")
+  const props: Record<string, string> = Object.create(null)
+  for (const attribute of node.attributes ?? []) {
+    if (
+      attribute.type !== "mdxJsxAttribute" ||
+      !attribute.name ||
+      !["path", "name"].includes(attribute.name)
+    ) {
+      throw new Error(
+        "Only literal path and name props are supported; spreads and extra props are not allowed"
+      )
+    }
+    if (typeof attribute.value !== "string" || !attribute.value.trim())
+      throw new Error(`${attribute.name} must be a non-empty quoted string literal`)
+    if (attribute.name in props) throw new Error(`Duplicate ${attribute.name} prop`)
+    props[attribute.name] = attribute.value
+  }
+  if (!props.path || !props.name) throw new Error("Both path and name props are required")
+  return { path: props.path, name: props.name }
+}
+
 /** Import-free authoring macro. Only the generated TypeTable reaches the browser. */
 export function remarkAutoTypeTable(options: AutoTypeTableOptions = {}) {
-  return async (tree: MdxNode, file: { path?: string }) => {
-    const visit = async (node: MdxNode): Promise<void> => {
-      if (
-        (node.type === "mdxJsxFlowElement" || node.type === "mdxJsxTextElement") &&
-        node.name === "AutoTypeTable"
-      ) {
-        try {
-          if (!file.path) throw new Error("The compiler must supply vfile.path")
-          if (node.children?.length)
-            throw new Error("AutoTypeTable must be self-closing and cannot contain children")
-          const props: Record<string, string> = Object.create(null)
-          for (const attribute of node.attributes ?? []) {
-            if (
-              attribute.type !== "mdxJsxAttribute" ||
-              !attribute.name ||
-              !["path", "name"].includes(attribute.name)
-            ) {
-              throw new Error(
-                "Only literal path and name props are supported; spreads and extra props are not allowed"
-              )
-            }
-            if (typeof attribute.value !== "string" || !attribute.value.trim())
-              throw new Error(`${attribute.name} must be a non-empty quoted string literal`)
-            if (attribute.name in props) throw new Error(`Duplicate ${attribute.name} prop`)
-            props[attribute.name] = attribute.value
-          }
-          if (!props.path || !props.name) throw new Error("Both path and name props are required")
-          const table = await resolveAutoTypeTable({
-            mdxPath: file.path,
-            path: props.path,
-            name: props.name,
-            contentRoot: options.contentRoot,
-          })
-          node.name = "TypeTable"
-          node.attributes = [
-            {
-              type: "mdxJsxAttribute",
-              name: "type",
-              value: {
-                type: "mdxJsxAttributeValueExpression",
-                value: JSON.stringify(table),
-                data: {
-                  estree: {
-                    type: "Program",
-                    sourceType: "module",
-                    body: [{ type: "ExpressionStatement", expression: expression(table) }],
-                  },
-                },
+  return async (tree: AutoTypeTableNode, file: { path?: string }) => {
+    for (const { node, table } of await resolveAutoTypeTableNodes(tree, file, options)) {
+      node.name = "TypeTable"
+      node.attributes = [
+        {
+          type: "mdxJsxAttribute",
+          name: "type",
+          value: {
+            type: "mdxJsxAttributeValueExpression",
+            value: JSON.stringify(table),
+            data: {
+              estree: {
+                type: "Program",
+                sourceType: "module",
+                body: [{ type: "ExpressionStatement", expression: expression(table) }],
               },
             },
-          ]
-        } catch (error) {
-          throw new Error(
-            `[AutoTypeTable] ${file.path ?? "unknown MDX file"}: ${error instanceof Error ? error.message : String(error)}`,
-            { cause: error }
-          )
-        }
-      }
-      for (const child of node.children ?? []) await visit(child)
+          },
+        },
+      ]
     }
-    await visit(tree)
   }
 }
